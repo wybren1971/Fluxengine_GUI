@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Application
+Exec=AppRun %F
+Icon=sky-cow.png
+Comment=Edit this default file
+Terminal=true
