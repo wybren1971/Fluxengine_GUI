@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Type=Application
+Name=Fluxengine_GUI
+Comment=GUI for the very cheap USB floppy disk interface capable of reading and writing exotic non-PC floppy disk formats.
+Terminal=false
+Path=/home/wybren/Documents/git/Fluxengine_GUI/Build1/DistributionKit/
+Exec=/home/wybren/Documents/git/Fluxengine_GUI/Build1/DistributionKit/Fluxengine_GUI.sh
+Icon=/home/wybren/Documents/git/Fluxengine_GUI/Build1/DistributionKit/sky-cow.png
+#Icon=sky-cow.png
+StartupWMClass=Fluxengine_GUI
