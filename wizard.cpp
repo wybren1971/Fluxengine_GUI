@@ -516,12 +516,13 @@ QString wizard::getData(int intDrive)
        QString TrackStop = field("ReadPage.TrackStop").toString();
 
        strFormat.append(" -s drive:" + QString::number(intDrive));
-       QString Heads = field("ReadPage.Heads").toString();
-       strFormat.append(" -h " + Heads);
-       strFormat.append(" -c ");
+       strFormat.append(" --cylinders ");
        strFormat.append(TrackStart);
        strFormat.append("-");
        strFormat.append(TrackStop);
+
+       QString Heads = field("ReadPage.Heads").toString();
+       strFormat.append(" -h " + Heads);
 
 //       qInfo() << field("ReadPage.SaveOutput").toString();
        strFormat.append(" -o ");
@@ -552,9 +553,7 @@ QString wizard::getData(int intDrive)
         QString TrackStop = field("WritePage.TrackStop").toString();
 
         strFormat.append(" -d drive:" + QString::number(intDrive));
-        QString Heads = field("WritePage.Heads").toString();
-        strFormat.append(" -c " + Heads);
-        strFormat.append("--cylinders ");
+        strFormat.append(" --cylinders ");
         strFormat.append(TrackStart);
         strFormat.append("-");
         strFormat.append(TrackStop);
