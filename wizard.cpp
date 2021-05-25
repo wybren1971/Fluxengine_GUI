@@ -56,6 +56,14 @@ const int WriteFormatDefault = 14; //IBM 1440
 
  *
  */
+
+
+/*
+ * For now i use structs but it is better to read the proto tekst definitions.
+ * this is for a next release
+ *
+ */
+
 FormatsDescription my_readformats[readformats] = {
     { "acornadfs", "Reads Acorn ADFS disks", "*.img *.flux", "acornadfs.img", "0", "79", "0-1"},
     { "acorndfs", "Reads Acorn DFS disks", "*.img *.flux", "acorndfs.img", "0", "79", "0"},
@@ -165,8 +173,7 @@ void wizard::showHelp()
                      "asked to fill in your details.");
         break;
     case Page_Conclusion:
-        message = tr("You must accept the terms and conditions of the "
-                     "license to proceed.");
+        message = tr("All the settings have been set. If you are sure push finish and fluxengine will start.");
         break;
     default:
         message = tr("This help is likely not to be of any help.");
@@ -174,7 +181,7 @@ void wizard::showHelp()
 
     if (lastHelpMessage == message)
         message = tr("Sorry, I already gave what help I could. "
-                     "Maybe you should try asking a human?");
+                     "Maybe you should try the github page?");
 
     QMessageBox::information(this, tr("Fluxengine Wizard Help"), message);
 

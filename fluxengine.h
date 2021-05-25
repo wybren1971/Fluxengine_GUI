@@ -22,7 +22,7 @@ public:
     void write(QByteArray comment);
 signals:
     void output(QString data);
-
+    void enableFluxengineCommands(bool blnStarted);
 public slots:
     void start();
     void stop();
