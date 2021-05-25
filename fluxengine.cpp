@@ -116,7 +116,7 @@ void fluxengine::readyReadStandardError()
     if (message.contains("No such file or directory", Qt::CaseInsensitive))
     {
         //fluxengine could not be located. Set the location to fluxengine
-        message = "Fluxengine could not be located. Use \"Ctrl+S\" to specify where fluxengine can be found.";
+        message = "Error: No such file or directory. Fluxengine could not be located. Use \"Ctrl+S\" to specify where fluxengine can be found.";
     }
     emit output(message);
 }
@@ -143,14 +143,18 @@ void fluxengine::stateChanged(QProcess::ProcessState newState)
     switch (newState) {
     case QProcess::NotRunning:
 //        emit output("Not Running");
+        emit enableFluxengineCommands(false);
+
         break;
     case QProcess::Starting:
 //        emit output("Starting");
+        emit enableFluxengineCommands(true);
         break;
     case QProcess::Running:
 //        emit output("Running");
         //startfluxengine
         startFluxengine();
+        emit enableFluxengineCommands(true);
         break;
 
     }

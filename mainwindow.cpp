@@ -25,11 +25,17 @@ MainWindow::MainWindow(QWidget *parent)
     m_fluxengine.setAddress(ui->plainTextEdit->text());
     connect(ui->btnStop,&QPushButton::clicked,&m_fluxengine,&fluxengine::stop);
     connect(&m_fluxengine,&fluxengine::output,this,&MainWindow::output);
+    connect(ui->Fluxengineinput,&QLineEdit::returnPressed,this,&MainWindow::on_pushButton_clicked);
+    connect(ui->Fluxengineinput, &QLineEdit::textChanged, this, &MainWindow::buttonenable);
+    connect(&m_fluxengine,&fluxengine::enableFluxengineCommands,this,&MainWindow::enableFluxengineCommands);
+    //ui->Fluxengineinput.textChanged().connect(lambda: ui->pushButton.setEnabled(ui-Fluxengineinput.textChenged.text() != ""));
+
     createActions();
     createMenus();
 
     setWindowTitle(tr("Fluxengine-GUI"));
     this->setFixedSize(QSize(800, 600));
+    ui->btnReadDisk->setFocus();
 }
 //! [2]
 
@@ -162,7 +168,7 @@ void MainWindow::about()
  //   infoLabel->setText(tr("Invoked <b>Help|About</b>"));
     QMessageBox::about(this, tr("About Menu"),
             tr("This is the fluxengine-GUI created by Wybren van Duinen. "
-               "               18 mei 2021"));
+               "               23 mei 2021"));
 }
 
 //! [4]
@@ -341,7 +347,24 @@ void MainWindow::output(QString data)
     ui->txtOutput->appendPlainText(data);
 }
 
+void MainWindow::enableFluxengineCommands(bool blnStarted)
+{
+    qInfo() << Q_FUNC_INFO;
+    qInfo() << blnStarted;
 
+    if (blnStarted)
+    {
+        ui->Fluxengineinput->setEnabled(true);
+        ui->btnStop->setEnabled(true);
+//        ui->bntStartFluxengine->setEnabled(false);
+    } else
+    {
+        ui->Fluxengineinput->setEnabled(false);
+        ui->btnStop->setEnabled(false);
+//        ui->bntStartFluxengine->setEnabled(true);
+
+    }
+}
 
 void MainWindow::on_plainTextEdit_textChanged()
 {
@@ -423,8 +446,28 @@ void MainWindow::on_pushButton_clicked()
    // QString input;
     QByteArray Input;
     //input = ui->Fluxengineinput->text();
-    Input = ui->Fluxengineinput->text().toUtf8();
-
-    m_fluxengine.write(Input);
+    if ((ui->Fluxengineinput->text() != "") and  (m_fluxengine.busy()))
+    {
+        Input = ui->Fluxengineinput->text().toUtf8();
+        m_fluxengine.write(Input);
+        ui->Fluxengineinput->clear();
+    }
 }
 
+
+void MainWindow::on_Fluxengineinput_returnPressed()
+{
+    //action is handled in the on_pushbutton_clicked()
+}
+
+
+void MainWindow::buttonenable()
+{
+    if (((ui->Fluxengineinput->text()) != "")  and  (m_fluxengine.busy()))
+    {
+        ui->pushButton->setEnabled(true);
+     } else
+    {
+        ui->pushButton->setEnabled(false);
+    }
+}

@@ -23,7 +23,8 @@ class MainWindow : public QMainWindow
         MainWindow(QWidget *parent = nullptr);
         ~MainWindow();
 
-    protected:
+public slots:
+protected:
     #ifndef QT_NO_CONTEXTMENU
         void contextMenuEvent(QContextMenuEvent *event) override;
     #endif // QT_NO_CONTEXTMENU
@@ -48,6 +49,8 @@ class MainWindow : public QMainWindow
         void setParagraphSpacing();
         void about();
         void output(QString data);
+        void enableFluxengineCommands(bool blnStarted);
+
         void on_plainTextEdit_textChanged();
         void on_btnReadDisk_clicked();
 
@@ -64,6 +67,10 @@ class MainWindow : public QMainWindow
         void on_bntStartFluxengine_clicked();
 
         void on_pushButton_clicked();
+
+        void on_Fluxengineinput_returnPressed();
+
+        void buttonenable();
 
 private:
         void createActions();
