@@ -169,8 +169,7 @@ void wizard::showHelp()
                      "and last but not least give a filenaam to store the information from the disk in.");
         break;
     case Page_Write:
-        message = tr("Choose the appropriate file format to write (most of the time IBM)"
-                     "asked to fill in your details.");
+        message = tr("Choose the appropriate file format to write (most of the time IBM)");
         break;
     case Page_Conclusion:
         message = tr("All the settings have been set. If you are sure push finish and fluxengine will start.");
