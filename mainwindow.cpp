@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QtWidgets>
 #include "wizard.h"
+#include <qsettings.h>
 
 
 /*
@@ -29,9 +30,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Fluxengineinput, &QLineEdit::textChanged, this, &MainWindow::buttonenable);
     connect(&m_fluxengine,&fluxengine::enableFluxengineCommands,this,&MainWindow::enableFluxengineCommands);
     //ui->Fluxengineinput.textChanged().connect(lambda: ui->pushButton.setEnabled(ui-Fluxengineinput.textChenged.text() != ""));
-
     createActions();
     createMenus();
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    m_fluxengine.setWorkingDirectory(settings.value("fluxengine").toString());
 
     setWindowTitle(tr("Fluxengine-GUI"));
     this->setFixedSize(QSize(800, 600));
@@ -55,11 +57,15 @@ void MainWindow::contextMenuEvent(QContextMenuEvent *event)
 void MainWindow::newFile()
 {
 //    infoLabel->setText(tr("Invoked <b>File|New</b>"));
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory where fluxengine resides"),
                                                 QDir::currentPath(),
                                                 QFileDialog::ShowDirsOnly
                                                 | QFileDialog::DontResolveSymlinks);
     m_fluxengine.setWorkingDirectory(dir);
+    settings.setValue("fluxengine", dir);
+
 }
 
 void MainWindow::readdisk()
