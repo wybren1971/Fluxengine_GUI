@@ -58,13 +58,28 @@ void MainWindow::newFile()
 {
 //    infoLabel->setText(tr("Invoked <b>File|New</b>"));
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    QString dir = "";
 
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory where fluxengine resides"),
-                                                QDir::currentPath(),
+    if (settings.value("fluxengine").toString() == "")
+    {
+        dir = QFileDialog::getExistingDirectory(this, tr("Open Directory where fluxengine resides"),
+                                                    QDir::currentPath(),
+                                                    QFileDialog::ShowDirsOnly
+                                                    | QFileDialog::DontResolveSymlinks);
+
+    } else
+    {
+
+         dir = QFileDialog::getExistingDirectory(this, tr("Open Directory where fluxengine resides"),
+                                                settings.value("fluxengine").toString(),
                                                 QFileDialog::ShowDirsOnly
                                                 | QFileDialog::DontResolveSymlinks);
-    m_fluxengine.setWorkingDirectory(dir);
-    settings.setValue("fluxengine", dir);
+    }
+    if (dir != "")
+    {
+        m_fluxengine.setWorkingDirectory(dir);
+        settings.setValue("fluxengine", dir);
+    }
 
 }
 
