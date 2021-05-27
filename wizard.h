@@ -56,6 +56,7 @@ private slots:
     void browse();
     void browseflux();
     void updatedirectorybox(int index);
+    void browsereadflux();
 private:
     QLabel *nameLabel;
     QLabel *trackLabel;
@@ -64,12 +65,15 @@ private:
     QLabel *trackLabelStop;
     QLabel *label;
     QLabel *label1;
+    QLabel *label2;
 
     QPushButton *button;
     QPushButton *button1;
+    QPushButton *button2;
     QComboBox *readFormatbox;
     QComboBox *directoryComboBox;
     QComboBox *fluxComboBox;
+    QComboBox *flux1ComboBox;
     QLineEdit *nameLineEdit;
     QLineEdit *trackLineEdit;
     QLineEdit *HeadLineEdit;

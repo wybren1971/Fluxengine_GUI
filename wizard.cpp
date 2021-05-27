@@ -25,6 +25,8 @@ struct FormatsDescription
 QString _strOutputfile;
 QString _strInputfile;
 QString _strFluxFile;
+QString _strInputFluxFile;
+
 const int readformats = 20;
 const int writeformats = 18;
 
@@ -166,7 +168,8 @@ void wizard::showHelp()
     case Page_Read:
         message = tr("Choose the appropriate file format to read (most of the time IBM)"
                      "if you don't want to read all of the tracks or all of the sides (heads) you can specify which tracks and sides (heads) to read"
-                     "and last but not least give a filenaam to store the information from the disk in.");
+                     " and last but not least give a filenaam to store the information from the disk in."
+                     " There is also the option to rerun the decode from the flux file, tweaking the parameters. In that case specify the 'Use Flux File'");
         break;
     case Page_Write:
         message = tr("Choose the appropriate file format to write (most of the time IBM)");
@@ -268,11 +271,17 @@ ReadPage::ReadPage(QWidget *parent)
     fluxComboBox = new QComboBox();
     connect(button1, SIGNAL(clicked()), SLOT(browseflux()));
 
+    label2 = new QLabel("Use Flux File");
+    button2 = new QPushButton("Browse");
+    flux1ComboBox = new QComboBox();
+    connect(button2, SIGNAL(clicked()), SLOT(browsereadflux()));
+
     registerField("ReadPage.format", readFormatbox);
     registerField("ReadPage.TrackStart", trackLineEditStart);
     registerField("ReadPage.TrackStop", trackLineEditStop);
     registerField("ReadPage.SaveOutput*", directoryComboBox);
     registerField("ReadPage.Saveflux", fluxComboBox);
+    registerField("ReadPage.Save1flux", flux1ComboBox);
     registerField("ReadPage.Heads", HeadLineEdit);
 
     QGridLayout *layout = new QGridLayout;
@@ -290,6 +299,9 @@ ReadPage::ReadPage(QWidget *parent)
     layout->addWidget(label1,4,0);
     layout->addWidget(fluxComboBox, 4,1);
     layout->addWidget(button1, 4, 2);
+    layout->addWidget(label2,5,0);
+    layout->addWidget(flux1ComboBox, 5,1);
+    layout->addWidget(button2, 5, 2);
 
     setLayout(layout);
 }
@@ -297,9 +309,6 @@ ReadPage::ReadPage(QWidget *parent)
 void ReadPage::initializePage()
 {
     readFormatbox->setCurrentIndex(ReadFormatDefault);                                                         //set IBM as standard
-    trackLineEditStart->setText("0");
-    trackLineEditStop->setText("79");
-    HeadLineEdit->setText("0-1");
 
 }
 
@@ -307,6 +316,7 @@ int ReadPage::nextId() const
 {
     _strOutputfile = (directoryComboBox->currentText());
     _strFluxFile = fluxComboBox->currentText();
+    _strInputFluxFile = flux1ComboBox->currentText();
     return wizard::Page_Conclusion;
 }
 void ReadPage::updatedirectorybox(int index)
@@ -363,6 +373,21 @@ void ReadPage::browseflux()
         if (fluxComboBox->findText(directory) == -1)
             fluxComboBox->addItem(directory);
         fluxComboBox->setCurrentIndex(fluxComboBox->findText(directory));
+    }
+}
+
+void ReadPage::browsereadflux()
+{
+    QString strFile;
+
+    strFile = my_readformats[readFormatbox->currentIndex()].strDefaultfilenaam;
+    QString directory = QFileDialog::getOpenFileName(this,
+                            tr("Find Files"), QDir::currentPath(), "*.flux");
+
+    if (!directory.isEmpty()) {
+        if (flux1ComboBox->findText(directory) == -1)
+            flux1ComboBox->addItem(directory);
+        flux1ComboBox->setCurrentIndex(flux1ComboBox->findText(directory));
     }
 }
 
@@ -521,7 +546,13 @@ QString wizard::getData(int intDrive)
        QString TrackStart = field("ReadPage.TrackStart").toString();
        QString TrackStop = field("ReadPage.TrackStop").toString();
 
-       strFormat.append(" -s drive:" + QString::number(intDrive));
+       if (_strInputFluxFile != "")
+       {
+           strFormat.append(" -s " + _strInputFluxFile);
+       } else
+       {
+           strFormat.append(" -s drive:" + QString::number(intDrive));
+       }
        strFormat.append(" --cylinders ");
        strFormat.append(TrackStart);
        strFormat.append("-");
