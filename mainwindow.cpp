@@ -7,9 +7,9 @@
 
 /*
  * To Do:
- * Aanpassen aan protobuf redesign
- *
- *
+ * Aanpassen aan protobuf redesign V
+ * inlezen van otpies uit protobuf tekstfiles
+ * Vastleggen van type drives in preferences zodat goede settings gebruikt worden (40track HD 96tpi, 48 tpi ertc)
  *
  *
  *
@@ -22,6 +22,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
 
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    m_fluxengine.setWorkingDirectory(settings.value("fluxengine").toString());
+    restoreGeometry(settings.value("myWidget/geometry").toByteArray());
+    restoreState(settings.value("myWidget/windowState").toByteArray());
     ui->setupUi(this);
     m_fluxengine.setAddress(ui->plainTextEdit->text());
     connect(ui->btnStop,&QPushButton::clicked,&m_fluxengine,&fluxengine::stop);
@@ -29,19 +33,16 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Fluxengineinput,&QLineEdit::returnPressed,this,&MainWindow::on_pushButton_clicked);
     connect(ui->Fluxengineinput, &QLineEdit::textChanged, this, &MainWindow::buttonenable);
     connect(&m_fluxengine,&fluxengine::enableFluxengineCommands,this,&MainWindow::enableFluxengineCommands);
-    //ui->Fluxengineinput.textChanged().connect(lambda: ui->pushButton.setEnabled(ui-Fluxengineinput.textChenged.text() != ""));
     createActions();
     createMenus();
-    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
-    m_fluxengine.setWorkingDirectory(settings.value("fluxengine").toString());
-
     setWindowTitle(tr("Fluxengine-GUI"));
-    this->setFixedSize(QSize(800, 600));
+//    this->centralWidget()->setMinimumSize(800,600);
+    int width = settings.value("WindowWidth").toInt();
+    int height = settings.value("WindowHeight").toInt();
+    this->resize(width, height);
     ui->btnReadDisk->setFocus();
 }
-//! [2]
 
-//! [3]
 #ifndef QT_NO_CONTEXTMENU
 void MainWindow::contextMenuEvent(QContextMenuEvent *event)
 {
@@ -52,7 +53,6 @@ void MainWindow::contextMenuEvent(QContextMenuEvent *event)
     menu.exec(event->globalPos());
 }
 #endif // QT_NO_CONTEXTMENU
-//! [3]
 
 void MainWindow::newFile()
 {
@@ -359,6 +359,12 @@ void MainWindow::createMenus()
 
 MainWindow::~MainWindow()
 {
+
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    settings.setValue("geometry", saveGeometry());
+    settings.setValue("windowState", saveState());
+    settings.setValue("WindowWidth", MainWindow::width());
+    settings.setValue("WindowHeight", MainWindow::height());
     delete ui;
     m_fluxengine.stop();
 }
