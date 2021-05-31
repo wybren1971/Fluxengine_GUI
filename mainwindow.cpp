@@ -3,13 +3,14 @@
 #include <QtWidgets>
 #include "wizard.h"
 #include <qsettings.h>
+#include <dialogpreferences.h>
 
 
 /*
  * To Do:
- * Aanpassen aan protobuf redesign
- *
- *
+ * Aanpassen aan protobuf redesign V
+ * inlezen van otpies uit protobuf tekstfiles
+ * Vastleggen van type drives in preferences zodat goede settings gebruikt worden (40track HD 96tpi, 48 tpi ertc)
  *
  *
  *
@@ -22,6 +23,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
 
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    m_fluxengine.setWorkingDirectory(settings.value("fluxengine").toString());
+    restoreGeometry(settings.value("myWidget/geometry").toByteArray());
+    restoreState(settings.value("myWidget/windowState").toByteArray());
     ui->setupUi(this);
     m_fluxengine.setAddress(ui->plainTextEdit->text());
     connect(ui->btnStop,&QPushButton::clicked,&m_fluxengine,&fluxengine::stop);
@@ -29,19 +34,16 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Fluxengineinput,&QLineEdit::returnPressed,this,&MainWindow::on_pushButton_clicked);
     connect(ui->Fluxengineinput, &QLineEdit::textChanged, this, &MainWindow::buttonenable);
     connect(&m_fluxengine,&fluxengine::enableFluxengineCommands,this,&MainWindow::enableFluxengineCommands);
-    //ui->Fluxengineinput.textChanged().connect(lambda: ui->pushButton.setEnabled(ui-Fluxengineinput.textChenged.text() != ""));
     createActions();
     createMenus();
-    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
-    m_fluxengine.setWorkingDirectory(settings.value("fluxengine").toString());
-
+    setDrive();
     setWindowTitle(tr("Fluxengine-GUI"));
-    this->setFixedSize(QSize(800, 600));
+    int width = settings.value("WindowWidth").toInt();
+    int height = settings.value("WindowHeight").toInt();
+    this->resize(width, height);
     ui->btnReadDisk->setFocus();
 }
-//! [2]
 
-//! [3]
 #ifndef QT_NO_CONTEXTMENU
 void MainWindow::contextMenuEvent(QContextMenuEvent *event)
 {
@@ -52,7 +54,6 @@ void MainWindow::contextMenuEvent(QContextMenuEvent *event)
     menu.exec(event->globalPos());
 }
 #endif // QT_NO_CONTEXTMENU
-//! [3]
 
 void MainWindow::newFile()
 {
@@ -87,12 +88,22 @@ void MainWindow::readdisk()
 {
 //    infoLabel->setText(tr("Invoked <b>File|Read</b>"));
 //    qInfo() << Q_FUNC_INFO;
+    int intDrive;
     if (m_fluxengine.busy())
          m_fluxengine.stop();
 
     ui->plainTextEdit->clear();
       //gtk_window_set_transient_for();
-    wizard Fwizard(this);
+    if (ui->btnDrive0->isChecked())
+    {
+        intDrive= 0;
+    } else
+    {
+        intDrive= 1;
+    }
+
+    wizard Fwizard(this, intDrive);
+
 
     if (Fwizard.exec() == QDialog::Accepted)
 //        qInfo() << "Accepted";
@@ -100,14 +111,8 @@ void MainWindow::readdisk()
     if (Fwizard.hasVisitedPage(3))
     {
 //       qInfo() << "hasvisitedpage 3";
-       if (ui->btnDrive0->isChecked())
-       {
-            ui->plainTextEdit->setText(Fwizard.getData(0));
-       } else
-       {
-           ui->plainTextEdit->setText(Fwizard.getData(1));
-       }
-        m_fluxengine.start();
+       ui->plainTextEdit->setText(Fwizard.getData());
+       m_fluxengine.start();
     }
 }
 
@@ -115,7 +120,10 @@ void MainWindow::readdisk()
 void MainWindow::preference()
 {
 //    infoLabel->setText(tr("Invoked <b>File|Print</b>"));
-    //for settings implement QSettings example
+    DialogPreferences *form = new DialogPreferences();
+    form->setWindowTitle("Preferences Fluxengine_GUI");
+    form->exec();
+    setDrive();
 
 }
 
@@ -192,26 +200,46 @@ void MainWindow::about()
                "               23 mei 2021"));
 }
 
-//! [4]
+void MainWindow::setDrive()
+{
+    qInfo() << Q_FUNC_INFO;
+
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    qInfo() << settings.value("drive0").toString() << settings.value("drive1").toString();
+
+    if (settings.value("drive0").toString() != "")
+    {
+        ui->btnDrive0->setText(settings.value("drive0").toString());
+    }
+    if (settings.value("drive1").toString() != "")
+    {
+        if (settings.value("drive1").toString() == "No drive 1 present")
+        {
+            ui->btnDrive1->setVisible(false);
+        } else
+        {
+            ui->btnDrive1->setVisible(true);
+            ui->btnDrive1->setText(settings.value("drive1").toString());
+        }
+    }
+}
+
 void MainWindow::createActions()
 {
-//! [5]
     newAct = new QAction(tr("&Set location of Fluxengine"), this);
     newAct->setShortcuts(QKeySequence::Save);
     newAct->setStatusTip(tr("Set the working directory of fluxengine"));
     connect(newAct, &QAction::triggered, this, &MainWindow::newFile);
-//! [4]
 
     openAct = new QAction(tr("&Fluxengine wizard..."), this);
     openAct->setShortcuts(QKeySequence::Find);
     openAct->setStatusTip(tr("Read or write a disk"));
     connect(openAct, &QAction::triggered, this, &MainWindow::readdisk);
-//! [5]
 
-//    preferenceAct = new QAction(tr("&Preference..."), this);
-//    preferenceAct->setShortcuts(QKeySequence::Print);
-//    preferenceAct->setStatusTip(tr("Set the preferences"));
-//    connect(preferenceAct, &QAction::triggered, this, &MainWindow::preference);
+    preferenceAct = new QAction(tr("&Preference..."), this);
+    preferenceAct->setShortcuts(QKeySequence::Print);
+    preferenceAct->setStatusTip(tr("Set the preferences"));
+    connect(preferenceAct, &QAction::triggered, this, &MainWindow::preference);
 
     exitAct = new QAction(tr("E&xit"), this);
     exitAct->setShortcuts(QKeySequence::Quit);
@@ -324,7 +352,7 @@ void MainWindow::createMenus()
 //! [9]
     fileMenu->addAction(openAct);
 //! [10]
-//    fileMenu->addAction(preferenceAct);
+    fileMenu->addAction(preferenceAct);
 //! [11]
     fileMenu->addSeparator();
 //! [11]
@@ -359,6 +387,12 @@ void MainWindow::createMenus()
 
 MainWindow::~MainWindow()
 {
+
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    settings.setValue("geometry", saveGeometry());
+    settings.setValue("windowState", saveState());
+    settings.setValue("WindowWidth", MainWindow::width());
+    settings.setValue("WindowHeight", MainWindow::height());
     delete ui;
     m_fluxengine.stop();
 }

@@ -77,7 +77,7 @@ private:
         void createMenus();
         Ui::MainWindow *ui;
         fluxengine m_fluxengine;
-        wizard m_readwizard;
+//        wizard m_readwizard;
         QMenu *fileMenu;
         QMenu *editMenu;
         QMenu *formatMenu;
@@ -102,5 +102,6 @@ private:
         QAction *setParagraphSpacingAct;
         QAction *aboutAct;
         QAction *aboutQtAct;
+        void setDrive();
 };
 #endif
