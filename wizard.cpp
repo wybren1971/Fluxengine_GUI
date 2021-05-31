@@ -4,12 +4,10 @@
  * This Wizard creates a string for input for fluxengine
  * output looks for example like:
  * ' read ibm -s :d=0:s=0:t=0-39 --overwrite -f ARK.flux -o ARK.imd'
- *
+ * double step is needed when one had a 80 track drive and wants to read or write 40 track disks.
  *
 */
-
-QString emailRegExp = QStringLiteral(".+@.+");
-
+int intSelectedDrive = 0;
 
 struct FormatsDescription
 {
@@ -64,6 +62,21 @@ const int WriteFormatDefault = 14; //IBM 1440
  * For now i use structs but it is better to read the proto tekst definitions.
  * this is for a next release
  *
+ *          Floppy disk physical characteristics (https://en.wikipedia.org/wiki/List_of_floppy_disk_formats)
+(capacity and tracks are nominal, per side)
+Size                                    Density 	Tracks      tpi 	bpi 	Coercivity 	Unformatted capacity per side
+21⁄2-inch[16][17]                       Single       16[16][17]  48[16]                              64 KB[16][17]
+31⁄2-inch                               Double[18] 	40[18]      67.5[18]8650[18] 	600 Oe          250 KB
+                                                    80          135 	8717        600-665 Oe      500 KB
+                                        High        80          135 	17434       720-750 Oe      1000 KB
+                                        Extended 	80          135 	34868       900 Oe          2000 KB
+                                        Triple[12] 	240[11] 	406.5[11] 	36700[11]               6500 KB
+51⁄4-inch                               Single/Double 40        48 	5876 	300 Oe                  250 KB
+                                        Double      80          62.5                                (Apple FileWare)
+                                        Quad        77          100 		300 Oe                  500 KB (Micropolis-compatible)
+                                        Quad        80          96      5922300 Oe                  500 KB
+                                        High        80          96      9646 	600 Oe              833 KB
+8-inch                              Single/Double 	77          48              300 Oe              1000 KB
  */
 
 FormatsDescription my_readformats[readformats] = {
@@ -136,16 +149,15 @@ FormatsDescription my_writeformats[writeformats] = {
     { "tids990", "Writes Texas Instruments DS990 disks", "*.img", "tids990.img", "0", "76", "0-1"},
 };
 
-wizard::wizard(QWidget *parent)
+wizard::wizard(QWidget *parent, int intDrive)
      : QWizard(parent)
 {
   setPage(Page_Intro, new IntroPage);
-  setPage(Page_Read, new ReadPage);
+  setPage(Page_Read, new ReadPage());
   setPage(Page_Write, new WritePage);
   setPage(Page_Conclusion, new ConclusionPage);
-
+  intSelectedDrive = intDrive;
   setStartId(Page_Intro);
-
   setOption(HaveHelpButton, true);
   setPixmap(QWizard::LogoPixmap, QPixmap("sky-cow.png"));
 
@@ -323,32 +335,63 @@ void ReadPage::updatedirectorybox(int index)
 {
     QString strFilter;
     QString strFile;
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
 
     if (index != 0)
     {
         trackLineEditStart->setText(my_readformats[index].trackstart);
-        trackLineEditStop->setText(my_readformats[index].trackstop);
+
+        QString drivetext = "drive" + QString::number(intSelectedDrive)+ "40track";
+        if (settings.value(drivetext).toBool())
+            //40track drive
+        {
+            trackLineEditStop->setText("39");
+
+        } else
+        {
+            trackLineEditStop->setText(my_readformats[index].trackstop);
+        }
         HeadLineEdit->setText(my_readformats[index].Heads);
     }
+
     strFilter = my_readformats[readFormatbox->currentIndex()].strFilter;
 
     strFile =  "/" + my_readformats[readFormatbox->currentIndex()].strDefaultfilenaam;
+    QString directory = settings.value("datalocation").toString();
     directoryComboBox->clear();
-    if (directoryComboBox->findText(QDir::currentPath() + strFile) == -1)
-        directoryComboBox->addItem(QDir::currentPath() + strFile);
-    directoryComboBox->setCurrentIndex(directoryComboBox->findText(QDir::currentPath() + strFile));
+    if (directory != "")
+    {
+        if (directoryComboBox->findText(directory + strFile) == -1)
+            directoryComboBox->addItem(directory + strFile);
+        directoryComboBox->setCurrentIndex(directoryComboBox->findText(directory + strFile));
+
+    } else
+    {
+        if (directoryComboBox->findText(QDir::currentPath() + strFile) == -1)
+            directoryComboBox->addItem(QDir::currentPath() + strFile);
+        directoryComboBox->setCurrentIndex(directoryComboBox->findText(QDir::currentPath() + strFile));
+    }
 }
 
 void ReadPage::browse()
 {
     QString strFilter;
     QString strFile;
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
 
     strFilter = my_readformats[readFormatbox->currentIndex()].strFilter;
     strFile =  "/" + my_readformats[readFormatbox->currentIndex()].strDefaultfilenaam;
-    QString directory = QFileDialog::getSaveFileName(this,
+    QString directory = settings.value("datalocation").toString();
+    if (directory == "")
+    {
+        directory = QFileDialog::getSaveFileName(this,
                             tr("Find Files"), QDir::currentPath()+strFile,strFilter);
+    } else
+    {
+        directory = QFileDialog::getSaveFileName(this,
+                            tr("Find Files"), directory + strFile,strFilter);
 
+    }
     if (!directory.isEmpty()) {
         if (directoryComboBox->findText(directory) == -1)
             directoryComboBox->addItem(directory);
@@ -360,14 +403,24 @@ void ReadPage::browseflux()
 {
     QString strFilter;
     QString strFile;
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
 
     strFile = my_readformats[readFormatbox->currentIndex()].strDefaultfilenaam;
     QString desired =  "/" + strFile.mid(0,strFile.indexOf(".")) + ".flux";
     //QFileDialog dialog(this);
     strFilter = my_readformats[readFormatbox->currentIndex()].strFilter;
     //dialog.setOption(QFileDialog::DontUseNativeDialog, true);
-    QString directory = QFileDialog::getSaveFileName(this,
+    QString directory = settings.value("fluxlocation").toString();
+    if (directory == "")
+    {
+        directory = QFileDialog::getSaveFileName(this,
                             tr("Find Files"), QDir::currentPath() + desired,strFilter);
+    } else
+    {
+        directory = QFileDialog::getSaveFileName(this,
+                            tr("Find Files"), directory + desired,strFilter);
+
+    }
 
     if (!directory.isEmpty()) {
         if (fluxComboBox->findText(directory) == -1)
@@ -379,10 +432,20 @@ void ReadPage::browseflux()
 void ReadPage::browsereadflux()
 {
     QString strFile;
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
 
     strFile = my_readformats[readFormatbox->currentIndex()].strDefaultfilenaam;
-    QString directory = QFileDialog::getOpenFileName(this,
+    QString directory = settings.value("fluxlocation").toString();
+    if (directory == "")
+    {
+        directory = QFileDialog::getOpenFileName(this,
                             tr("Find Files"), QDir::currentPath(), "*.flux");
+    } else
+    {
+        directory = QFileDialog::getOpenFileName(this,
+                            tr("Find Files"), directory, "*.flux");
+
+    }
 
     if (!directory.isEmpty()) {
         if (flux1ComboBox->findText(directory) == -1)
@@ -395,6 +458,7 @@ WritePage::WritePage(QWidget *parent)
     : QWizardPage(parent)
 {
     QValidator *validator = new QIntValidator(10, 99, this);
+//    QValidator *validator = new QIntValidator(10, 99, this);
     QRegularExpression rx("^[0-1][-][1]$");
     QValidator *validatorhead = new QRegularExpressionValidator(rx, this);
     setTitle(tr("Write a Disk with <i>Fluxengine</i>;"));
@@ -405,7 +469,6 @@ WritePage::WritePage(QWidget *parent)
     for (unsigned i = 0; i<writeformats ; i++) {
        writeFormatbox->addItem(my_writeformats[i].strDescription);
     }
-    writeFormatbox->setCurrentIndex(WriteFormatDefault);                                                         //set IBM as standard
     connect(writeFormatbox, SIGNAL(currentIndexChanged(int)), SLOT(Update(int)));
     nameLabel->setBuddy(writeFormatbox);
 
@@ -449,6 +512,11 @@ WritePage::WritePage(QWidget *parent)
     setLayout(layout);
 }
 
+void WritePage::initializePage()
+{
+    writeFormatbox->setCurrentIndex(WriteFormatDefault);   //set IBM as standard
+}
+
 int WritePage::nextId() const
 {
     return wizard::Page_Conclusion;
@@ -459,12 +527,22 @@ void WritePage::browse()
 {
     QString strFilter;
     QString strFile;
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
 
     strFilter = my_writeformats[writeFormatbox->currentIndex()].strFilter;
     strFile = "/" + my_writeformats[writeFormatbox->currentIndex()].strDefaultfilenaam;
 
-    QString directory = QFileDialog::getOpenFileName(this,
+    QString directory = settings.value("datalocation").toString();
+    if (directory == "")
+    {
+        directory = QFileDialog::getOpenFileName(this,
                             tr("Find Files"), QDir::currentPath() + strFile,strFilter);
+    } else
+    {
+        directory = QFileDialog::getOpenFileName(this,
+                            tr("Find Files"), directory + strFile,strFilter);
+
+    }
 
     if (!directory.isEmpty()) {
         if (directoryComboBox->findText(directory) == -1)
@@ -476,12 +554,22 @@ void WritePage::browse()
 
 void WritePage::Update(int index)
 {
-//    qInfo() << "Updateevent";
-//    qInfo() << intIndex;
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+
     if (index != 0)
     {
         trackLineEditStart->setText(my_writeformats[index].trackstart);
-        trackLineEditStop->setText(my_writeformats[index].trackstop);
+
+        QString drivetext = "drive" + QString::number(intSelectedDrive)+ "40track";
+        if (settings.value(drivetext).toBool())
+            //40track drive
+        {
+            trackLineEditStop->setText("39");
+
+        } else
+        {
+            trackLineEditStop->setText(my_writeformats[index].trackstop);
+        }
         HeadLineEdit->setText(my_writeformats[index].Heads);
     }
 }
@@ -522,12 +610,12 @@ void ConclusionPage::initializePage()
 
 }
 
-QString wizard::getData(int intDrive)
+QString wizard::getData()
 {
     QString command;
     QString strFormat;
     QString strDisk;
-
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
 
     command = "";
     strFormat = "";
@@ -551,11 +639,20 @@ QString wizard::getData(int intDrive)
            strFormat.append(" -s " + _strInputFluxFile);
        } else
        {
-           strFormat.append(" -s drive:" + QString::number(intDrive));
+           strFormat.append(" -s drive:" + QString::number(intSelectedDrive));
        }
        strFormat.append(" --cylinders ");
        strFormat.append(TrackStart);
        strFormat.append("-");
+       QString drivetext = "drive" + QString::number(intSelectedDrive)+ "40track";
+//       qInfo() << drivetext;
+//       qInfo() << ((TrackStop > 39) && (settings.value(drivetext).toBool()));
+       if ((TrackStop.toInt() > 39) && (settings.value(drivetext).toBool()))
+       {
+           //40 track drive with 80track operand use doublestep x2
+           TrackStop = TrackStop + "x2";
+       }
+
        strFormat.append(TrackStop);
 
        QString Heads = field("ReadPage.Heads").toString();
@@ -589,10 +686,18 @@ QString wizard::getData(int intDrive)
         QString TrackStart = field("WritePage.TrackStart").toString();
         QString TrackStop = field("WritePage.TrackStop").toString();
 
-        strFormat.append(" -d drive:" + QString::number(intDrive));
+        strFormat.append(" -d drive:" + QString::number(intSelectedDrive));
         strFormat.append(" --cylinders ");
         strFormat.append(TrackStart);
         strFormat.append("-");
+        QString drivetext = "drive" + QString::number(intSelectedDrive)+ "40track";
+//        qInfo() << drivetext;
+//        qInfo() << ((TrackStop > 39) && (settings.value(drivetext).toBool()));
+        if (((TrackStop.toInt()) > 39) && (settings.value(drivetext).toBool()))
+        {
+            //40 track drive with 80track operand use doublestep x2
+            TrackStop = TrackStop + "x2";
+        }
         strFormat.append(TrackStop);
 
         QString writeHeads = field("WritePage.Heads").toString();
@@ -605,4 +710,3 @@ QString wizard::getData(int intDrive)
     }
     return command;
 }
-

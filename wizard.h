@@ -12,13 +12,13 @@ public:
     enum { Page_Intro , Page_Read, Page_Write,
                  Page_Conclusion};
 
-    wizard(QWidget *parent = 0);
-
+    wizard(QWidget *parent, int intDrive);
 public slots:
-    QString getData(int intDrive);
+    QString getData();
 
 private slots:
     void showHelp();
+
 
 private:
 
@@ -39,9 +39,7 @@ private:
     QRadioButton *readRadioButton;
     QRadioButton *writeRadioButton;
 };
-//! [4]
 
-//! [5]
 class ReadPage : public QWizardPage
 {
     Q_OBJECT
@@ -81,7 +79,6 @@ private:
     QLineEdit *trackLineEditStop;    
 
 };
-//! [5]
 
 class WritePage : public QWizardPage
 {
@@ -91,6 +88,8 @@ public:
     WritePage(QWidget *parent = nullptr);
 
     int nextId() const override;
+    void initializePage() override;
+
 private slots:
     void browse();
     void Update(int intIndex);
