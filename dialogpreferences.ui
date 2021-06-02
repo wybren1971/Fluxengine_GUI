@@ -41,6 +41,9 @@
                <property name="text">
                 <string>No drive 1 present</string>
                </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
               </widget>
              </item>
              <item>
@@ -106,6 +109,9 @@
                <property name="text">
                 <string>3.5 inch drive</string>
                </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
               </widget>
              </item>
             </layout>
@@ -124,7 +130,7 @@
        <item row="0" column="0">
         <widget class="QGroupBox" name="groupBox_4">
          <property name="title">
-          <string>Default location to write data to images</string>
+          <string>Default location to write images to</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
@@ -162,7 +168,7 @@
        <item row="1" column="0">
         <widget class="QGroupBox" name="groupBox_5">
          <property name="title">
-          <string>Default location to read and write fluxfiles</string>
+          <string>Default location to read and write fluxfiles to</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>

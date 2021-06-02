@@ -4,7 +4,7 @@
 #include "wizard.h"
 #include <qsettings.h>
 #include <dialogpreferences.h>
-
+#include <QApplication>
 
 /*
  * To Do:
@@ -194,10 +194,12 @@ void MainWindow::setParagraphSpacing()
 
 void MainWindow::about()
 {
+    QString yourAppVersion = QCoreApplication::applicationVersion();
+    QString datetime = QStringLiteral(__DATE__) + QStringLiteral(" ") + QStringLiteral(__TIME__);
  //   infoLabel->setText(tr("Invoked <b>Help|About</b>"));
     QMessageBox::about(this, tr("About Menu"),
             tr("This is the fluxengine-GUI created by Wybren van Duinen. "
-               "               23 mei 2021"));
+               "Application version: ") +yourAppVersion + "\nBuilddate and time: " + datetime);
 }
 
 void MainWindow::setDrive()
