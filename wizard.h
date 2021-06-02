@@ -49,12 +49,17 @@ public:
 
     int nextId() const override;
     void initializePage() override;
+    bool isComplete() const override;
 
 private slots:
     void browse();
     void browseflux();
     void updatedirectorybox(int index);
     void browsereadflux();
+    void editDirectoryBox(QString dir);
+    void editFluxBox(QString dir);
+    void editFlux1Box(QString dir);
+    void editLineBox(QString dir);
 private:
     QLabel *nameLabel;
     QLabel *trackLabel;
@@ -69,9 +74,9 @@ private:
     QPushButton *button1;
     QPushButton *button2;
     QComboBox *readFormatbox;
-    QComboBox *directoryComboBox;
-    QComboBox *fluxComboBox;
-    QComboBox *flux1ComboBox;
+    QLineEdit *directoryComboBox;
+    QLineEdit *fluxComboBox;
+    QLineEdit *flux1ComboBox;
     QLineEdit *nameLineEdit;
     QLineEdit *trackLineEdit;
     QLineEdit *HeadLineEdit;
@@ -89,11 +94,14 @@ public:
 
     int nextId() const override;
     void initializePage() override;
+    bool isComplete() const override;
 
 private slots:
     void browse();
     void Update(int intIndex);
+    void editDirectoryBox(QString dir);
 
+    void editLineBox(QString dir);
 private:
     QLabel *nameLabel;
     QLabel *trackLabel;
@@ -105,7 +113,7 @@ private:
     QLabel *namePresetLabel;
     QPushButton *button;
     QComboBox *writeFormatbox;
-    QComboBox *directoryComboBox;
+    QLineEdit *directoryComboBox;
     QComboBox *writePresetbox;
     QCheckBox *DiskLineEdit;
     QLineEdit *nameLineEdit;
