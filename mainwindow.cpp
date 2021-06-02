@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     restoreGeometry(settings.value("myWidget/geometry").toByteArray());
     restoreState(settings.value("myWidget/windowState").toByteArray());
     ui->setupUi(this);
-    m_fluxengine.setAddress(ui->plainTextEdit->text());
+    //m_fluxengine.setAddress(ui->plainTextEdit->text());
     connect(ui->btnStop,&QPushButton::clicked,&m_fluxengine,&fluxengine::stop);
     connect(&m_fluxengine,&fluxengine::output,this,&MainWindow::output);
     connect(ui->Fluxengineinput,&QLineEdit::returnPressed,this,&MainWindow::on_pushButton_clicked);
@@ -42,6 +42,8 @@ MainWindow::MainWindow(QWidget *parent)
     int height = settings.value("WindowHeight").toInt();
     this->resize(width, height);
     ui->btnReadDisk->setFocus();
+    ui->plainTextEdit_2->completer();
+    ui->plainTextEdit_2->addItem(settings.value("Fluxengine.command").toString());
 }
 
 #ifndef QT_NO_CONTEXTMENU
@@ -92,7 +94,7 @@ void MainWindow::readdisk()
     if (m_fluxengine.busy())
          m_fluxengine.stop();
 
-    ui->plainTextEdit->clear();
+    //ui->plainTextEdit->clear();
       //gtk_window_set_transient_for();
     if (ui->btnDrive0->isChecked())
     {
@@ -110,8 +112,21 @@ void MainWindow::readdisk()
 //    qInfo() << Fwizard.hasVisitedPage(3);
     if (Fwizard.hasVisitedPage(3))
     {
-//       qInfo() << "hasvisitedpage 3";
-       ui->plainTextEdit->setText(Fwizard.getData());
+        if (ui->plainTextEdit_2->findText(Fwizard.getData()) == -1)
+        {
+            if (ui->plainTextEdit_2->currentText() != Fwizard.getData())
+            {
+                ui->plainTextEdit_2->addItem(Fwizard.getData());
+                ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->findText(Fwizard.getData()));
+                m_fluxengine.setAddress(ui->plainTextEdit_2->currentText());
+            } else
+            {
+                m_fluxengine.setAddress(ui->plainTextEdit_2->currentText());
+            }
+        } else
+        {
+           ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->findText(Fwizard.getData()));
+        }
        m_fluxengine.start();
     }
 }
@@ -334,30 +349,21 @@ void MainWindow::createActions()
     centerAct->setStatusTip(tr("Center the selected text"));
     connect(centerAct, &QAction::triggered, this, &MainWindow::center);
 
-//! [6] //! [7]
     alignmentGroup = new QActionGroup(this);
     alignmentGroup->addAction(leftAlignAct);
     alignmentGroup->addAction(rightAlignAct);
     alignmentGroup->addAction(justifyAct);
     alignmentGroup->addAction(centerAct);
     leftAlignAct->setChecked(true);
-//! [6]
 }
-//! [7]
 
-//! [8]
 void MainWindow::createMenus()
 {
-//! [9] //! [10]
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(newAct);
-//! [9]
     fileMenu->addAction(openAct);
-//! [10]
     fileMenu->addAction(preferenceAct);
-//! [11]
     fileMenu->addSeparator();
-//! [11]
     fileMenu->addAction(exitAct);
 
     editMenu = menuBar()->addMenu(tr("&Edit"));
@@ -372,8 +378,6 @@ void MainWindow::createMenus()
     helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(aboutAct);
 
-
-//! [12]
     formatMenu = editMenu->addMenu(tr("&Format"));
     formatMenu->addAction(boldAct);
     formatMenu->addAction(italicAct);
@@ -423,9 +427,9 @@ void MainWindow::enableFluxengineCommands(bool blnStarted)
     }
 }
 
-void MainWindow::on_plainTextEdit_textChanged()
+void MainWindow::on_plainTextEdit_2_textChanged()
 {
-    m_fluxengine.setAddress(ui->plainTextEdit->text());
+    m_fluxengine.setAddress(ui->plainTextEdit_2->currentText());
 }
 
 
@@ -444,7 +448,8 @@ void MainWindow::on_btntestVoltages_clicked()
     if (m_fluxengine.busy())
         m_fluxengine.stop();
     m_fluxengine.setAddress("test voltages");
-    ui->plainTextEdit->setText(m_fluxengine.getAddress());
+//    ui->plainTextEdit_2->addItem(m_fluxengine.getAddress());
+//    ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->count()-1);
     m_fluxengine.start();
 }
 
@@ -454,7 +459,8 @@ void MainWindow::on_btntestbandwidth_clicked()
     if (m_fluxengine.busy())
          m_fluxengine.stop();
     m_fluxengine.setAddress("test bandwidth");
-    ui->plainTextEdit->setText(m_fluxengine.getAddress());
+//    ui->plainTextEdit_2->addItem(m_fluxengine.getAddress());
+//    ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->count()-1);
     m_fluxengine.start();
 
 }
@@ -465,11 +471,13 @@ void MainWindow::on_btnRPM_clicked()
     if (blnDrive0 == true)
     {
         m_fluxengine.setAddress("rpm -s drive:0");
-        ui->plainTextEdit->setText(m_fluxengine.getAddress());
+//        ui->plainTextEdit_2->addItem(m_fluxengine.getAddress());
+//        ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->count()-1);
     } else
     {
         m_fluxengine.setAddress("rpm -s drive:1");
-        ui->plainTextEdit->setText(m_fluxengine.getAddress());
+//        ui->plainTextEdit_2->addItem(m_fluxengine.getAddress());
+//        ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->count()-1);
     }
     if (m_fluxengine.busy())
          m_fluxengine.stop();
@@ -493,6 +501,18 @@ void MainWindow::on_bntStartFluxengine_clicked()
 {
     if (m_fluxengine.busy())
          m_fluxengine.stop();
+    //als command nog niet voorkomt voeg hem toe.
+    if (ui->plainTextEdit_2->findText(m_fluxengine.getAddress()) == -1)
+    {
+        if (ui->plainTextEdit_2->currentText() != m_fluxengine.getAddress())
+        {
+            m_fluxengine.setAddress(ui->plainTextEdit_2->currentText());
+        } else
+        {
+            ui->plainTextEdit_2->addItem(m_fluxengine.getAddress());
+            ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->findText(m_fluxengine.getAddress()));
+        }
+    }
     m_fluxengine.start();
 
 }
@@ -528,3 +548,24 @@ void MainWindow::buttonenable()
         ui->pushButton->setEnabled(false);
     }
 }
+
+void MainWindow::on_plainTextEdit_2_currentIndexChanged(const QString &arg1)
+{
+    m_fluxengine.setAddress(arg1);
+
+}
+
+
+void MainWindow::on_plainTextEdit_2_currentTextChanged(const QString &arg1)
+{
+    m_fluxengine.setAddress(arg1);
+
+}
+
+
+void MainWindow::on_plainTextEdit_2_editTextChanged(const QString &arg1)
+{
+    m_fluxengine.setAddress(arg1);
+
+}
+

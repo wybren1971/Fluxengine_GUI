@@ -515,18 +515,23 @@ void ReadPage::updatedirectorybox(int index)
 
     if (index != 0)
     {
+        trackLineEditStart->setFocus();
         trackLineEditStart->setText(my_readformats[index].trackstart);
 
         QString drivetext = "drive" + QString::number(intSelectedDrive)+ "40track";
         if (settings.value(drivetext).toBool())
             //40track drive
         {
+            trackLineEditStop->setFocus();
             trackLineEditStop->setText("39");
+
 
         } else
         {
+            trackLineEditStop->setFocus();
             trackLineEditStop->setText(my_readformats[index].trackstop);
         }
+        HeadLineEdit->setFocus();
         HeadLineEdit->setText(my_readformats[index].Heads);
     }
 
@@ -543,6 +548,7 @@ void ReadPage::updatedirectorybox(int index)
     {
         directoryComboBox->setText(QDir::currentPath() + strFile);
     }
+    directoryComboBox->setFocus();
 }
 
 void ReadPage::browse()
@@ -830,19 +836,27 @@ void WritePage::Update(int index)
 
     if (index != 0)
     {
+        trackLineEditStart->setFocus();
         trackLineEditStart->setText(my_writeformats[index].trackstart);
+        trackLineEditStart->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
 
         QString drivetext = "drive" + QString::number(intSelectedDrive)+ "40track";
         if (settings.value(drivetext).toBool())
             //40track drive
         {
+            trackLineEditStop->setFocus();
             trackLineEditStop->setText("39");
+            trackLineEditStop->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
 
         } else
         {
+            trackLineEditStop->setFocus();
             trackLineEditStop->setText(my_writeformats[index].trackstop);
+            trackLineEditStop->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
         }
+        HeadLineEdit->setFocus();
         HeadLineEdit->setText(my_writeformats[index].Heads);
+        HeadLineEdit->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
     }
 }
 
@@ -851,11 +865,12 @@ ConclusionPage::ConclusionPage(QWidget *parent)
     : QWizardPage(parent)
 {
     //setPixmap(QWizard::WatermarkPixmap, QPixmap(":/images/watermark.png"));
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
 
     bottomLabel = new QLabel;
     bottomLabel->setWordWrap(true);
 
-    bottomLabel->setText("");
+    registerField("Fluxengine.command", bottomLabel);
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(bottomLabel);
@@ -864,24 +879,26 @@ ConclusionPage::ConclusionPage(QWidget *parent)
 
 int ConclusionPage::nextId() const
 {
+
     return -1;
 }
 
 void ConclusionPage::initializePage()
 {
+    bottomLabel->setText(getData());
     if (field("IntroPage.read") == "True")
     {
         setTitle(tr("The fluxengine wizard had gathered all the necessary settings to proceed reading the disk."));
-        setSubTitle(tr("Press finish to start reading"));
+        setSubTitle(tr("The command for fluxengine is shown below. Press finish to start reading"));
+
     } else
     {
         setTitle(tr("The fluxengine wizard had gathered all the necessary settings to proceed writing the disk."));
-        setSubTitle(tr("Press finish to start writing"));
+        setSubTitle(tr("The command for fluxengine is shown below. Press finish to start writing"));
     }
-
 }
 
-QString wizard::getData()
+QString ConclusionPage::getData()
 {
     QString command;
     QString strFormat;
@@ -910,7 +927,7 @@ QString wizard::getData()
        {
            strFormat.append(" -s drive:" + QString::number(intSelectedDrive));
        }
-       strFormat.append(" --cylinders ");
+       strFormat.append(" -c ");
        strFormat.append(TrackStart);
        strFormat.append("-");
        QString drivetext = "drive" + QString::number(intSelectedDrive)+ "40track";
@@ -950,7 +967,7 @@ QString wizard::getData()
         QString TrackStop = field("WritePage.TrackStop").toString();
 
         strFormat.append(" -d drive:" + QString::number(intSelectedDrive));
-        strFormat.append(" --cylinders ");
+        strFormat.append(" -c ");
         strFormat.append(TrackStart);
         strFormat.append("-");
         QString drivetext = "drive" + QString::number(intSelectedDrive)+ "40track";
@@ -966,5 +983,13 @@ QString wizard::getData()
 
         command.append(strFormat);
     }
+    settings.setValue("Fluxengine.command",command);
     return command;
+}
+
+QString wizard::getData()
+{
+
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    return settings.value("Fluxengine.command").toString();
 }

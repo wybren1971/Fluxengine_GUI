@@ -135,6 +135,7 @@ public:
     void initializePage() override;
     int nextId() const override;
 
+    QString getData();
 private:
     QCheckBox *writeFluxFilecheckBox;
     QCheckBox *overwriteFluxFilecheckBox;

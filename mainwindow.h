@@ -51,7 +51,7 @@ protected:
         void output(QString data);
         void enableFluxengineCommands(bool blnStarted);
 
-        void on_plainTextEdit_textChanged();
+        void on_plainTextEdit_2_textChanged();
         void on_btnReadDisk_clicked();
 
         void on_btntestVoltages_clicked();
@@ -71,6 +71,12 @@ protected:
         void on_Fluxengineinput_returnPressed();
 
         void buttonenable();
+
+        void on_plainTextEdit_2_currentIndexChanged(const QString &arg1);
+
+        void on_plainTextEdit_2_currentTextChanged(const QString &arg1);
+
+        void on_plainTextEdit_2_editTextChanged(const QString &arg1);
 
 private:
         void createActions();

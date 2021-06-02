@@ -56,7 +56,7 @@ QString fluxengine::getWorkingDirectory()
 void fluxengine::start()
 {
 
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     m_listening = true;
     QString program = getProcess();
     QStringList Arguments;
@@ -71,14 +71,14 @@ void fluxengine::start()
 
 void fluxengine::stop()
 {
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     m_listening = false;
     m_process.close();
 }
 
 bool fluxengine::busy()
 {
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     if (!m_listening)
     {
         return false;
@@ -92,24 +92,25 @@ bool fluxengine::busy()
 void fluxengine::errorOccured(QProcess::ProcessError error)
 {
     if(!m_listening) return;
-    qInfo() << Q_FUNC_INFO << error;
+//    qInfo() << Q_FUNC_INFO << error;
+    Q_UNUSED(error);
     emit output("Error");
 }
 
 void fluxengine::finished(int exitcode, QProcess::ExitStatus exitStatus)
 {
     if(!m_listening) return;
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     Q_UNUSED(exitcode);
     Q_UNUSED(exitStatus);
-//    emit output("Complete");
+    emit output("Complete");
 
 }
 
 void fluxengine::readyReadStandardError()
 {
     if(!m_listening) return;
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     QByteArray data = m_process.readAllStandardError();
     QString message = "Standard Error: ";
     message.append(data);
@@ -124,7 +125,7 @@ void fluxengine::readyReadStandardError()
 void fluxengine::readyReadStandardOutput()
 {
     if(!m_listening) return;
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     QByteArray data = m_process.readAllStandardOutput();
     emit output(QString(data.trimmed()));
 
@@ -133,13 +134,13 @@ void fluxengine::readyReadStandardOutput()
 void fluxengine::started()
 {
     //do nothing
-    qInfo() << Q_FUNC_INFO;
+ //   qInfo() << Q_FUNC_INFO;
 
 }
 
 void fluxengine::stateChanged(QProcess::ProcessState newState)
 {
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     switch (newState) {
     case QProcess::NotRunning:
 //        emit output("Not Running");
@@ -163,16 +164,16 @@ void fluxengine::stateChanged(QProcess::ProcessState newState)
 void fluxengine::readyRead()
 {
     if(!m_listening) return;
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     QByteArray data = m_process.readAll().trimmed();
-    qInfo() << data;
+//    qInfo() << data;
     emit output(data);
 
 }
 
 QString fluxengine::getProcess()
 {
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     if(QSysInfo::productType() == "windows") return "cmd";
 
    // if(QSysInfo::productType() == "OSX") return "??";
