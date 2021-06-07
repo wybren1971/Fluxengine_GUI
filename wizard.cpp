@@ -4,7 +4,7 @@
  * This Wizard creates a string for input for fluxengine
  * output looks for example like:
  * ' read ibm -s :d=0:s=0:t=0-39 --overwrite -f ARK.flux -o ARK.imd'
- * double step is needed when one had a 80 track drive and wants to read or write 40 track disks.
+ * double step is needed when one has a 80 track drive and wants to read or write 40 track disks.
  *
 */
 int intSelectedDrive = 0;
@@ -228,12 +228,8 @@ IntroPage::IntroPage(QWidget *parent)
 int IntroPage::nextId() const
 {
     if (writeRadioButton->isChecked()) {
-        //fluxengine::setAddress("write");
-       //parent->plainTextEdit->setPlainText("write");
- //       registerField("fluxenginecommand", "write");
         return wizard::Page_Write;
     } else {
-        //fluxengine::setAddress("read");
         return wizard::Page_Read;
     }
 }
@@ -246,7 +242,6 @@ ReadPage::ReadPage(QWidget *parent)
     QValidator *validatorhead = new QRegularExpressionValidator(rx, this);
     setTitle(tr("Set the read options for <i>Fluxengine</i>;"));
     setSubTitle(tr("Please choose the format of the disk to be read "
-
                    "and the name of the output file (e.g., wordperfect5.img)."));
 
     nameLabel = new QLabel(tr("F&ormat:"));
@@ -254,10 +249,8 @@ ReadPage::ReadPage(QWidget *parent)
     for (unsigned i = 0; i<readformats ; i++) {
        readFormatbox->addItem(my_readformats[i].strDescription);
     }
-    //connect(readFormatbox, QOverload<int>::of(&QComboBox::currentIndexChanged()), SLOT(updatedirectorybox()));
 
     QObject::connect(readFormatbox, SIGNAL(currentIndexChanged(int)), this, SLOT(updatedirectorybox(int)));
-    //readFormatbox->setCurrentIndex(0);                                                         //set IBM as standard
 
     nameLabel->setBuddy(readFormatbox);
 
@@ -524,8 +517,6 @@ void ReadPage::updatedirectorybox(int index)
         {
             trackLineEditStop->setFocus();
             trackLineEditStop->setText("39");
-
-
         } else
         {
             trackLineEditStop->setFocus();
@@ -568,7 +559,6 @@ void ReadPage::browse()
     {
         directory = QFileDialog::getSaveFileName(this,
                             tr("Find Files"), directory + strFile,strFilter);
-
     }
     if (!directory.isEmpty()) {
         directoryComboBox->setText(directory);
@@ -593,7 +583,6 @@ void ReadPage::browseflux()
     {
         directory = QFileDialog::getSaveFileName(this,
                             tr("Find Files"), directory + desired,strFilter);
-
     }
 
     if (!directory.isEmpty()) {
@@ -952,7 +941,6 @@ QString ConclusionPage::getData()
            strFormat.append(_strFluxFile);
        }
        command.append(strFormat);
-
     }
     else {
         strFormat = "write ";
@@ -980,7 +968,6 @@ QString ConclusionPage::getData()
 
         QString writeHeads = field("WritePage.Heads").toString();
         strFormat.append(" -h " + writeHeads);
-
         command.append(strFormat);
     }
     settings.setValue("Fluxengine.command",command);
