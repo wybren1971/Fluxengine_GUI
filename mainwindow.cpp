@@ -219,24 +219,26 @@ void MainWindow::about()
 
 void MainWindow::setDrive()
 {
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
 
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
-    qInfo() << settings.value("drive0").toString() << settings.value("drive1").toString();
+//    qInfo() << settings.value("drive0").toString() << settings.value("drive1").toString();
 
     if (settings.value("drive0").toString() != "")
     {
-        ui->btnDrive0->setText(settings.value("drive0").toString());
+        ui->btnDrive0->setText("0: " + settings.value("drive0").toString());
     }
     if (settings.value("drive1").toString() != "")
     {
         if (settings.value("drive1").toString() == "No drive 1 present")
         {
-            ui->btnDrive1->setVisible(false);
+            ui->groupBox->hide();
+//            ui->btnDrive1->setVisible(false);
         } else
         {
-            ui->btnDrive1->setVisible(true);
-            ui->btnDrive1->setText(settings.value("drive1").toString());
+            ui->groupBox->show();
+//            ui->btnDrive1->setVisible(true);
+            ui->btnDrive1->setText("1: " + settings.value("drive1").toString());
         }
     }
 }
@@ -410,8 +412,8 @@ void MainWindow::output(QString data)
 
 void MainWindow::enableFluxengineCommands(bool blnStarted)
 {
-    qInfo() << Q_FUNC_INFO;
-    qInfo() << blnStarted;
+//    qInfo() << Q_FUNC_INFO;
+//    qInfo() << blnStarted;
 
     if (blnStarted)
     {
@@ -427,15 +429,9 @@ void MainWindow::enableFluxengineCommands(bool blnStarted)
     }
 }
 
-void MainWindow::on_plainTextEdit_2_textChanged()
-{
-    m_fluxengine.setAddress(ui->plainTextEdit_2->currentText());
-}
-
-
 void MainWindow::on_btnReadDisk_clicked()
 {
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     //start the wizard to create the read command
     //fluxengine read c64 -o c64-test-1.d64
    MainWindow::readdisk();

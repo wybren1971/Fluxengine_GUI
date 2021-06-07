@@ -51,7 +51,6 @@ protected:
         void output(QString data);
         void enableFluxengineCommands(bool blnStarted);
 
-        void on_plainTextEdit_2_textChanged();
         void on_btnReadDisk_clicked();
 
         void on_btntestVoltages_clicked();

@@ -20,6 +20,7 @@ private slots:
     void browseflux();
 
     void save();
+    void browsefluxengine();
 private:
     Ui::DialogPreferences *ui;
 };
