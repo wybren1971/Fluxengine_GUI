@@ -42,8 +42,6 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
         }
     }
 
-
-
     connect(ui->btndatalocation, SIGNAL(clicked()), SLOT(browse()));
     connect(ui->btnfluxlocation, SIGNAL(clicked()), SLOT(browseflux()));
     connect(ui->btnfluxenginelocation, SIGNAL(clicked()), SLOT(browsefluxengine()));
@@ -63,12 +61,11 @@ void DialogPreferences::browsefluxengine()
     if (ui->cmbFluxengineLocation->count() == 0)
     {
         directory = QFileDialog::getExistingDirectory(this,
-                                                              tr("Set default fluxengine directory"), QDir::currentPath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+                                tr("Set default fluxengine directory"), QDir::currentPath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     } else
     {
         directory = QFileDialog::getExistingDirectory(this,
-                                                              tr("Set default fluxengine directory"), ui->cmbFluxengineLocation->currentText(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-
+                                tr("Set default fluxengine directory"), ui->cmbFluxengineLocation->currentText(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     }
 
     if (!directory.isEmpty()) {
@@ -88,8 +85,7 @@ void DialogPreferences::browseflux()
     } else
     {
         directory = QFileDialog::getExistingDirectory(this,
-                                                              tr("Set default flux output directory"), ui->cmbfluxlocation->currentText(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-
+                                tr("Set default flux output directory"), ui->cmbfluxlocation->currentText(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     }
 
     if (!directory.isEmpty()) {
@@ -109,8 +105,7 @@ void DialogPreferences::browse()
     } else
     {
         directory = QFileDialog::getExistingDirectory(this,
-                                                              tr("Set default data output directory"), ui->cmbdatalocation->currentText(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-
+                                tr("Set default data output directory"), ui->cmbdatalocation->currentText(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     }
 
     if (!directory.isEmpty()) {
