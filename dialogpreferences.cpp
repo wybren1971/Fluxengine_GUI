@@ -159,5 +159,4 @@ void DialogPreferences::save()
     settings.setValue("datalocation", ui->cmbdatalocation->currentText());
     settings.setValue("fluxlocation", ui->cmbfluxlocation->currentText());
     settings.setValue("fluxengine", ui->cmbFluxengineLocation->currentText());
-
 }

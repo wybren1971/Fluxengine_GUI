@@ -60,29 +60,29 @@ void MainWindow::contextMenuEvent(QContextMenuEvent *event)
 void MainWindow::newFile()
 {
 //    infoLabel->setText(tr("Invoked <b>File|New</b>"));
-    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
-    QString dir = "";
+//    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+//    QString dir = "";
 
-    if (settings.value("fluxengine").toString() == "")
-    {
-        dir = QFileDialog::getExistingDirectory(this, tr("Open Directory where fluxengine resides"),
-                                                    QDir::currentPath(),
-                                                    QFileDialog::ShowDirsOnly
-                                                    | QFileDialog::DontResolveSymlinks);
+//    if (settings.value("fluxengine").toString() == "")
+//    {
+//        dir = QFileDialog::getExistingDirectory(this, tr("Open Directory where fluxengine resides"),
+//                                                    QDir::currentPath(),
+//                                                    QFileDialog::ShowDirsOnly
+//                                                    | QFileDialog::DontResolveSymlinks);
 
-    } else
-    {
+//    } else
+//    {
 
-         dir = QFileDialog::getExistingDirectory(this, tr("Open Directory where fluxengine resides"),
-                                                settings.value("fluxengine").toString(),
-                                                QFileDialog::ShowDirsOnly
-                                                | QFileDialog::DontResolveSymlinks);
-    }
-    if (dir != "")
-    {
-        m_fluxengine.setWorkingDirectory(dir);
-        settings.setValue("fluxengine", dir);
-    }
+//         dir = QFileDialog::getExistingDirectory(this, tr("Open Directory where fluxengine resides"),
+//                                                settings.value("fluxengine").toString(),
+//                                                QFileDialog::ShowDirsOnly
+//                                                | QFileDialog::DontResolveSymlinks);
+//    }
+//    if (dir != "")
+//    {
+//        m_fluxengine.setWorkingDirectory(dir);
+//        settings.setValue("fluxengine", dir);
+//    }
 
 }
 
@@ -134,11 +134,12 @@ void MainWindow::readdisk()
 
 void MainWindow::preference()
 {
-//    infoLabel->setText(tr("Invoked <b>File|Print</b>"));
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
     DialogPreferences *form = new DialogPreferences();
     form->setWindowTitle("Preferences Fluxengine_GUI");
     form->exec();
     setDrive();
+    m_fluxengine.setWorkingDirectory(settings.value("fluxengine").toString());
 
 }
 
@@ -219,11 +220,7 @@ void MainWindow::about()
 
 void MainWindow::setDrive()
 {
-//    qInfo() << Q_FUNC_INFO;
-
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
-//    qInfo() << settings.value("drive0").toString() << settings.value("drive1").toString();
-
     if (settings.value("drive0").toString() != "")
     {
         ui->btnDrive0->setText("0: " + settings.value("drive0").toString());
@@ -233,11 +230,9 @@ void MainWindow::setDrive()
         if (settings.value("drive1").toString() == "No drive 1 present")
         {
             ui->groupBox->hide();
-//            ui->btnDrive1->setVisible(false);
         } else
         {
             ui->groupBox->show();
-//            ui->btnDrive1->setVisible(true);
             ui->btnDrive1->setText("1: " + settings.value("drive1").toString());
         }
     }
@@ -245,10 +240,10 @@ void MainWindow::setDrive()
 
 void MainWindow::createActions()
 {
-    newAct = new QAction(tr("&Set location of Fluxengine"), this);
-    newAct->setShortcuts(QKeySequence::Save);
-    newAct->setStatusTip(tr("Set the working directory of fluxengine"));
-    connect(newAct, &QAction::triggered, this, &MainWindow::newFile);
+//    newAct = new QAction(tr("&Set location of Fluxengine"), this);
+//    newAct->setShortcuts(QKeySequence::Save);
+//    newAct->setStatusTip(tr("Set the working directory of fluxengine"));
+//    connect(newAct, &QAction::triggered, this, &MainWindow::newFile);
 
     openAct = new QAction(tr("&Fluxengine wizard..."), this);
     openAct->setShortcuts(QKeySequence::Find);
@@ -362,7 +357,7 @@ void MainWindow::createActions()
 void MainWindow::createMenus()
 {
     fileMenu = menuBar()->addMenu(tr("&File"));
-    fileMenu->addAction(newAct);
+//    fileMenu->addAction(newAct);
     fileMenu->addAction(openAct);
     fileMenu->addAction(preferenceAct);
     fileMenu->addSeparator();
