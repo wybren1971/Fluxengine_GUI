@@ -488,24 +488,33 @@ void MainWindow::WriteItemList()
 }
 void MainWindow::on_bntStartFluxengine_clicked()
 {
-    if (m_fluxengine.busy())
-         m_fluxengine.stop();
     //We dont want the test and rpm commands in the list because there are dedicated buttons for this.
     QString string1 = m_fluxengine.getAddress();
     QString string2 = m_fluxengine.getAddress();
     string1.truncate(4);
     string2.truncate(3);
-    if (( string1 != "test") || (string2 != "rpm"))
+    if (( string1 != "test") && (string2 != "rpm"))
     {
+        if (m_fluxengine.busy())
+             m_fluxengine.stop();
         if (ui->plainTextEdit_2->findText(m_fluxengine.getAddress()) == -1)
         {
             ui->plainTextEdit_2->addItem(m_fluxengine.getAddress());
             ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->findText(m_fluxengine.getAddress()));
             WriteItemList();
         }
+        m_fluxengine.start();
+    } else
+    {
+        //if there is a valid command in the listbox execute that
+        if (ui->plainTextEdit_2->currentText() != "")
+        {
+            if (m_fluxengine.busy())
+                 m_fluxengine.stop();
+            m_fluxengine.setAddress(ui->plainTextEdit_2->currentText());
+            m_fluxengine.start();
+        }
     }
-    m_fluxengine.start();
-
 }
 
 void MainWindow::on_pushButton_clicked()
