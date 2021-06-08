@@ -74,8 +74,6 @@ protected:
 
         void buttonenable();
 
-        void on_plainTextEdit_2_currentIndexChanged(const QString &arg1);
-
         void on_plainTextEdit_2_editTextChanged(const QString &arg1);
 
 private:
