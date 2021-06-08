@@ -970,6 +970,7 @@ QString ConclusionPage::getData()
         strFormat.append(" -h " + writeHeads);
         command.append(strFormat);
     }
+
     settings.setValue("Fluxengine.command",command);
     return command;
 }

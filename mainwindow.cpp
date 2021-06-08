@@ -16,8 +16,6 @@
  *
 */
 
-bool blnDrive0 = true;
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -34,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Fluxengineinput,&QLineEdit::returnPressed,this,&MainWindow::on_pushButton_clicked);
     connect(ui->Fluxengineinput, &QLineEdit::textChanged, this, &MainWindow::buttonenable);
     connect(&m_fluxengine,&fluxengine::enableFluxengineCommands,this,&MainWindow::enableFluxengineCommands);
+//    connect(ui->plainTextEdit_2,&QComboBox::currentIndexChanged(),this,&MainWindow::on_bntStartFluxengine_clicked);
     createActions();
     createMenus();
     setDrive();
@@ -43,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->resize(width, height);
     ui->btnReadDisk->setFocus();
     ui->plainTextEdit_2->completer();
-    ui->plainTextEdit_2->addItem(settings.value("Fluxengine.command").toString());
+    ReadItemList();
 }
 
 #ifndef QT_NO_CONTEXTMENU
@@ -110,24 +109,27 @@ void MainWindow::readdisk()
     if (Fwizard.exec() == QDialog::Accepted)
 //        qInfo() << "Accepted";
 //    qInfo() << Fwizard.hasVisitedPage(3);
-    if (Fwizard.hasVisitedPage(3))
     {
-        if (ui->plainTextEdit_2->findText(Fwizard.getData()) == -1)
+        if (Fwizard.hasVisitedPage(3))
         {
-            if (ui->plainTextEdit_2->currentText() != Fwizard.getData())
+            if (ui->plainTextEdit_2->findText(Fwizard.getData()) == -1)
             {
-                ui->plainTextEdit_2->addItem(Fwizard.getData());
-                ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->findText(Fwizard.getData()));
-                m_fluxengine.setAddress(ui->plainTextEdit_2->currentText());
+ //               if (ui->plainTextEdit_2->currentText() != Fwizard.getData())
+ //               {
+                    ui->plainTextEdit_2->addItem(Fwizard.getData());
+                    ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->findText(Fwizard.getData()));
+                    m_fluxengine.setAddress(ui->plainTextEdit_2->currentText());
+                    WriteItemList();
+ //               } else
+ //               {
+ //                   m_fluxengine.setAddress(ui->plainTextEdit_2->currentText());
+ //               }
             } else
             {
-                m_fluxengine.setAddress(ui->plainTextEdit_2->currentText());
+               ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->findText(Fwizard.getData()));
             }
-        } else
-        {
-           ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->findText(Fwizard.getData()));
+           m_fluxengine.start();
         }
-       m_fluxengine.start();
     }
 }
 
@@ -459,7 +461,8 @@ void MainWindow::on_btntestbandwidth_clicked()
 
 void MainWindow::on_btnRPM_clicked()
 {
-    if (blnDrive0 == true)
+//    qInfo() << Q_FUNC_INFO;
+    if (ui->btnDrive0->isChecked())
     {
         m_fluxengine.setAddress("rpm -s drive:0");
 //        ui->plainTextEdit_2->addItem(m_fluxengine.getAddress());
@@ -470,43 +473,118 @@ void MainWindow::on_btnRPM_clicked()
 //        ui->plainTextEdit_2->addItem(m_fluxengine.getAddress());
 //        ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->count()-1);
     }
+
+//    qInfo() << m_fluxengine.getAddress();
     if (m_fluxengine.busy())
          m_fluxengine.stop();
     m_fluxengine.start();
+//    qInfo() << m_fluxengine.getAddress();
 }
 
 
 void MainWindow::on_btnDrive0_clicked()
 {
-    blnDrive0 = true;
 }
 
 
 void MainWindow::on_btnDrive1_clicked()
 {
-    blnDrive0 = false;
 }
 
+void MainWindow::ReadItemList()
+{
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    for (unsigned i = 0;i<10;i++)
+    {
+        QString setting = "Fluxengine.command";
+        QString s = QString::number(i);
+        setting = setting + s;
+        if (settings.value(setting).toString() != "")
+        {
+            ui->plainTextEdit_2->addItem(settings.value(setting).toString());
+            ui->plainTextEdit_2->setCurrentIndex(i);
+        }
+    }
 
+}
+
+void MainWindow::WriteItemList()
+{
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    qInfo() << Q_FUNC_INFO;
+    //write to settings
+    for (unsigned i = 0;i<10;i++)
+    {
+        QString setting = "Fluxengine.command";
+        QString s = QString::number(i);
+        setting = setting + s;
+        qInfo() << setting;
+        qInfo() << settings.value(setting).toString();
+        if (settings.value(setting).toString() == "")
+        {//i kleiner dan 10 and nog geen command.
+            settings.setValue(setting,m_fluxengine.getAddress());
+            break;
+        } else
+        {
+            if (i == 9)
+            {
+                qInfo() << setting;
+                qInfo() << i;
+                QString settingold = "Fluxengine.command";
+                //overwrite move everything up and loose first command.
+                //1 overschrijft 0, 2 overschrijft 1 3 overschrijft 2 etc 9 wordt toegevoegd
+                for (unsigned i = 0;i<9;i++)
+                {
+                    QString s = QString::number(i);
+                    QString t = QString::number(i+1);
+                    settings.setValue(settingold +s,settings.value(settingold +t));
+                }
+                settings.setValue(setting,m_fluxengine.getAddress());
+                ui->plainTextEdit_2->clear();
+                ReadItemList();
+                ui->plainTextEdit_2->setCurrentIndex(i);
+            }
+        }
+    }
+
+}
 void MainWindow::on_bntStartFluxengine_clicked()
 {
     if (m_fluxengine.busy())
          m_fluxengine.stop();
     //als command nog niet voorkomt voeg hem toe.
+    qInfo() << ui->plainTextEdit_2->findText(m_fluxengine.getAddress());
     if (ui->plainTextEdit_2->findText(m_fluxengine.getAddress()) == -1)
     {
-        if (ui->plainTextEdit_2->currentText() != m_fluxengine.getAddress())
-        {
-            m_fluxengine.setAddress(ui->plainTextEdit_2->currentText());
-        } else
-        {
+//        if (ui->plainTextEdit_2->currentText() != m_fluxengine.getAddress())
+//        {
+//            m_fluxengine.setAddress(ui->plainTextEdit_2->currentText());
+//        } else
+//        {
             ui->plainTextEdit_2->addItem(m_fluxengine.getAddress());
             ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->findText(m_fluxengine.getAddress()));
-        }
+            WriteItemList();
+  //          }
+
     }
     m_fluxengine.start();
 
 }
+//bool MainWindow::eventFilter(QObject* obj, QEvent* event)
+//{
+//    if (event->type()==QEvent::KeyPress) {
+//        QKeyEvent* key = static_cast<QKeyEvent*>(event);
+//        if ( (key->key()==Qt::Key_Enter) || (key->key()==Qt::Key_Return) ) {
+//            //Enter or return was pressed
+//        } else {
+//            return QObject::eventFilter(obj, event);
+//        }
+//        return true;
+//    } else {
+//        return QObject::eventFilter(obj, event);
+//    }
+//    return false;
+//}
 
 
 void MainWindow::on_pushButton_clicked()
@@ -528,7 +606,6 @@ void MainWindow::on_Fluxengineinput_returnPressed()
     //action is handled in the on_pushbutton_clicked()
 }
 
-
 void MainWindow::buttonenable()
 {
     if (((ui->Fluxengineinput->text()) != "")  and  (m_fluxengine.busy()))
@@ -542,21 +619,13 @@ void MainWindow::buttonenable()
 
 void MainWindow::on_plainTextEdit_2_currentIndexChanged(const QString &arg1)
 {
-    m_fluxengine.setAddress(arg1);
-
+//    m_fluxengine.setAddress(arg1);
+//    qInfo() << arg1;
 }
-
-
-void MainWindow::on_plainTextEdit_2_currentTextChanged(const QString &arg1)
-{
-    m_fluxengine.setAddress(arg1);
-
-}
-
 
 void MainWindow::on_plainTextEdit_2_editTextChanged(const QString &arg1)
 {
     m_fluxengine.setAddress(arg1);
-
+    qInfo() << "editTextChanged";
 }
 
