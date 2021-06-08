@@ -406,7 +406,6 @@ void MainWindow::on_btntestbandwidth_clicked()
          m_fluxengine.stop();
     m_fluxengine.setAddress("test bandwidth");
     m_fluxengine.start();
-
 }
 
 
@@ -491,12 +490,19 @@ void MainWindow::on_bntStartFluxengine_clicked()
 {
     if (m_fluxengine.busy())
          m_fluxengine.stop();
-    //als command nog niet voorkomt voeg hem toe.
-    if (ui->plainTextEdit_2->findText(m_fluxengine.getAddress()) == -1)
+    //We dont want the test and rpm commands in the list because there are dedicated buttons for this.
+    QString string1 = m_fluxengine.getAddress();
+    QString string2 = m_fluxengine.getAddress();
+    string1.truncate(4);
+    string2.truncate(3);
+    if (( string1 != "test") || (string2 != "rpm"))
     {
-        ui->plainTextEdit_2->addItem(m_fluxengine.getAddress());
-        ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->findText(m_fluxengine.getAddress()));
-        WriteItemList();
+        if (ui->plainTextEdit_2->findText(m_fluxengine.getAddress()) == -1)
+        {
+            ui->plainTextEdit_2->addItem(m_fluxengine.getAddress());
+            ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->findText(m_fluxengine.getAddress()));
+            WriteItemList();
+        }
     }
     m_fluxengine.start();
 
