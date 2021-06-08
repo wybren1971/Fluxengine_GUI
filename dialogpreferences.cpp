@@ -21,6 +21,11 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
         ui->cmbfluxlocation->addItem(settings.value("fluxlocation").toString());
     }
 
+    if (settings.value("fluxengine").toString() != "")
+    {
+        ui->cmbFluxengineLocation->addItem(settings.value("fluxengine").toString());
+    }
+
     QList<QRadioButton *> allRadioButtons = ui->groupBox_2->findChildren<QRadioButton*>();
     for (auto RadioButton : allRadioButtons) {
         if (settings.value("drive0").toString() == RadioButton->text())
@@ -37,10 +42,9 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
         }
     }
 
-
-
     connect(ui->btndatalocation, SIGNAL(clicked()), SLOT(browse()));
     connect(ui->btnfluxlocation, SIGNAL(clicked()), SLOT(browseflux()));
+    connect(ui->btnfluxenginelocation, SIGNAL(clicked()), SLOT(browsefluxengine()));
     connect(ui->buttonBox, SIGNAL(accepted()), SLOT(save()));
 
 }
@@ -51,13 +55,38 @@ DialogPreferences::~DialogPreferences()
 }
 
 
+void DialogPreferences::browsefluxengine()
+{
+    QString directory;
+    if (ui->cmbFluxengineLocation->count() == 0)
+    {
+        directory = QFileDialog::getExistingDirectory(this,
+                                tr("Set default fluxengine directory"), QDir::currentPath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    } else
+    {
+        directory = QFileDialog::getExistingDirectory(this,
+                                tr("Set default fluxengine directory"), ui->cmbFluxengineLocation->currentText(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    }
+
+    if (!directory.isEmpty()) {
+        if (ui->cmbFluxengineLocation->findText(directory) == -1)
+            ui->cmbFluxengineLocation->addItem(directory);
+        ui->cmbFluxengineLocation->setCurrentIndex(ui->cmbFluxengineLocation->findText(directory));
+    }
+}
+
 void DialogPreferences::browseflux()
 {
-//    QString strFilter;
-//    QString strFile;
-
-    QString directory = QFileDialog::getExistingDirectory(this,
-                            tr("Set default data output directory"), QDir::currentPath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    QString directory;
+    if (ui->cmbFluxengineLocation->count() == 0)
+    {
+        directory = QFileDialog::getExistingDirectory(this,
+                                tr("Set default flux output directory"), QDir::currentPath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    } else
+    {
+        directory = QFileDialog::getExistingDirectory(this,
+                                tr("Set default flux output directory"), ui->cmbfluxlocation->currentText(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    }
 
     if (!directory.isEmpty()) {
         if (ui->cmbfluxlocation->findText(directory) == -1)
@@ -68,11 +97,16 @@ void DialogPreferences::browseflux()
 
 void DialogPreferences::browse()
 {
-//    QString strFilter;
-//    QString strFile;
-
-    QString directory = QFileDialog::getExistingDirectory(this,
-                            tr("Set default data output directory"), QDir::currentPath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    QString directory;
+    if (ui->cmbFluxengineLocation->count() == 0)
+    {
+        directory = QFileDialog::getExistingDirectory(this,
+                                tr("Set default data output directory"), QDir::currentPath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    } else
+    {
+        directory = QFileDialog::getExistingDirectory(this,
+                                tr("Set default data output directory"), ui->cmbdatalocation->currentText(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    }
 
     if (!directory.isEmpty()) {
         if (ui->cmbdatalocation->findText(directory) == -1)
@@ -124,5 +158,5 @@ void DialogPreferences::save()
 
     settings.setValue("datalocation", ui->cmbdatalocation->currentText());
     settings.setValue("fluxlocation", ui->cmbfluxlocation->currentText());
-
+    settings.setValue("fluxengine", ui->cmbFluxengineLocation->currentText());
 }

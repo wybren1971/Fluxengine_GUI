@@ -23,11 +23,14 @@ class MainWindow : public QMainWindow
         MainWindow(QWidget *parent = nullptr);
         ~MainWindow();
 
+        void WriteItemList();
+        void ReadItemList();
 public slots:
 protected:
     #ifndef QT_NO_CONTEXTMENU
         void contextMenuEvent(QContextMenuEvent *event) override;
     #endif // QT_NO_CONTEXTMENU
+//    bool eventFilter(QObject* obj, QEvent* event) override;
 
     //! [1]
     private slots:
@@ -51,7 +54,6 @@ protected:
         void output(QString data);
         void enableFluxengineCommands(bool blnStarted);
 
-        void on_plainTextEdit_textChanged();
         void on_btnReadDisk_clicked();
 
         void on_btntestVoltages_clicked();
@@ -71,6 +73,8 @@ protected:
         void on_Fluxengineinput_returnPressed();
 
         void buttonenable();
+
+        void on_plainTextEdit_2_editTextChanged(const QString &arg1);
 
 private:
         void createActions();

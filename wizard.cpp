@@ -4,7 +4,7 @@
  * This Wizard creates a string for input for fluxengine
  * output looks for example like:
  * ' read ibm -s :d=0:s=0:t=0-39 --overwrite -f ARK.flux -o ARK.imd'
- * double step is needed when one had a 80 track drive and wants to read or write 40 track disks.
+ * double step is needed when one has a 80 track drive and wants to read or write 40 track disks.
  *
 */
 int intSelectedDrive = 0;
@@ -228,12 +228,8 @@ IntroPage::IntroPage(QWidget *parent)
 int IntroPage::nextId() const
 {
     if (writeRadioButton->isChecked()) {
-        //fluxengine::setAddress("write");
-       //parent->plainTextEdit->setPlainText("write");
- //       registerField("fluxenginecommand", "write");
         return wizard::Page_Write;
     } else {
-        //fluxengine::setAddress("read");
         return wizard::Page_Read;
     }
 }
@@ -246,7 +242,6 @@ ReadPage::ReadPage(QWidget *parent)
     QValidator *validatorhead = new QRegularExpressionValidator(rx, this);
     setTitle(tr("Set the read options for <i>Fluxengine</i>;"));
     setSubTitle(tr("Please choose the format of the disk to be read "
-
                    "and the name of the output file (e.g., wordperfect5.img)."));
 
     nameLabel = new QLabel(tr("F&ormat:"));
@@ -254,47 +249,57 @@ ReadPage::ReadPage(QWidget *parent)
     for (unsigned i = 0; i<readformats ; i++) {
        readFormatbox->addItem(my_readformats[i].strDescription);
     }
-    //connect(readFormatbox, QOverload<int>::of(&QComboBox::currentIndexChanged()), SLOT(updatedirectorybox()));
 
     QObject::connect(readFormatbox, SIGNAL(currentIndexChanged(int)), this, SLOT(updatedirectorybox(int)));
-    //readFormatbox->setCurrentIndex(0);                                                         //set IBM as standard
 
     nameLabel->setBuddy(readFormatbox);
 
 
     trackLabelStart = new QLabel(tr("Tracks:"));
     trackLineEditStart = new QLineEdit;
+    QObject::connect(trackLineEditStart, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
+    QObject::connect(trackLineEditStart, SIGNAL(textChanged(QString)), this, SLOT(editLineBox(QString)));
     trackLineEditStart->setValidator(validator);
     trackLabelStop = new QLabel(tr(" : "));
     trackLineEditStop = new QLineEdit;
+    QObject::connect(trackLineEditStop, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
+    QObject::connect(trackLineEditStop, SIGNAL(textChanged(QString)), this, SLOT(editLineBox(QString)));
     trackLineEditStop->setValidator(validator);
-    directoryComboBox = new QComboBox();
+    directoryComboBox = new QLineEdit();
+    QObject::connect(directoryComboBox, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
+    QObject::connect(directoryComboBox, SIGNAL(textChanged(QString)), this, SLOT(editDirectoryBox(QString)));
 
-    // -s :d=0:s=0:t=0-39
     HeadLineLabel = new QLabel(tr("Head(s):"));
     HeadLineEdit = new QLineEdit;
+    QObject::connect(HeadLineEdit, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
+    QObject::connect(HeadLineEdit, SIGNAL(textChanged(QString)), this, SLOT(editLineBox(QString)));
     HeadLineEdit->setValidator(validatorhead);
 
     label = new QLabel("Outputfile");
-    button = new QPushButton("Browse");
+    button = new QPushButton("Browse...");
     connect(button, SIGNAL(clicked()), SLOT(browse()));
     label1 = new QLabel("Write Flux File");
-    button1 = new QPushButton("Browse");
-    fluxComboBox = new QComboBox();
+    button1 = new QPushButton("Browse...");
+    fluxComboBox = new QLineEdit();
+    QObject::connect(fluxComboBox, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
+    QObject::connect(fluxComboBox, SIGNAL(textChanged(QString)), this, SLOT(editFluxBox(QString)));
+
     connect(button1, SIGNAL(clicked()), SLOT(browseflux()));
 
     label2 = new QLabel("Use Flux File");
-    button2 = new QPushButton("Browse");
-    flux1ComboBox = new QComboBox();
+    button2 = new QPushButton("Browse...");
+    flux1ComboBox = new QLineEdit();
+    QObject::connect(flux1ComboBox, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
+    QObject::connect(flux1ComboBox, SIGNAL(textChanged(QString)), this, SLOT(editFlux1Box(QString)));
     connect(button2, SIGNAL(clicked()), SLOT(browsereadflux()));
 
     registerField("ReadPage.format", readFormatbox);
-    registerField("ReadPage.TrackStart", trackLineEditStart);
-    registerField("ReadPage.TrackStop", trackLineEditStop);
+    registerField("ReadPage.TrackStart*", trackLineEditStart);
+    registerField("ReadPage.TrackStop*", trackLineEditStop);
     registerField("ReadPage.SaveOutput*", directoryComboBox);
     registerField("ReadPage.Saveflux", fluxComboBox);
     registerField("ReadPage.Save1flux", flux1ComboBox);
-    registerField("ReadPage.Heads", HeadLineEdit);
+    registerField("ReadPage.Heads*", HeadLineEdit);
 
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(nameLabel, 0, 0);
@@ -326,11 +331,175 @@ void ReadPage::initializePage()
 
 int ReadPage::nextId() const
 {
-    _strOutputfile = (directoryComboBox->currentText());
-    _strFluxFile = fluxComboBox->currentText();
-    _strInputFluxFile = flux1ComboBox->currentText();
+    _strOutputfile = (directoryComboBox->text());
+    _strFluxFile = fluxComboBox->text();
+    _strInputFluxFile = flux1ComboBox->text();
+
     return wizard::Page_Conclusion;
 }
+
+void ReadPage::editLineBox(QString dir)
+{
+        QList<QWidget*> mylineEdits = this->findChildren<QWidget*>();
+        QListIterator<QWidget*> it(mylineEdits); // iterate through the list of widgets
+        QWidget *lineEditField;
+        while (it.hasNext()) {
+            lineEditField = it.next(); // take each widget in the list
+            if(QLineEdit *lineE = qobject_cast<QLineEdit*>(lineEditField)) {  // check if iterated widget is of type QLineEdit
+                //
+                if (lineE->hasFocus())
+                  {
+                    if (dir == "")
+                    {
+                        lineE->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
+                        emit completeChanged();
+                    } else
+                    {
+                        lineE->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
+                        emit completeChanged();
+                    }
+                  }
+             }
+        }
+}
+
+void ReadPage::editDirectoryBox(QString dir)
+{
+    QMessageBox msgBox;
+  {
+    if (dir != "")
+    {
+        //haal het einde van de string af. De filenaam:-)
+        int last_dot = dir.lastIndexOf("/");
+        QString dir1 = dir.left(last_dot);
+        const QFileInfo outputDir(dir1);
+        if (!outputDir.isDir()) {
+            directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
+            emit completeChanged();
+        } else
+        {
+            int last_dot = dir.lastIndexOf(".");
+            int size = dir.size();
+            if ((last_dot == -1) || ((size - last_dot) > 5))
+              //check for valid filenaam. ends with .xxxx
+            {
+                directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
+                emit completeChanged();
+            } else
+            {
+                directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
+                emit completeChanged();
+            }
+        }
+    } else
+    {
+        directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
+        emit completeChanged();
+    }
+  }
+}
+void ReadPage::editFluxBox(QString dir)
+{
+    QMessageBox msgBox;
+    {
+        if (dir != "")
+        {
+            //haal het einde van de string af. De filenaam:-)
+            int last_dot = dir.lastIndexOf("/");
+            QString dir1 = dir.left(last_dot);
+            const QFileInfo outputDir(dir1);
+            if (!outputDir.isDir()) {
+                fluxComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
+                emit completeChanged();
+            } else
+            {
+                int last_dot = dir.lastIndexOf(".");
+                int size = dir.size();
+                if ((last_dot == -1) || ((size - last_dot) > 5))
+                  //check for valid filenaam. ends with .xxx
+                {
+                    fluxComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
+                    emit completeChanged();
+                } else
+                {
+                    fluxComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
+                    emit completeChanged();
+                }
+            }
+        } else
+        {
+            fluxComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
+            emit completeChanged();
+        }
+    }
+
+
+}
+void ReadPage::editFlux1Box(QString dir)
+{
+    QMessageBox msgBox;
+    //bepaal welke linedit the focus heeft
+    if (dir != "")
+    {
+        //haal het einde van de string af. De filenaam:-)
+        int last_dot = dir.lastIndexOf("/");
+        QString dir1 = dir.left(last_dot);
+        const QFileInfo outputDir(dir1);
+        if (!outputDir.isDir()) {
+            flux1ComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
+            emit completeChanged();
+        } else
+        {
+            int last_dot = dir.lastIndexOf(".");
+            int size = dir.size();
+            if ((last_dot == -1) || ((size - last_dot) > 5))
+              //check for valid filenaam. ends with .xxx
+            {
+                flux1ComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
+                emit completeChanged();
+            } else
+            {
+                flux1ComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
+                emit completeChanged();
+            }
+        }
+    } else
+    {
+        flux1ComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
+        emit completeChanged();
+    }
+}
+
+bool ReadPage::isComplete() const
+{
+    bool Complete = true;
+    QList<QWidget*> mylineEdits = this->findChildren<QWidget*>();
+    QListIterator<QWidget*> it(mylineEdits); // iterate through the list of widgets
+    QWidget *lineEditField;
+    while (it.hasNext())
+    {
+        lineEditField = it.next(); // take each widget in the list
+        if(QLineEdit *lineE = qobject_cast<QLineEdit*>(lineEditField))
+         {  // check if iterated widget is of type QLineEdit
+            if (lineE->styleSheet() == "QLineEdit { background: rgb(255,0,0); }" )
+            {
+
+                return false;
+            }
+            else
+            {
+                Complete = true;
+            }
+
+        } else
+        {
+            Complete = true;
+        }
+        //qInfo() << "lineeditwidget";
+    }
+    return Complete;
+}
+
 void ReadPage::updatedirectorybox(int index)
 {
     QString strFilter;
@@ -339,18 +508,21 @@ void ReadPage::updatedirectorybox(int index)
 
     if (index != 0)
     {
+        trackLineEditStart->setFocus();
         trackLineEditStart->setText(my_readformats[index].trackstart);
 
         QString drivetext = "drive" + QString::number(intSelectedDrive)+ "40track";
         if (settings.value(drivetext).toBool())
             //40track drive
         {
+            trackLineEditStop->setFocus();
             trackLineEditStop->setText("39");
-
         } else
         {
+            trackLineEditStop->setFocus();
             trackLineEditStop->setText(my_readformats[index].trackstop);
         }
+        HeadLineEdit->setFocus();
         HeadLineEdit->setText(my_readformats[index].Heads);
     }
 
@@ -361,16 +533,13 @@ void ReadPage::updatedirectorybox(int index)
     directoryComboBox->clear();
     if (directory != "")
     {
-        if (directoryComboBox->findText(directory + strFile) == -1)
-            directoryComboBox->addItem(directory + strFile);
-        directoryComboBox->setCurrentIndex(directoryComboBox->findText(directory + strFile));
+        directoryComboBox->setText(directory + strFile);
 
     } else
     {
-        if (directoryComboBox->findText(QDir::currentPath() + strFile) == -1)
-            directoryComboBox->addItem(QDir::currentPath() + strFile);
-        directoryComboBox->setCurrentIndex(directoryComboBox->findText(QDir::currentPath() + strFile));
+        directoryComboBox->setText(QDir::currentPath() + strFile);
     }
+    directoryComboBox->setFocus();
 }
 
 void ReadPage::browse()
@@ -390,12 +559,9 @@ void ReadPage::browse()
     {
         directory = QFileDialog::getSaveFileName(this,
                             tr("Find Files"), directory + strFile,strFilter);
-
     }
     if (!directory.isEmpty()) {
-        if (directoryComboBox->findText(directory) == -1)
-            directoryComboBox->addItem(directory);
-        directoryComboBox->setCurrentIndex(directoryComboBox->findText(directory));
+        directoryComboBox->setText(directory);
     }
 }
 
@@ -407,9 +573,7 @@ void ReadPage::browseflux()
 
     strFile = my_readformats[readFormatbox->currentIndex()].strDefaultfilenaam;
     QString desired =  "/" + strFile.mid(0,strFile.indexOf(".")) + ".flux";
-    //QFileDialog dialog(this);
     strFilter = my_readformats[readFormatbox->currentIndex()].strFilter;
-    //dialog.setOption(QFileDialog::DontUseNativeDialog, true);
     QString directory = settings.value("fluxlocation").toString();
     if (directory == "")
     {
@@ -419,13 +583,10 @@ void ReadPage::browseflux()
     {
         directory = QFileDialog::getSaveFileName(this,
                             tr("Find Files"), directory + desired,strFilter);
-
     }
 
     if (!directory.isEmpty()) {
-        if (fluxComboBox->findText(directory) == -1)
-            fluxComboBox->addItem(directory);
-        fluxComboBox->setCurrentIndex(fluxComboBox->findText(directory));
+        fluxComboBox->setText(directory);
     }
 }
 
@@ -448,9 +609,7 @@ void ReadPage::browsereadflux()
     }
 
     if (!directory.isEmpty()) {
-        if (flux1ComboBox->findText(directory) == -1)
-            flux1ComboBox->addItem(directory);
-        flux1ComboBox->setCurrentIndex(flux1ComboBox->findText(directory));
+        flux1ComboBox->setText(directory);
     }
 }
 
@@ -458,7 +617,6 @@ WritePage::WritePage(QWidget *parent)
     : QWizardPage(parent)
 {
     QValidator *validator = new QIntValidator(10, 99, this);
-//    QValidator *validator = new QIntValidator(10, 99, this);
     QRegularExpression rx("^[0-1][-][1]$");
     QValidator *validatorhead = new QRegularExpressionValidator(rx, this);
     setTitle(tr("Write a Disk with <i>Fluxengine</i>;"));
@@ -474,22 +632,30 @@ WritePage::WritePage(QWidget *parent)
 
     trackLabelStart = new QLabel(tr("Tracks:"));
     trackLineEditStart = new QLineEdit;
+    QObject::connect(trackLineEditStart, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
+    QObject::connect(trackLineEditStart, SIGNAL(textChanged(QString)), this, SLOT(editLineBox(QString)));
     trackLineEditStart->setText("0");
     trackLineEditStart->setValidator(validator);
     trackLabelStop = new QLabel(tr(" : "));
     trackLineEditStop = new QLineEdit;
+    QObject::connect(trackLineEditStop, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
+    QObject::connect(trackLineEditStop, SIGNAL(textChanged(QString)), this, SLOT(editLineBox(QString)));
     trackLineEditStop->setText("79");
     trackLineEditStop->setValidator(validator);
-    directoryComboBox = new QComboBox();
+    directoryComboBox = new QLineEdit();
+    QObject::connect(directoryComboBox, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
+    QObject::connect(directoryComboBox, SIGNAL(textChanged(QString)), this, SLOT(editDirectoryBox(QString)));
 
     // -s :d=0:s=0:t=0-39
     HeadLineLabel = new QLabel(tr("Head(s):"));
     HeadLineEdit = new QLineEdit;
+    QObject::connect(HeadLineEdit, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
+    QObject::connect(HeadLineEdit, SIGNAL(textChanged(QString)), this, SLOT(editLineBox(QString)));
     HeadLineEdit->setText("0-1");
     HeadLineEdit->setValidator(validatorhead);
 
     label = new QLabel("Inputfile");
-    button = new QPushButton("Browse");
+    button = new QPushButton("Browse...");
     connect(button, SIGNAL(clicked()), SLOT(browse()));
     registerField("WritePage.format", writeFormatbox);
     registerField("WritePage.TrackStart", trackLineEditStart);
@@ -511,10 +677,50 @@ WritePage::WritePage(QWidget *parent)
     layout->addWidget(button, 3, 2);
     setLayout(layout);
 }
+bool WritePage::isComplete() const
+{
+    bool Complete = true;
+    QList<QWidget*> mylineEdits = this->findChildren<QWidget*>();
+    QListIterator<QWidget*> it(mylineEdits); // iterate through the list of widgets
+    QWidget *lineEditField;
+    while (it.hasNext())
+    {
+        lineEditField = it.next(); // take each widget in the list
+        if(QLineEdit *lineE = qobject_cast<QLineEdit*>(lineEditField))
+        {  // check if iterated widget is of type QLineEdit
+            //
+            //qInfo() << "lineeditwidget";
+            if (lineE->styleSheet() == "QLineEdit { background: rgb(255,0,0); }" )
+            {
+
+                return false;
+            }
+            else
+            {
+                if (lineE->text() != "")
+                {
+                    Complete = true;
+                } else
+                {
+                    Complete = false;
+                }
+            }
+
+        } else
+        {
+            Complete = true;
+        }
+        //qInfo() << Complete;
+    }
+    return Complete;
+}
 
 void WritePage::initializePage()
 {
     writeFormatbox->setCurrentIndex(WriteFormatDefault);   //set IBM as standard
+    directoryComboBox->setText("."); // trick the program to disable the next button
+    directoryComboBox->clear();
+
 }
 
 int WritePage::nextId() const
@@ -522,6 +728,69 @@ int WritePage::nextId() const
     return wizard::Page_Conclusion;
 
 }
+
+void WritePage::editDirectoryBox(QString dir)
+{
+    QMessageBox msgBox;
+    //bepaal welke linedit the focus heeft
+    {
+        if (dir != "")
+        {
+            //haal het einde van de string af. De filenaam:-)
+            int last_dot = dir.lastIndexOf("/");
+            QString dir1 = dir.left(last_dot);
+            const QFileInfo outputDir(dir1);
+            if (!outputDir.isDir()) {
+                directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
+            } else
+            {
+                int last_dot = dir.lastIndexOf(".");
+                int size = dir.size();
+                if ((last_dot == -1) || ((size - last_dot) > 5))
+                  //check for valid filenaam. ends with .xxx
+                {
+                    directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
+                    emit completeChanged();
+                } else
+                {
+                    directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
+                    emit completeChanged();
+                }
+            }
+        } else
+        {
+            directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
+            emit completeChanged();
+        }
+    }
+
+}
+
+void WritePage::editLineBox(QString dir)
+{
+        QList<QWidget*> mylineEdits = this->findChildren<QWidget*>();
+        QListIterator<QWidget*> it(mylineEdits); // iterate through the list of widgets
+        QWidget *lineEditField;
+        while (it.hasNext()) {
+            lineEditField = it.next(); // take each widget in the list
+            if(QLineEdit *lineE = qobject_cast<QLineEdit*>(lineEditField)) {  // check if iterated widget is of type QLineEdit
+                //
+                if (lineE->hasFocus())
+                  {
+                    if (dir == "")
+                    {
+                        lineE->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
+                        emit completeChanged();
+                    } else
+                    {
+                        lineE->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
+                        emit completeChanged();
+                    }
+                  }
+             }
+        }
+}
+
 
 void WritePage::browse()
 {
@@ -545,10 +814,8 @@ void WritePage::browse()
     }
 
     if (!directory.isEmpty()) {
-        if (directoryComboBox->findText(directory) == -1)
-            directoryComboBox->addItem(directory);
-        directoryComboBox->setCurrentIndex(directoryComboBox->findText(directory));
-        _strInputfile = (directoryComboBox->currentText());
+        directoryComboBox->setText(directory);
+        _strInputfile = directory;
     }
 }
 
@@ -558,19 +825,27 @@ void WritePage::Update(int index)
 
     if (index != 0)
     {
+        trackLineEditStart->setFocus();
         trackLineEditStart->setText(my_writeformats[index].trackstart);
+        trackLineEditStart->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
 
         QString drivetext = "drive" + QString::number(intSelectedDrive)+ "40track";
         if (settings.value(drivetext).toBool())
             //40track drive
         {
+            trackLineEditStop->setFocus();
             trackLineEditStop->setText("39");
+            trackLineEditStop->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
 
         } else
         {
+            trackLineEditStop->setFocus();
             trackLineEditStop->setText(my_writeformats[index].trackstop);
+            trackLineEditStop->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
         }
+        HeadLineEdit->setFocus();
         HeadLineEdit->setText(my_writeformats[index].Heads);
+        HeadLineEdit->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
     }
 }
 
@@ -579,11 +854,12 @@ ConclusionPage::ConclusionPage(QWidget *parent)
     : QWizardPage(parent)
 {
     //setPixmap(QWizard::WatermarkPixmap, QPixmap(":/images/watermark.png"));
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
 
     bottomLabel = new QLabel;
     bottomLabel->setWordWrap(true);
 
-    bottomLabel->setText("");
+    registerField("Fluxengine.command", bottomLabel);
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(bottomLabel);
@@ -592,25 +868,26 @@ ConclusionPage::ConclusionPage(QWidget *parent)
 
 int ConclusionPage::nextId() const
 {
+
     return -1;
 }
 
 void ConclusionPage::initializePage()
 {
-    qInfo() << field("IntroPage.read").toString();
+    bottomLabel->setText(getData());
     if (field("IntroPage.read") == "True")
     {
         setTitle(tr("The fluxengine wizard had gathered all the necessary settings to proceed reading the disk."));
-        setSubTitle(tr("Press finish to start reading"));
+        setSubTitle(tr("The command for fluxengine is shown below. Press finish to start reading"));
+
     } else
     {
         setTitle(tr("The fluxengine wizard had gathered all the necessary settings to proceed writing the disk."));
-        setSubTitle(tr("Press finish to start writing"));
+        setSubTitle(tr("The command for fluxengine is shown below. Press finish to start writing"));
     }
-
 }
 
-QString wizard::getData()
+QString ConclusionPage::getData()
 {
     QString command;
     QString strFormat;
@@ -625,12 +902,10 @@ QString wizard::getData()
         //./fluxengine read commodore1541 -s drive:0 -o uridium.d64 --copy-flux-to uridium.flux
     {
        strFormat = "read ";
-//       qInfo() << field("ReadPage.format").toInt();
        int index = field("ReadPage.format").toInt();
 
        strDisk = my_readformats[index].strType;
        strFormat.append(strDisk);
-//       qInfo() << strFormat;
        QString TrackStart = field("ReadPage.TrackStart").toString();
        QString TrackStop = field("ReadPage.TrackStop").toString();
 
@@ -641,12 +916,10 @@ QString wizard::getData()
        {
            strFormat.append(" -s drive:" + QString::number(intSelectedDrive));
        }
-       strFormat.append(" --cylinders ");
+       strFormat.append(" -c ");
        strFormat.append(TrackStart);
        strFormat.append("-");
        QString drivetext = "drive" + QString::number(intSelectedDrive)+ "40track";
-//       qInfo() << drivetext;
-//       qInfo() << ((TrackStop > 39) && (settings.value(drivetext).toBool()));
        if ((TrackStop.toInt() > 39) && (settings.value(drivetext).toBool()))
        {
            //40 track drive with 80track operand use doublestep x2
@@ -658,7 +931,6 @@ QString wizard::getData()
        QString Heads = field("ReadPage.Heads").toString();
        strFormat.append(" -h " + Heads);
 
-//       qInfo() << field("ReadPage.SaveOutput").toString();
        strFormat.append(" -o ");
        strFormat.append(_strOutputfile);
 
@@ -668,14 +940,10 @@ QString wizard::getData()
            strFormat.append(" --copy-flux-to ");
            strFormat.append(_strFluxFile);
        }
-//       qInfo() << strFormat;
        command.append(strFormat);
-
     }
     else {
-        //./fluxengine write commodore1541 -i uridium.d64 -d drive:0 -c 0-39 -h 0
         strFormat = "write ";
-        //qInfo() << field("WritePage.format").toInt();
         int index = field("WritePage.format").toInt();
 
         strDisk = my_writeformats[index].strType;
@@ -687,12 +955,10 @@ QString wizard::getData()
         QString TrackStop = field("WritePage.TrackStop").toString();
 
         strFormat.append(" -d drive:" + QString::number(intSelectedDrive));
-        strFormat.append(" --cylinders ");
+        strFormat.append(" -c ");
         strFormat.append(TrackStart);
         strFormat.append("-");
         QString drivetext = "drive" + QString::number(intSelectedDrive)+ "40track";
-//        qInfo() << drivetext;
-//        qInfo() << ((TrackStop > 39) && (settings.value(drivetext).toBool()));
         if (((TrackStop.toInt()) > 39) && (settings.value(drivetext).toBool()))
         {
             //40 track drive with 80track operand use doublestep x2
@@ -702,11 +968,16 @@ QString wizard::getData()
 
         QString writeHeads = field("WritePage.Heads").toString();
         strFormat.append(" -h " + writeHeads);
-
-//        qInfo() << strFormat;
-//        qInfo() << field("WritePage.OpenInput").toString();
-//        qInfo() << strFormat;
         command.append(strFormat);
     }
+
+    settings.setValue("Fluxengine.command",command);
     return command;
+}
+
+QString wizard::getData()
+{
+
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    return settings.value("Fluxengine.command").toString();
 }

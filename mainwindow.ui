@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>661</height>
+    <width>757</width>
+    <height>566</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,6 +18,12 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>320</width>
+    <height>240</height>
+   </size>
   </property>
   <property name="maximumSize">
    <size>
@@ -44,13 +50,19 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>640</width>
-     <height>480</height>
+     <width>320</width>
+     <height>240</height>
     </size>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="11" column="2">
+    <item row="12" column="2">
      <widget class="QPushButton" name="btnReadDisk">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="cursor">
        <cursorShape>ArrowCursor</cursorShape>
       </property>
@@ -74,20 +86,7 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="0" colspan="3">
-     <widget class="QLineEdit" name="plainTextEdit">
-      <property name="font">
-       <font>
-        <family>Monospace</family>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;For advanced users who want to give in the commandline options for fluxengine. Also shows the result of the wizard. These arguments are passed on to fluxengine by pressing the start fluxengine button.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="2" rowspan="2">
+    <item row="5" column="2" rowspan="2">
      <widget class="QGroupBox" name="groupBox">
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the drive to use for reading and writing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -96,7 +95,14 @@
        <string>Select drive:</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0" alignment="Qt::AlignVCenter">
+       <item row="2" column="0">
+        <widget class="QRadioButton" name="btnDrive1">
+         <property name="text">
+          <string>Drive 1</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
         <widget class="QRadioButton" name="btnDrive0">
          <property name="text">
           <string>Drive 0</string>
@@ -106,34 +112,30 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QRadioButton" name="btnDrive1">
-         <property name="text">
-          <string>Drive 1</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
     </item>
-    <item row="14" column="0">
-     <widget class="QLineEdit" name="Fluxengineinput">
+    <item row="15" column="1">
+     <widget class="QPushButton" name="pushButton">
       <property name="enabled">
        <bool>false</bool>
       </property>
-      <property name="font">
-       <font>
-        <family>Monospace</family>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This line can be used to enter input to fluxengine. For instance when fluxengine asks for a comment to store in an IMD file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This buttons sends the input for, for instance a comment in an IMD file, to fluxengine.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Send</string>
       </property>
      </widget>
     </item>
-    <item row="7" column="2">
+    <item row="8" column="2">
      <widget class="QPushButton" name="btntestVoltages">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="cursor">
        <cursorShape>ArrowCursor</cursorShape>
       </property>
@@ -154,49 +156,7 @@
       </property>
      </widget>
     </item>
-    <item row="10" column="2">
-     <spacer name="verticalSpacer_2">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="9" column="2">
-     <widget class="QPushButton" name="btnRPM">
-      <property name="cursor">
-       <cursorShape>ArrowCursor</cursorShape>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;rpm: Measures the disk rotational speed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="autoFillBackground">
-       <bool>true</bool>
-      </property>
-      <property name="text">
-       <string>RPM</string>
-      </property>
-     </widget>
-    </item>
-    <item row="14" column="1">
-     <widget class="QPushButton" name="pushButton">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This buttons sends the input for, for instance a comment in an IMD file, to fluxengine.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string>Send</string>
-      </property>
-     </widget>
-    </item>
-    <item row="6" column="2">
+    <item row="7" column="2">
      <spacer name="verticalSpacer">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
@@ -209,95 +169,7 @@
       </property>
      </spacer>
     </item>
-    <item row="8" column="2">
-     <widget class="QPushButton" name="btntestbandwidth">
-      <property name="cursor">
-       <cursorShape>ArrowCursor</cursorShape>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;bandwidth: Measures your USB bandwidth.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="autoFillBackground">
-       <bool>true</bool>
-      </property>
-      <property name="text">
-       <string>Test bandwidth</string>
-      </property>
-     </widget>
-    </item>
-    <item row="12" column="2">
-     <spacer name="verticalSpacer_3">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="14" column="2">
-     <widget class="QPushButton" name="btnStop">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Panic button to stop fluxengine if something goes wrong.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="text">
-       <string>Stop Fluxengine</string>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>panic.png</normaloff>panic.png</iconset>
-      </property>
-      <property name="autoDefault">
-       <bool>false</bool>
-      </property>
-      <property name="default">
-       <bool>false</bool>
-      </property>
-      <property name="flat">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0" colspan="3">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Command for fluxengine:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="13" column="2">
-     <widget class="QPushButton" name="bntStartFluxengine">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start fluxengine with the arguments provided in the top &amp;quot;Command for fluxengine&amp;quot; box.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string>Start Fluxengine</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0" rowspan="2" colspan="3">
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>Output fluxengine</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="0" rowspan="10" colspan="2">
+    <item row="5" column="0" rowspan="10" colspan="2">
      <widget class="QPlainTextEdit" name="txtOutput">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -317,6 +189,9 @@
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This box shows the output from fluxengine.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
+      <property name="statusTip">
+       <string extracomment="This box shows the output from fluxengine."/>
+      </property>
       <property name="autoFillBackground">
        <bool>false</bool>
       </property>
@@ -331,12 +206,177 @@
       </property>
      </widget>
     </item>
+    <item row="14" column="2">
+     <widget class="QPushButton" name="bntStartFluxengine">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start fluxengine with the arguments provided in the top &amp;quot;Command for fluxengine&amp;quot; box.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Start Fluxengine</string>
+      </property>
+     </widget>
+    </item>
+    <item row="15" column="0">
+     <widget class="QLineEdit" name="Fluxengineinput">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="font">
+       <font>
+        <family>Monospace</family>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This line can be used to enter input to fluxengine. For instance when fluxengine asks for a comment to store in an IMD file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </item>
+    <item row="15" column="2">
+     <widget class="QPushButton" name="btnStop">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Panic button to stop fluxengine if something goes wrong.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="text">
+       <string>Stop Fluxengine</string>
+      </property>
+      <property name="autoDefault">
+       <bool>false</bool>
+      </property>
+      <property name="default">
+       <bool>false</bool>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="13" column="2">
+     <spacer name="verticalSpacer_3">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="9" column="2">
+     <widget class="QPushButton" name="btntestbandwidth">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="cursor">
+       <cursorShape>ArrowCursor</cursorShape>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;bandwidth: Measures your USB bandwidth.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string>Test bandwidth</string>
+      </property>
+     </widget>
+    </item>
+    <item row="11" column="2">
+     <spacer name="verticalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="10" column="2">
+     <widget class="QPushButton" name="btnRPM">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="cursor">
+       <cursorShape>ArrowCursor</cursorShape>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;rpm: Measures the disk rotational speed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string>RPM</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="3">
+     <widget class="QComboBox" name="plainTextEdit_2">
+      <property name="font">
+       <font>
+        <family>Monospace</family>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;For advanced users who want to give in the commandline options for fluxengine. Also shows the result of the wizard. These arguments are passed on to fluxengine by pressing the start fluxengine button. This combobox also remembers previous commands during this session.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="statusTip">
+       <string extracomment="For advanced users who want to give in the commandline options for fluxengine. Also shows the result of the wizard. These arguments are passed on to fluxengine by pressing the start fluxengine button. This combobox also remembers previous commands during this session."/>
+      </property>
+      <property name="editable">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="3">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Command for fluxengine:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0" rowspan="2" colspan="3">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Output fluxengine</string>
+      </property>
+     </widget>
+    </item>
    </layout>
    <zorder>groupBox</zorder>
    <zorder>txtOutput</zorder>
    <zorder>btnReadDisk</zorder>
    <zorder>btnStop</zorder>
-   <zorder>label</zorder>
    <zorder>label_2</zorder>
    <zorder>btntestVoltages</zorder>
    <zorder>btnRPM</zorder>
@@ -344,27 +384,25 @@
    <zorder>bntStartFluxengine</zorder>
    <zorder>pushButton</zorder>
    <zorder>Fluxengineinput</zorder>
-   <zorder>plainTextEdit</zorder>
    <zorder>verticalSpacer</zorder>
    <zorder>verticalSpacer_2</zorder>
    <zorder>verticalSpacer_3</zorder>
+   <zorder>plainTextEdit_2</zorder>
+   <zorder>label</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>757</width>
      <height>22</height>
     </rect>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <tabstops>
-  <tabstop>plainTextEdit</tabstop>
   <tabstop>txtOutput</tabstop>
-  <tabstop>btnDrive0</tabstop>
   <tabstop>btntestVoltages</tabstop>
   <tabstop>btntestbandwidth</tabstop>
   <tabstop>btnRPM</tabstop>
