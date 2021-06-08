@@ -20,8 +20,8 @@ fluxengine::fluxengine(QObject *parent) : QObject(parent)
 }
 void fluxengine::write(QByteArray comment)
 {
-    qInfo() << Q_FUNC_INFO;
-    qInfo() << comment;
+//    qInfo() << Q_FUNC_INFO;
+//    qInfo() << comment;
 
     if(QSysInfo::productType() == "windows") comment.append("\r");
     m_process.write(comment+"\n");

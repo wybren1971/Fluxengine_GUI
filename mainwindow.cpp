@@ -535,6 +535,5 @@ void MainWindow::buttonenable()
 void MainWindow::on_plainTextEdit_2_editTextChanged(const QString &arg1)
 {
     m_fluxengine.setAddress(arg1);
-    qInfo() << "editTextChanged";
 }
 
