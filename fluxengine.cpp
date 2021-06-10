@@ -1,5 +1,6 @@
 #include "fluxengine.h"
 #include <QDir>
+#include <qsettings.h>
 
 fluxengine::fluxengine(QObject *parent) : QObject(parent)
 {
@@ -16,7 +17,6 @@ fluxengine::fluxengine(QObject *parent) : QObject(parent)
     m_listening = false;
     m_address = "";
     m_workingdirectory = QDir::currentPath();
-
 }
 void fluxengine::write(QByteArray comment)
 {
@@ -111,10 +111,18 @@ void fluxengine::readyReadStandardError()
 
 void fluxengine::readyReadStandardOutput()
 {
+    qInfo() << Q_FUNC_INFO;
+//    qInfo() << m_listening;
+//    qInfo() << m_process.readAllStandardOutput();
     if(!m_listening) return;
-    QByteArray data = m_process.readAllStandardOutput();
-    emit output(QString(data.trimmed()));
-
+//    if(!m_initializing)
+//    {
+        QByteArray data = m_process.readAllStandardOutput();
+        emit output(QString(data.trimmed()));
+//    } else
+//    {   //get all the settings form fluxengine
+//        m_initializing = false;
+//    }
 }
 
 void fluxengine::started()
@@ -143,10 +151,12 @@ void fluxengine::stateChanged(QProcess::ProcessState newState)
 
 void fluxengine::readyRead()
 {
+
+    qInfo() << Q_FUNC_INFO;
+    qInfo() << "readyRead: " + m_address;
     if(!m_listening) return;
     QByteArray data = m_process.readAll().trimmed();
     emit output(data);
-
 }
 
 QString fluxengine::getProcess()
@@ -160,8 +170,185 @@ void fluxengine::startFluxengine()
 {
     QByteArray command;
 
-    command = (m_workingdirectory + "/fluxengine " + m_address).toUtf8();
+//    command = (m_workingdirectory + "/fluxengine " + m_address).toUtf8();
+    command = (m_workingdirectory + " " + m_address).toUtf8();
     if(QSysInfo::productType() == "windows") command.append("\r");
     command.append("\n");
     m_process.write(command);
 }
+
+//void fluxengine::initializeFluxengine()
+//{
+//    // get all the read formats
+//    m_address = "read";
+//    start();
+//    startFluxengine();
+//    foreach (QString x, formats) {
+//        qInfo() << Q_FUNC_INFO;
+//        m_address = m_address + x + " -C";
+//        qInfo() << m_address;
+//        startFluxengine();
+
+//    }
+
+
+
+//}
+
+//QStringList fluxengine::initializeformats(QByteArray data)
+//{
+//    QStringList Formats;
+//    //returns a stringlist with read or write formats.
+//    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+//   if (data.contains("syntax: fluxengine read ") || (data.contains("syntax: fluxengine write ")))
+//    {
+//       /*syntax: fluxengine read <profile> [<options>...]
+//        Use --help for option help.
+//        Available profiles include:
+//          acornadfs
+//          acorndfs
+//          aeslanier
+//          amiga
+//          ampro
+//          apple2
+//          atarist
+//          brother
+//          commodore1541
+//          commodore1581
+//          eco1
+//          f85
+//          fb100
+//          ibm
+//          macintosh
+//          micropolis
+//          mx
+//          tids990
+//          victor9k
+//          zilogmcz
+//        Or use a text file containing your own configuration.
+//        */
+//        qInfo() << Q_FUNC_INFO;
+//        qInfo() << "read";
+
+//        //get the readformats and store in section
+//        int i = data.indexOf(":",0);
+//        int j = data.indexOf(":", i+1);
+//        for (int x=0; x < data.count(); x++)
+//        {
+//            i = data.indexOf("\n", j);
+//            j = data.indexOf("\n", i+1);
+//            if (j == -1) break;
+//            qInfo() << j;
+//            qInfo() << data.mid(i, j+1 - i).trimmed();
+//            Formats.append(data.mid(i, j+1 - i).trimmed());
+//            //i = j+1;
+
+//        }
+//        return Formats;
+////        foreach (QString x, Formats) {
+////            qInfo() << x;
+////        }
+//        //get the config for each readformat and store in section
+//        /*
+//         * input {
+//              flux {
+//                drive {
+//                }
+//              }
+//            }
+//            output {
+//              image {
+//                filename: "acornadfs.img"
+//                img {
+//                }
+//              }
+//            }
+//            decoder {
+//              ibm {
+//                sector_id_base: 0
+//              }
+//            }
+//            cylinders {
+//              start: 0
+//              end: 79
+//            }
+//            heads {
+//              start: 0
+//              end: 1
+//            }
+//            */
+//        foreach (QString x, Formats) {
+//            qInfo() << x;
+//        }
+//    }
+//   return Formats;
+//}
+
+//QStringList fluxengine::getConfig(QString data)
+//{
+//    QStringList Configs;
+//    struct FormatsDescription
+//    {
+//        QString strType;
+//        QString strDescription;
+//        QString strFilter;
+//        QString strDefaultfilenaam;
+//        QString trackstart;
+//        QString trackstop;
+//        QString headstart;
+//        QString headstop;
+//    };
+
+//    if (data.contains("encoder") || (data.contains("decoder")))
+//    {
+//        int i = data.indexOf(":",0);
+//        int j;
+////        for (int x=0; x < data.count(); x++)
+////        {
+////            i = data.indexOf("\n", );
+//            j = data.indexOf("\n", i+1);
+////            if (j == -1) break;
+//            qInfo() << j;
+//            qInfo() << data.mid(i, j+1 - i).trimmed();
+//            Configs.append(data.mid(i, j+1 - i).trimmed());
+//            //i = j+1;
+
+////        }
+//        return Configs;
+////        foreach (QString x, Configs) {
+////            qInfo() << x;
+////        }
+
+//    }
+//    //get the config for each readformat and store in section
+//    /*
+//     * input {
+//          flux {
+//            drive {
+//            }
+//          }
+//        }
+//        output {
+//          image {
+//            filename: "acornadfs.img"
+//            img {
+//            }
+//          }
+//        }
+//        decoder {
+//          ibm {
+//            sector_id_base: 0
+//          }
+//        }
+//        cylinders {
+//          start: 0
+//          end: 79
+//        }
+//        heads {
+//          start: 0
+//          end: 1
+//        }
+//        */
+//    //stringlist contains filename, start cylinder, stop cylinder, start Head, stop head.
+//    return Configs;
+//}
