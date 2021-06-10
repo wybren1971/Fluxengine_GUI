@@ -32,6 +32,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Fluxengineinput,&QLineEdit::returnPressed,this,&MainWindow::on_pushButton_clicked);
     connect(ui->Fluxengineinput, &QLineEdit::textChanged, this, &MainWindow::buttonenable);
     connect(&m_fluxengine,&fluxengine::enableFluxengineCommands,this,&MainWindow::enableFluxengineCommands);
+    ui->txtOutput->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->txtOutput,&QPlainTextEdit::customContextMenuRequested,this,&MainWindow::showContextMenu);
+
     createActions();
     createMenus();
     setDrive();
@@ -178,8 +181,8 @@ void MainWindow::about()
     QString datetime = QStringLiteral(__DATE__) + QStringLiteral(" ") + QStringLiteral(__TIME__);
  //   infoLabel->setText(tr("Invoked <b>Help|About</b>"));
     QMessageBox::about(this, tr("About Menu"),
-            tr("This is the fluxengine-GUI created by Wybren van Duinen. "
-               "Application version: ") +yourAppVersion + "\nBuilddate and time: " + datetime);
+            tr("This is the fluxengine-GUI created by Wybren van Duinen."
+               "\nApplication version: ") +yourAppVersion + "\nBuilddate and time: " + datetime);
 }
 
 void MainWindow::setDrive()
@@ -213,6 +216,12 @@ void MainWindow::createActions()
     openAct->setShortcuts(QKeySequence::Find);
     openAct->setStatusTip(tr("Read or write a disk"));
     connect(openAct, &QAction::triggered, this, &MainWindow::readdisk);
+
+    clear = new QAction(tr("Clear &output fluxengine"), this);
+//    clear->setShortcuts(QKeySequence::Find);
+    clear->setStatusTip(tr("Clear the box with the output from fluxengine"));
+    connect(clear, &QAction::triggered, this, &MainWindow::ClearText);
+
 
     preferenceAct = new QAction(tr("&Preference..."), this);
     preferenceAct->setShortcuts(QKeySequence::Print);
@@ -331,6 +340,8 @@ void MainWindow::createMenus()
     editMenu->addAction(undoAct);
     editMenu->addAction(redoAct);
     editMenu->addSeparator();
+    editMenu->addAction(clear);
+    editMenu->addSeparator();
     editMenu->addAction(cutAct);
     editMenu->addAction(copyAct);
     editMenu->addAction(pasteAct);
@@ -366,6 +377,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::output(QString data)
 {
+//    ui->txtOutput->clear();
+
     ui->txtOutput->appendPlainText(data);
 }
 
@@ -552,3 +565,18 @@ void MainWindow::on_plainTextEdit_2_editTextChanged(const QString &arg1)
     m_fluxengine.setAddress(arg1);
 }
 
+void MainWindow::showContextMenu(const QPoint &pt)
+{
+    qInfo() << Q_FUNC_INFO;
+    qInfo() << pt;
+    QMenu *menu = ui->txtOutput->createStandardContextMenu();
+    menu->addAction(clear);
+    menu->exec(ui->txtOutput->mapToGlobal(pt));
+    delete menu;
+}
+
+void MainWindow::ClearText()
+{
+    qInfo() << Q_FUNC_INFO;
+    ui->txtOutput->clear();
+}
