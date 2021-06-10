@@ -46,6 +46,7 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
     connect(ui->btnfluxlocation, SIGNAL(clicked()), SLOT(browseflux()));
     connect(ui->btnfluxenginelocation, SIGNAL(clicked()), SLOT(browsefluxengine()));
     connect(ui->buttonBox, SIGNAL(accepted()), SLOT(save()));
+    //ui->tabWidget->
 
 }
 
@@ -57,21 +58,24 @@ DialogPreferences::~DialogPreferences()
 
 void DialogPreferences::browsefluxengine()
 {
-    QString directory;
+   // QString directory;
+    QDir directory;
+
     if (ui->cmbFluxengineLocation->count() == 0)
     {
-        directory = QFileDialog::getExistingDirectory(this,
-                                tr("Set default fluxengine directory"), QDir::currentPath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+        directory.setPath(QFileDialog::getOpenFileName(this,
+                                tr("Set default fluxengine application"), QDir::currentPath()));
     } else
     {
-        directory = QFileDialog::getExistingDirectory(this,
-                                tr("Set default fluxengine directory"), ui->cmbFluxengineLocation->currentText(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+        directory.setPath(QFileDialog::getOpenFileName(this,
+                                tr("Set default fluxengine application"), ui->cmbFluxengineLocation->currentText()));
     }
 
-    if (!directory.isEmpty()) {
-        if (ui->cmbFluxengineLocation->findText(directory) == -1)
-            ui->cmbFluxengineLocation->addItem(directory);
-        ui->cmbFluxengineLocation->setCurrentIndex(ui->cmbFluxengineLocation->findText(directory));
+    qInfo() << directory.absolutePath();
+    if (directory.absolutePath() != "") {
+        if (ui->cmbFluxengineLocation->findText(directory.absolutePath()) == -1)
+            ui->cmbFluxengineLocation->addItem(directory.absolutePath());
+        ui->cmbFluxengineLocation->setCurrentIndex(ui->cmbFluxengineLocation->findText(directory.absolutePath()));
     }
 }
 
