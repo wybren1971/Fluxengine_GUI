@@ -186,6 +186,9 @@
         <bold>false</bold>
        </font>
       </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::DefaultContextMenu</enum>
+      </property>
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This box shows the output from fluxengine.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
