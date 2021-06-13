@@ -76,6 +76,9 @@ protected:
 
         void on_plainTextEdit_2_editTextChanged(const QString &arg1);
 
+        void showContextMenu(const QPoint &pt);
+
+        void ClearText();
 private:
         void createActions();
         void createMenus();
@@ -88,6 +91,7 @@ private:
         QMenu *helpMenu;
         QActionGroup *alignmentGroup;
         QAction *newAct;
+        QAction *clear;
         QAction *openAct;
         QAction *preferenceAct;
         QAction *exitAct;

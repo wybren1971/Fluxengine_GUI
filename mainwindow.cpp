@@ -378,14 +378,16 @@ MainWindow::~MainWindow()
 void MainWindow::output(QString data)
 {
 //    ui->txtOutput->clear();
-
-    ui->txtOutput->appendPlainText(data);
+    if (data.size() > 1)
+    {
+        ui->txtOutput->appendPlainText(data);
+    }
 }
 
 void MainWindow::enableFluxengineCommands(bool blnStarted)
 {
-//    qInfo() << Q_FUNC_INFO;
-//    qInfo() << blnStarted;
+    qInfo() << Q_FUNC_INFO;
+    qInfo() << blnStarted;
 
     if (blnStarted)
     {
@@ -535,7 +537,7 @@ void MainWindow::on_pushButton_clicked()
    // QString input;
     QByteArray Input;
     //input = ui->Fluxengineinput->text();
-    if ((ui->Fluxengineinput->text() != "") and  (m_fluxengine.busy()))
+    if ((ui->Fluxengineinput->text() != "") && (m_fluxengine.busy()))
     {
         Input = ui->Fluxengineinput->text().toUtf8();
         m_fluxengine.write(Input);
@@ -551,7 +553,7 @@ void MainWindow::on_Fluxengineinput_returnPressed()
 
 void MainWindow::buttonenable()
 {
-    if (((ui->Fluxengineinput->text()) != "")  and  (m_fluxengine.busy()))
+    if (((ui->Fluxengineinput->text()) != "")  &&  (m_fluxengine.busy()))
     {
         ui->pushButton->setEnabled(true);
      } else
@@ -567,8 +569,6 @@ void MainWindow::on_plainTextEdit_2_editTextChanged(const QString &arg1)
 
 void MainWindow::showContextMenu(const QPoint &pt)
 {
-    qInfo() << Q_FUNC_INFO;
-    qInfo() << pt;
     QMenu *menu = ui->txtOutput->createStandardContextMenu();
     menu->addAction(clear);
     menu->exec(ui->txtOutput->mapToGlobal(pt));
@@ -577,6 +577,5 @@ void MainWindow::showContextMenu(const QPoint &pt)
 
 void MainWindow::ClearText()
 {
-    qInfo() << Q_FUNC_INFO;
     ui->txtOutput->clear();
 }
