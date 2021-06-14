@@ -54,7 +54,7 @@ QString fluxengine::getWorkingDirectory()
 
 void fluxengine::start()
 {
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     m_listening = true;
     QString program = getProcess();
     QStringList Arguments;
@@ -105,8 +105,8 @@ void fluxengine::errorOccured(QProcess::ProcessError error)
 
 void fluxengine::finished(int exitcode, QProcess::ExitStatus exitStatus)
 {
-    qInfo() << Q_FUNC_INFO;
-    qInfo() << exitcode;
+//    qInfo() << Q_FUNC_INFO;
+//    qInfo() << exitcode;
     if(!m_listening) return;
     Q_UNUSED(exitcode);
     Q_UNUSED(exitStatus);
@@ -135,8 +135,8 @@ void fluxengine::readyReadStandardError()
 
 void fluxengine::readyReadStandardOutput()
 {
-    qInfo() << Q_FUNC_INFO;
-    qInfo() << m_process.readAllStandardOutput().size();
+//    qInfo() << Q_FUNC_INFO;
+//    qInfo() << m_process.readAllStandardOutput().size();
     if(!m_listening) return;
     QByteArray data = m_process.readAllStandardOutput();
     if (data.size() > 1)
@@ -153,18 +153,18 @@ void fluxengine::started()
 
 void fluxengine::stateChanged(QProcess::ProcessState newState)
 {
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     switch (newState) {
     case QProcess::NotRunning:
-        qInfo() << "NotRunning";
+//        qInfo() << "NotRunning";
         emit enableFluxengineCommands(false);
         break;
     case QProcess::Starting:
-        qInfo() << "Starting";
+//        qInfo() << "Starting";
         emit enableFluxengineCommands(false);
         break;
     case QProcess::Running:
-        qInfo() << "Running";
+//        qInfo() << "Running";
         startFluxengine();
         emit enableFluxengineCommands(true);
         break;
@@ -175,7 +175,7 @@ void fluxengine::stateChanged(QProcess::ProcessState newState)
 void fluxengine::readyRead()
 {
 
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
 //    qInfo() << "readyRead: " + m_address;
     if(!m_listening) return;
     QByteArray data = m_process.readAll().trimmed();
@@ -196,9 +196,9 @@ void fluxengine::startFluxengine()
 {
     QByteArray command;
 
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     command = (m_workingdirectory + " " + m_address).toUtf8();
-    qInfo() << command;
+//    qInfo() << command;
     if(QSysInfo::productType() == "windows") command.append("\r");
     command.append("\n");
     m_process.write(command);
