@@ -83,12 +83,13 @@ void MainWindow::readdisk()
     {
         if (Fwizard.hasVisitedPage(3))
         {
+            m_fluxengine.setAddress(Fwizard.getData());
+            //see if something needs to be added to the combobox
             if (ui->plainTextEdit_2->findText(Fwizard.getData()) == -1)
             {
                 ui->plainTextEdit_2->addItem(Fwizard.getData());
                 ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->findText(Fwizard.getData()));
-                m_fluxengine.setAddress(ui->plainTextEdit_2->currentText());
-                WriteItemList();
+                 WriteItemList();
             } else
             {
                ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->findText(Fwizard.getData()));
