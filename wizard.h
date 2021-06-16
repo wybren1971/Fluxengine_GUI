@@ -70,6 +70,7 @@ private:
     QLabel *label;
     QLabel *label1;
     QLabel *label2;
+    QLabel *lblAdvancedSettings;
 
     QPushButton *button;
     QPushButton *button1;
@@ -83,7 +84,8 @@ private:
     QLineEdit *HeadLineEditStart;
     QLineEdit *HeadLineEditStop;
     QLineEdit *trackLineEditStart;
-    QLineEdit *trackLineEditStop;    
+    QLineEdit *trackLineEditStop;
+    QCheckBox *Checkbox;
 
 };
 

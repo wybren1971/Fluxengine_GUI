@@ -302,6 +302,10 @@ ReadPage::ReadPage(QWidget *parent)
     QObject::connect(flux1ComboBox, SIGNAL(textChanged(QString)), this, SLOT(editFlux1Box(QString)));
     connect(button2, SIGNAL(clicked()), SLOT(browsereadflux()));
 
+//    lblAdvancedSettings = new QLabel("Advanced settings");
+//    Checkbox = new QCheckBox;
+//    Checkbox->setToolTip("check this to set advanced read settings");
+//    lblAdvancedSettings->setToolTip("check this to set advanced read settings");
     registerField("ReadPage.format", readFormatbox);
     registerField("ReadPage.TrackStart*", trackLineEditStart);
     registerField("ReadPage.TrackStop*", trackLineEditStop);
@@ -324,13 +328,15 @@ ReadPage::ReadPage(QWidget *parent)
     layout->addWidget(HeadLineEditStop, 2, 3);
     layout->addWidget(label,3,0);
     layout->addWidget(directoryComboBox, 3,1);
-    layout->addWidget(button, 3, 2);
+    layout->addWidget(button, 3, 3);
     layout->addWidget(label1,4,0);
     layout->addWidget(fluxComboBox, 4,1);
-    layout->addWidget(button1, 4, 2);
+    layout->addWidget(button1, 4, 3);
     layout->addWidget(label2,5,0);
     layout->addWidget(flux1ComboBox, 5,1);
-    layout->addWidget(button2, 5, 2);
+    layout->addWidget(button2, 5, 3);
+//    layout->addWidget(lblAdvancedSettings, 6,0);
+//    layout->addWidget(Checkbox, 6, 1);
 
     setLayout(layout);
 }
@@ -346,8 +352,13 @@ int ReadPage::nextId() const
     _strOutputfile = (directoryComboBox->text());
     _strFluxFile = fluxComboBox->text();
     _strInputFluxFile = flux1ComboBox->text();
-
-    return wizard::Page_Conclusion;
+    if (Checkbox->isChecked())
+    {
+        return wizard::Page_Advanced;
+    } else
+    {
+        return wizard::Page_Conclusion;
+    }
 }
 
 void ReadPage::editLineBox(QString dir)
@@ -713,7 +724,7 @@ WritePage::WritePage(QWidget *parent)
     layout->addWidget(HeadLineEditStop, 2, 3);
     layout->addWidget(label,3,0);
     layout->addWidget(directoryComboBox, 3,1);
-    layout->addWidget(button, 3, 2);
+    layout->addWidget(button, 3, 3);
     setLayout(layout);
 }
 bool WritePage::isComplete() const
@@ -862,7 +873,7 @@ void WritePage::Update(int index)
 {
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
 
-    if (index != 0)
+    if (index >= 0)
     {
         trackLineEditStart->setFocus();
         trackLineEditStart->setText(my_writeformats[index].trackstart);
