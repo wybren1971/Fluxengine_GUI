@@ -302,10 +302,10 @@ ReadPage::ReadPage(QWidget *parent)
     QObject::connect(flux1ComboBox, SIGNAL(textChanged(QString)), this, SLOT(editFlux1Box(QString)));
     connect(button2, SIGNAL(clicked()), SLOT(browsereadflux()));
 
-//    lblAdvancedSettings = new QLabel("Advanced settings");
-//    Checkbox = new QCheckBox;
-//    Checkbox->setToolTip("check this to set advanced read settings");
-//    lblAdvancedSettings->setToolTip("check this to set advanced read settings");
+    lblAdvancedSettings = new QLabel("Advanced settings");
+    Checkbox = new QCheckBox;
+    Checkbox->setToolTip("check this to set advanced read settings");
+    lblAdvancedSettings->setToolTip("check this to set advanced read settings");
     registerField("ReadPage.format", readFormatbox);
     registerField("ReadPage.TrackStart*", trackLineEditStart);
     registerField("ReadPage.TrackStop*", trackLineEditStop);
@@ -335,8 +335,8 @@ ReadPage::ReadPage(QWidget *parent)
     layout->addWidget(label2,5,0);
     layout->addWidget(flux1ComboBox, 5,1);
     layout->addWidget(button2, 5, 3);
-//    layout->addWidget(lblAdvancedSettings, 6,0);
-//    layout->addWidget(Checkbox, 6, 1);
+    layout->addWidget(lblAdvancedSettings, 6,0);
+    layout->addWidget(Checkbox, 6, 1);
 
     setLayout(layout);
 }
@@ -865,7 +865,11 @@ void WritePage::browse()
 
     if (!directory.isEmpty()) {
         directoryComboBox->setText(directory);
+        directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
         _strInputfile = directory;
+    } else
+    {
+        directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
     }
 }
 
@@ -895,6 +899,7 @@ void WritePage::Update(int index)
         }
         HeadLineEditStart->setFocus();
         HeadLineEditStart->setText(my_writeformats[index].Headstart);
+//        HeadLineEditStart->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
         HeadLineEditStop->setFocus();
         if (my_writeformats[index].Headstop == "")
         {
@@ -906,14 +911,24 @@ void WritePage::Update(int index)
             headLabelStop->setVisible(false);
             HeadLineEditStop->setText(my_writeformats[index].Headstart);
             HeadLineEditStart->setDisabled(true);
+            trackLineEditStop->setFocus();
+
 
         } else
         {
             HeadLineEditStop->setVisible(true);
             headLabelStop->setVisible(true);
-//            HeadLineEditStop->setFocus();
+            HeadLineEditStop->setFocus();
             HeadLineEditStop->setText(my_writeformats[index].Headstop);
+//            HeadLineEditStop->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
             HeadLineEditStart->setDisabled(false);
+        }
+        if (directoryComboBox->text() != "")
+        {
+            directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
+        } else
+        {
+            directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
         }
     }
 }
