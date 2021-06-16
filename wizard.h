@@ -9,7 +9,7 @@ class wizard : public QWizard
     Q_OBJECT
 
 public:
-    enum { Page_Intro , Page_Read, Page_Write,
+    enum { Page_Intro , Page_Read, Page_Write, Page_Advanced,
                  Page_Conclusion};
 
     wizard(QWidget *parent, int intDrive);
@@ -63,9 +63,10 @@ private slots:
 private:
     QLabel *nameLabel;
     QLabel *trackLabel;
-    QLabel *HeadLineLabel;
+    QLabel *HeadLineLabelStart;
     QLabel *trackLabelStart;
     QLabel *trackLabelStop;
+    QLabel *headLabelStop;
     QLabel *label;
     QLabel *label1;
     QLabel *label2;
@@ -79,7 +80,8 @@ private:
     QLineEdit *flux1ComboBox;
     QLineEdit *nameLineEdit;
     QLineEdit *trackLineEdit;
-    QLineEdit *HeadLineEdit;
+    QLineEdit *HeadLineEditStart;
+    QLineEdit *HeadLineEditStop;
     QLineEdit *trackLineEditStart;
     QLineEdit *trackLineEditStop;    
 
@@ -105,10 +107,11 @@ private slots:
 private:
     QLabel *nameLabel;
     QLabel *trackLabel;
-    QLabel *HeadLineLabel;
+    QLabel *HeadLabelStart;
+    QLabel *headLabelStop;
+    QLabel *label;
     QLabel *trackLabelStart;
     QLabel *trackLabelStop;
-    QLabel *label;
     QLabel *DiskLabel;
     QLabel *namePresetLabel;
     QPushButton *button;
@@ -118,11 +121,26 @@ private:
     QCheckBox *DiskLineEdit;
     QLineEdit *nameLineEdit;
     QLineEdit *trackLineEdit;
-    QLineEdit *HeadLineEdit;
+    QLineEdit *HeadLineEditStart;
+    QLineEdit *HeadLineEditStop;
     QLineEdit *trackLineEditStart;
     QLineEdit *trackLineEditStop;
 };
 
+class AdvancedPage : public QWizardPage
+{
+    Q_OBJECT
+
+public:
+    AdvancedPage(QWidget *parent = nullptr);
+
+    int nextId() const override;
+    void initializePage() override;
+
+private slots:
+private:
+    QLabel *bottomLabel;
+};
 
 //! [6]
 class ConclusionPage : public QWizardPage

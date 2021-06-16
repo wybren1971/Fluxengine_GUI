@@ -17,7 +17,8 @@ struct FormatsDescription
     QString strDefaultfilenaam;
     QString trackstart;
     QString trackstop;
-    QString Heads;
+    QString Headstart;
+    QString Headstop;
 };
 
 QString _strOutputfile;
@@ -80,26 +81,26 @@ Size                                    Density 	Tracks      tpi 	bpi 	Coercivit
  */
 
 FormatsDescription my_readformats[readformats] = {
-    { "acornadfs", "Reads Acorn ADFS disks", "*.img *.flux", "acornadfs.img", "0", "79", "0-1"},
-    { "acorndfs", "Reads Acorn DFS disks", "*.img *.flux", "acorndfs.img", "0", "79", "0"},
-    { "aeslanier", "Reads AES Lanier disks", "*.img *.flux", "aeslanier.img", "0", "76", "0"},
-    { "amiga", "Reads Commodore Amiga disks", "*.adf *.flux", "amiga.adf", "0", "79", "0-1"},
-    { "ampro", "Reads Ampro disks", "*.img *.flux", "ampro.img", "0", "79", "0"},
-    { "apple2", "Reads Apple II disks", "*.img *.flux", "apple2.img", "0", "79", "0"},
-    { "atarist", "Reads Atari ST disks", "*.img *.flux *.st", "atarist.st", "0", "81", "0-1"},
-    { "brother", "Reads 120kB and 240kB Brother word processor disks", "*.img *.flux", "brother.img", "0", "81", "0"},
-    { "commodore1541", "Reads Commodore 64 disks in 1541 format", "*.d64 *.flux", "commodore1541.d64", "0", "39", "0"},
-    { "commodore1581", "Reads Commodore 64 disks in 1581 format", "*.d81 *.flux", "commodore1581.d81", "0", "79", "0-1"},
-    { "eco1", "Reads eco1 disks", "*.img *.flux", "eco1.img", "0", "81", "0-1"},
-    { "f85", "Reads Durango F85 disks", "*.img *.flux", "f85.img", "0", "79", "0"},
-    { "fb100", "Reads FB100 disks", "*.img *.flux", "fb100.img", "0", "39", "0"},
-    { "ibm", "Reads the ubiquitous IBM format disks (Most common)", "*.img *.imd *.flux", "ibm.img", "0", "81", "0-1"},
-    { "macintosh", "Reads Apple Macintosh disks", "*.diskcopy *.flux", "macintosh.diskcopy", "0", "79", "0-1"},
-    { "micropolis", "Reads Micropolis disks", "*.img *.flux", "micropolis.img", "0", "76", "0-1"},
-    { "mx", "Reads MX disks", "*.img *.flux", "mx.img", "0", "79", "0-1"},
-    { "tids990", "Reads Texas Instruments DS990 disks", "*.img *.flux", "tids990.img", "0", "76", "0-1"},
-    { "victor9k", "Reads Victor 9000 disks", "*.img *.flux", "victor9k.img", "0", "79", "0"},
-    { "zilogmcz", "Reads Zilog MCZ disks", "*.img *.flux", "zilogmcz.img", "0", "76", "0"}
+    { "acornadfs", "Reads Acorn ADFS disks", "*.img *.flux", "acornadfs.img", "0", "79", "0", "1"},
+    { "acorndfs", "Reads Acorn DFS disks", "*.img *.flux", "acorndfs.img", "0", "79", "0", ""},
+    { "aeslanier", "Reads AES Lanier disks", "*.img *.flux", "aeslanier.img", "0", "76", "0", ""},
+    { "amiga", "Reads Commodore Amiga disks", "*.adf *.flux", "amiga.adf", "0", "79", "0", "1"},
+    { "ampro", "Reads Ampro disks", "*.img *.flux", "ampro.img", "0", "79", "0", ""},
+    { "apple2", "Reads Apple II disks", "*.img *.flux", "apple2.img", "0", "79", "0", ""},
+    { "atarist", "Reads Atari ST disks", "*.img *.flux *.st", "atarist.st", "0", "81", "0", "1"},
+    { "brother", "Reads 120kB and 240kB Brother word processor disks", "*.img *.flux", "brother.img", "0", "81", "0", ""},
+    { "commodore1541", "Reads Commodore 64 disks in 1541 format", "*.d64 *.flux", "commodore1541.d64", "0", "39", "0", ""},
+    { "commodore1581", "Reads Commodore 64 disks in 1581 format", "*.d81 *.flux", "commodore1581.d81", "0", "79", "0", "1"},
+    { "eco1", "Reads eco1 disks", "*.img *.flux", "eco1.img", "0", "81", "0", "1"},
+    { "f85", "Reads Durango F85 disks", "*.img *.flux", "f85.img", "0", "79", "0", ""},
+    { "fb100", "Reads FB100 disks", "*.img *.flux", "fb100.img", "0", "39", "0", ""},
+    { "ibm", "Reads the ubiquitous IBM format disks (Most common)", "*.img *.imd *.flux", "ibm.img", "0", "81", "0", "1"},
+    { "macintosh", "Reads Apple Macintosh disks", "*.diskcopy *.flux", "macintosh.diskcopy", "0", "79", "0", "1"},
+    { "micropolis", "Reads Micropolis disks", "*.img *.flux", "micropolis.img", "0", "76", "0", "1"},
+    { "mx", "Reads MX disks", "*.img *.flux", "mx.img", "0", "79", "0", "1"},
+    { "tids990", "Reads Texas Instruments DS990 disks", "*.img *.flux", "tids990.img", "0", "76", "0", "1"},
+    { "victor9k", "Reads Victor 9000 disks", "*.img *.flux", "victor9k.img", "0", "79", "0", ""},
+    { "zilogmcz", "Reads Zilog MCZ disks", "*.img *.flux", "zilogmcz.img", "0", "76", "0", ""}
 };
 
 
@@ -129,24 +130,24 @@ FormatsDescription my_readformats[readformats] = {
  *
  */
 FormatsDescription my_writeformats[writeformats] = {
-    { "amiga", "Writes Commodore Amiga disks", "*.adf", "amiga.adf", "0", "79", "0-1"},
-    { "atarist360", "Writes 360 kB Atari st disks", "*.img", "atarist360.st", "0", "79", "0-1"},
-    { "atarist370", "Writes 370 kB Atari st disks", "*.img", "atarist370.st", "0", "81", "0"},
-    { "atarist400", "Writes 400 kB Atari st disks", "*.img", "atarist400.st", "0", "79", "0"},
-    { "atarist410", "Writes 410 kB Atari st disks", "*.img", "atarist410.st", "0", "81", "0"},
-    { "atarist720", "Writes 720 kB Atari st disks", "*.img", "atarist720.st", "0", "79", "0-1"},
-    { "atarist740", "Writes 740 kB Atari st disks", "*.img", "atarist740.st", "0", "81", "0-1"},
-    { "atarist800", "Writes 800 kB Atari st disks", "*.img", "atarist800.st", "0", "79", "0-1"},
-    { "atarist820", "Writes 820 kB Atari st disks", "*.img", "atarist820.st", "0", "81", "0-1"},
-    { "brother120", "Writes 120 kB Brother word processor disks", "*.img", "brother120.img", "0", "39", "0"},
-    { "brother240", "Writes 240 kB Brother word processor disks", "*.img", "brother240.img", "0", "80", "0"},
-    { "commodore1541", "Writes Commodore 64 disks in 1541 format", "*.d64", "commodore1541.d64", "0", "39", "0"},
-    { "commodore1581", "Writes Commodore 64 disks in 1581 format", "*.d81", "commodore1581.d64", "0", "79", "0-1"},
-    { "hplif770", "Writes 770 kB HP LIF format disks", "*.img *.imd *.st", "hplif770.img", "0", "76", "0-1"},
-    { "ibm1440", "Writes 1440 kB IBM format disks", "*.img *.imd *.st", "ibm1440.img", "0", "79", "0-1"},
-    { "ibm720", "Writes 720 kB IBM format disks", "*.img *.imd *.st", "ibm720.img", "0", "79", "0-1"},
-    { "macintosh", "Writes Apple Macintosh disks", "*.diskcopy", "macintosh.diskcopy", "0", "79", "0-1"},
-    { "tids990", "Writes Texas Instruments DS990 disks", "*.img", "tids990.img", "0", "76", "0-1"},
+    { "amiga", "Writes Commodore Amiga disks", "*.adf", "amiga.adf", "0", "79", "0", "1"},
+    { "atarist360", "Writes 360 kB Atari st disks", "*.img", "atarist360.st", "0", "79", "0", "1"},
+    { "atarist370", "Writes 370 kB Atari st disks", "*.img", "atarist370.st", "0", "81", "0", ""},
+    { "atarist400", "Writes 400 kB Atari st disks", "*.img", "atarist400.st", "0", "79", "0", ""},
+    { "atarist410", "Writes 410 kB Atari st disks", "*.img", "atarist410.st", "0", "81", "0", ""},
+    { "atarist720", "Writes 720 kB Atari st disks", "*.img", "atarist720.st", "0", "79", "0", "1"},
+    { "atarist740", "Writes 740 kB Atari st disks", "*.img", "atarist740.st", "0", "81", "0", "1"},
+    { "atarist800", "Writes 800 kB Atari st disks", "*.img", "atarist800.st", "0", "79", "0", "1"},
+    { "atarist820", "Writes 820 kB Atari st disks", "*.img", "atarist820.st", "0", "81", "0", "1"},
+    { "brother120", "Writes 120 kB Brother word processor disks", "*.img", "brother120.img", "0", "39", "0", ""},
+    { "brother240", "Writes 240 kB Brother word processor disks", "*.img", "brother240.img", "0", "80", "0",""},
+    { "commodore1541", "Writes Commodore 64 disks in 1541 format", "*.d64", "commodore1541.d64", "0", "39", "0",""},
+    { "commodore1581", "Writes Commodore 64 disks in 1581 format", "*.d81", "commodore1581.d64", "0", "79", "0","1"},
+    { "hplif770", "Writes 770 kB HP LIF format disks", "*.img *.imd *.st", "hplif770.img", "0", "76", "0", "1"},
+    { "ibm1440", "Writes 1440 kB IBM format disks", "*.img *.imd *.st", "ibm1440.img", "0", "79", "0", "1"},
+    { "ibm720", "Writes 720 kB IBM format disks", "*.img *.imd *.st", "ibm720.img", "0", "79", "0", "1"},
+    { "macintosh", "Writes Apple Macintosh disks", "*.diskcopy", "macintosh.diskcopy", "0", "79", "0","1"},
+    { "tids990", "Writes Texas Instruments DS990 disks", "*.img", "tids990.img", "0", "76", "0","1"},
 };
 
 wizard::wizard(QWidget *parent, int intDrive)
@@ -155,6 +156,7 @@ wizard::wizard(QWidget *parent, int intDrive)
   setPage(Page_Intro, new IntroPage);
   setPage(Page_Read, new ReadPage());
   setPage(Page_Write, new WritePage);
+  setPage(Page_Advanced, new AdvancedPage);
   setPage(Page_Conclusion, new ConclusionPage);
   intSelectedDrive = intDrive;
   setStartId(Page_Intro);
@@ -238,8 +240,10 @@ ReadPage::ReadPage(QWidget *parent)
     : QWizardPage(parent)
 {
     QValidator *validator = new QIntValidator(10, 99, this);
-    QRegularExpression rx("^[0-1][-][1]$");
+//    QRegularExpression rx("^[0-1][-][1]$");
+    QRegularExpression rx("[0-1]");
     QValidator *validatorhead = new QRegularExpressionValidator(rx, this);
+//    QValidator *validatorhead = new QIntValidator(0, 1, this);
     setTitle(tr("Set the read options for <i>Fluxengine</i>;"));
     setSubTitle(tr("Please choose the format of the disk to be read "
                    "and the name of the output file (e.g., wordperfect5.img)."));
@@ -260,7 +264,7 @@ ReadPage::ReadPage(QWidget *parent)
     QObject::connect(trackLineEditStart, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
     QObject::connect(trackLineEditStart, SIGNAL(textChanged(QString)), this, SLOT(editLineBox(QString)));
     trackLineEditStart->setValidator(validator);
-    trackLabelStop = new QLabel(tr(" : "));
+    trackLabelStop = new QLabel(tr(" - "));
     trackLineEditStop = new QLineEdit;
     QObject::connect(trackLineEditStop, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
     QObject::connect(trackLineEditStop, SIGNAL(textChanged(QString)), this, SLOT(editLineBox(QString)));
@@ -269,11 +273,16 @@ ReadPage::ReadPage(QWidget *parent)
     QObject::connect(directoryComboBox, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
     QObject::connect(directoryComboBox, SIGNAL(textChanged(QString)), this, SLOT(editDirectoryBox(QString)));
 
-    HeadLineLabel = new QLabel(tr("Head(s):"));
-    HeadLineEdit = new QLineEdit;
-    QObject::connect(HeadLineEdit, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
-    QObject::connect(HeadLineEdit, SIGNAL(textChanged(QString)), this, SLOT(editLineBox(QString)));
-    HeadLineEdit->setValidator(validatorhead);
+    HeadLineLabelStart = new QLabel(tr("Head(s):"));
+    HeadLineEditStart = new QLineEdit;
+    QObject::connect(HeadLineEditStart, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
+    QObject::connect(HeadLineEditStart, SIGNAL(textChanged(QString)), this, SLOT(editLineBox(QString)));
+    HeadLineEditStart->setValidator(validatorhead);
+    headLabelStop = new QLabel(tr(" - "));
+    HeadLineEditStop = new QLineEdit;
+    QObject::connect(HeadLineEditStop, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
+    QObject::connect(HeadLineEditStop, SIGNAL(textChanged(QString)), this, SLOT(editLineBox(QString)));
+    HeadLineEditStop->setValidator(validatorhead);
 
     label = new QLabel("Outputfile");
     button = new QPushButton("Browse...");
@@ -299,7 +308,8 @@ ReadPage::ReadPage(QWidget *parent)
     registerField("ReadPage.SaveOutput*", directoryComboBox);
     registerField("ReadPage.Saveflux", fluxComboBox);
     registerField("ReadPage.Save1flux", flux1ComboBox);
-    registerField("ReadPage.Heads*", HeadLineEdit);
+    registerField("ReadPage.Headstart*", HeadLineEditStart);
+    registerField("ReadPage.Headstop*", HeadLineEditStop);
 
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(nameLabel, 0, 0);
@@ -308,8 +318,10 @@ ReadPage::ReadPage(QWidget *parent)
     layout->addWidget(trackLineEditStart, 1, 1);
     layout->addWidget(trackLabelStop, 1, 2);
     layout->addWidget(trackLineEditStop, 1, 3);
-    layout->addWidget(HeadLineLabel, 2, 0);
-    layout->addWidget(HeadLineEdit, 2, 1);
+    layout->addWidget(HeadLineLabelStart, 2, 0);
+    layout->addWidget(HeadLineEditStart, 2, 1);
+    layout->addWidget(headLabelStop, 2, 2);
+    layout->addWidget(HeadLineEditStop, 2, 3);
     layout->addWidget(label,3,0);
     layout->addWidget(directoryComboBox, 3,1);
     layout->addWidget(button, 3, 2);
@@ -506,7 +518,7 @@ void ReadPage::updatedirectorybox(int index)
     QString strFile;
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
 
-    if (index != 0)
+    if (index >= 0)
     {
         trackLineEditStart->setFocus();
         trackLineEditStart->setText(my_readformats[index].trackstart);
@@ -522,8 +534,27 @@ void ReadPage::updatedirectorybox(int index)
             trackLineEditStop->setFocus();
             trackLineEditStop->setText(my_readformats[index].trackstop);
         }
-        HeadLineEdit->setFocus();
-        HeadLineEdit->setText(my_readformats[index].Heads);
+        HeadLineEditStart->setFocus();
+        HeadLineEditStart->setText(my_readformats[index].Headstart);
+        if (my_readformats[index].Headstop == "")
+        {
+            //empty no second head
+//            QRegularExpression rx("[0]");
+//            QValidator *validatorhead = new QRegularExpressionValidator(rx, this);
+//            HeadLineEditStart->setValidator(validatorhead);
+            HeadLineEditStop->setVisible(false);
+            headLabelStop->setVisible(false);
+            HeadLineEditStop->setText(my_readformats[index].Headstart);
+            HeadLineEditStart->setDisabled(true);
+
+        } else
+        {
+            HeadLineEditStop->setVisible(true);
+            headLabelStop->setVisible(true);
+            HeadLineEditStop->setFocus();
+            HeadLineEditStop->setText(my_readformats[index].Headstop);
+            HeadLineEditStart->setDisabled(false);
+        }
     }
 
     strFilter = my_readformats[readFormatbox->currentIndex()].strFilter;
@@ -636,7 +667,7 @@ WritePage::WritePage(QWidget *parent)
     QObject::connect(trackLineEditStart, SIGNAL(textChanged(QString)), this, SLOT(editLineBox(QString)));
     trackLineEditStart->setText("0");
     trackLineEditStart->setValidator(validator);
-    trackLabelStop = new QLabel(tr(" : "));
+    trackLabelStop = new QLabel(tr(" - "));
     trackLineEditStop = new QLineEdit;
     QObject::connect(trackLineEditStop, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
     QObject::connect(trackLineEditStop, SIGNAL(textChanged(QString)), this, SLOT(editLineBox(QString)));
@@ -647,12 +678,17 @@ WritePage::WritePage(QWidget *parent)
     QObject::connect(directoryComboBox, SIGNAL(textChanged(QString)), this, SLOT(editDirectoryBox(QString)));
 
     // -s :d=0:s=0:t=0-39
-    HeadLineLabel = new QLabel(tr("Head(s):"));
-    HeadLineEdit = new QLineEdit;
-    QObject::connect(HeadLineEdit, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
-    QObject::connect(HeadLineEdit, SIGNAL(textChanged(QString)), this, SLOT(editLineBox(QString)));
-    HeadLineEdit->setText("0-1");
-    HeadLineEdit->setValidator(validatorhead);
+    HeadLabelStart = new QLabel(tr("Head(s):"));
+    HeadLineEditStart = new QLineEdit;
+    QObject::connect(HeadLineEditStart, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
+    QObject::connect(HeadLineEditStart, SIGNAL(textChanged(QString)), this, SLOT(editLineBox(QString)));
+    HeadLineEditStart->setValidator(validatorhead);
+    headLabelStop = new QLabel(tr(" - "));
+    HeadLineEditStop = new QLineEdit;
+    QObject::connect(HeadLineEditStop, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
+    QObject::connect(HeadLineEditStop, SIGNAL(textChanged(QString)), this, SLOT(editLineBox(QString)));
+    HeadLineEditStop->setValidator(validatorhead);
+
 
     label = new QLabel("Inputfile");
     button = new QPushButton("Browse...");
@@ -661,7 +697,8 @@ WritePage::WritePage(QWidget *parent)
     registerField("WritePage.TrackStart", trackLineEditStart);
     registerField("WritePage.TrackStop", trackLineEditStop);
     registerField("WritePage.OpenInput*", directoryComboBox);
-    registerField("WritePage.Heads", HeadLineEdit);
+    registerField("WritePage.Headstart", HeadLineEditStart);
+    registerField("WritePage.Headstop", HeadLineEditStop);
 
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(nameLabel, 0, 0);
@@ -670,8 +707,10 @@ WritePage::WritePage(QWidget *parent)
     layout->addWidget(trackLineEditStart, 1, 1);
     layout->addWidget(trackLabelStop, 1, 2);
     layout->addWidget(trackLineEditStop, 1, 3);
-    layout->addWidget(HeadLineLabel, 2, 0);
-    layout->addWidget(HeadLineEdit, 2, 1);
+    layout->addWidget(HeadLabelStart, 2, 0);
+    layout->addWidget(HeadLineEditStart, 2, 1);
+    layout->addWidget(headLabelStop, 2, 2);
+    layout->addWidget(HeadLineEditStop, 2, 3);
     layout->addWidget(label,3,0);
     layout->addWidget(directoryComboBox, 3,1);
     layout->addWidget(button, 3, 2);
@@ -843,12 +882,68 @@ void WritePage::Update(int index)
             trackLineEditStop->setText(my_writeformats[index].trackstop);
             trackLineEditStop->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
         }
-        HeadLineEdit->setFocus();
-        HeadLineEdit->setText(my_writeformats[index].Heads);
-        HeadLineEdit->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
+        HeadLineEditStart->setFocus();
+        HeadLineEditStart->setText(my_writeformats[index].Headstart);
+        HeadLineEditStop->setFocus();
+        if (my_writeformats[index].Headstop == "")
+        {
+            //empty no second head
+//            QRegularExpression rx("[0]");
+//            QValidator *validatorhead = new QRegularExpressionValidator(rx, this);
+//            HeadLineEditStart->setValidator(validatorhead);
+            HeadLineEditStop->setVisible(false);
+            headLabelStop->setVisible(false);
+            HeadLineEditStop->setText(my_writeformats[index].Headstart);
+            HeadLineEditStart->setDisabled(true);
+
+        } else
+        {
+            HeadLineEditStop->setVisible(true);
+            headLabelStop->setVisible(true);
+//            HeadLineEditStop->setFocus();
+            HeadLineEditStop->setText(my_writeformats[index].Headstop);
+            HeadLineEditStart->setDisabled(false);
+        }
     }
 }
+AdvancedPage::AdvancedPage(QWidget *parent)
+    : QWizardPage(parent)
+{
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
 
+    bottomLabel = new QLabel;
+    bottomLabel->setWordWrap(true);
+
+//    registerField("Fluxengine.command", bottomLabel);
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(bottomLabel);
+    setLayout(layout);
+
+
+}
+
+void AdvancedPage::initializePage()
+{
+    bottomLabel->setText("advancedoptions");
+    if (field("IntroPage.read") == "True")
+    {
+        setTitle(tr("The fluxengine wizard had gathered all the necessary settings to proceed reading the disk."));
+        setSubTitle(tr("The command for fluxengine is shown below. Press finish to start reading"));
+
+    } else
+    {
+        setTitle(tr("The fluxengine wizard had gathered all the necessary settings to proceed writing the disk."));
+        setSubTitle(tr("The command for fluxengine is shown below. Press finish to start writing"));
+    }
+
+}
+
+int AdvancedPage::nextId() const
+{
+    return wizard::Page_Conclusion;
+
+}
 
 ConclusionPage::ConclusionPage(QWidget *parent)
     : QWizardPage(parent)
@@ -928,8 +1023,23 @@ QString ConclusionPage::getData()
 
        strFormat.append(TrackStop);
 
-       QString Heads = field("ReadPage.Heads").toString();
-       strFormat.append(" -h " + Heads);
+       QString Headstart = field("ReadPage.Headstart").toString();
+       QString Headstop = field("ReadPage.Headstop").toString();
+       if (Headstart > Headstop)
+           //swap around)
+       {
+           QString tmp = Headstart;
+           Headstart = Headstop;
+           Headstop = tmp;
+       }
+       strFormat.append(" -h " + Headstart);
+       if ((Headstop == "") || (Headstop == Headstart))
+       {
+           //nothing
+       } else
+       {
+           strFormat.append("-" + Headstop);
+       }
 
        strFormat.append(" -o ");
        strFormat.append(_strOutputfile);
@@ -966,8 +1076,23 @@ QString ConclusionPage::getData()
         }
         strFormat.append(TrackStop);
 
-        QString writeHeads = field("WritePage.Heads").toString();
-        strFormat.append(" -h " + writeHeads);
+        QString writeHeadstart = field("WritePage.Headstart").toString();
+        QString writeHeadstop = field("WritePage.Headstop").toString();
+        if (writeHeadstart > writeHeadstop)
+            //swap around)
+        {
+            QString tmp = writeHeadstart;
+            writeHeadstart = writeHeadstop;
+            writeHeadstop = tmp;
+        }
+        strFormat.append(" -h " + writeHeadstart);
+        if ((writeHeadstop == "") || (writeHeadstop == writeHeadstart))
+        {
+            //nothing
+        } else
+        {
+            strFormat.append("-" + writeHeadstop);
+        }
         command.append(strFormat);
     }
 
