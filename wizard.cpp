@@ -768,9 +768,6 @@ bool WritePage::isComplete() const
 void WritePage::initializePage()
 {
     writeFormatbox->setCurrentIndex(WriteFormatDefault);   //set IBM as standard
-    directoryComboBox->setText("."); // trick the program to disable the next button
-    directoryComboBox->clear();
-
 }
 
 int WritePage::nextId() const
@@ -781,31 +778,18 @@ int WritePage::nextId() const
 
 void WritePage::editDirectoryBox(QString dir)
 {
-    QMessageBox msgBox;
-    //bepaal welke linedit the focus heeft
-    {
+    { //Check if the file to write exists
         if (dir != "")
         {
-            //haal het einde van de string af. De filenaam:-)
-            int last_dot = dir.lastIndexOf("/");
-            QString dir1 = dir.left(last_dot);
-            const QFileInfo outputDir(dir1);
-            if (!outputDir.isDir()) {
+            const QFileInfo outputDir(dir);
+            if (!outputDir.isFile()) {
                 directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
+                emit completeChanged();
             } else
             {
-                int last_dot = dir.lastIndexOf(".");
-                int size = dir.size();
-                if ((last_dot == -1) || ((size - last_dot) > 5))
-                  //check for valid filenaam. ends with .xxx
-                {
-                    directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
-                    emit completeChanged();
-                } else
-                {
-                    directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
-                    emit completeChanged();
-                }
+                directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
+                _strInputfile = dir;
+                emit completeChanged();
             }
         } else
         {
@@ -813,7 +797,6 @@ void WritePage::editDirectoryBox(QString dir)
             emit completeChanged();
         }
     }
-
 }
 
 void WritePage::editLineBox(QString dir)
@@ -923,13 +906,7 @@ void WritePage::Update(int index)
 //            HeadLineEditStop->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
             HeadLineEditStart->setDisabled(false);
         }
-        if (directoryComboBox->text() != "")
-        {
-            directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
-        } else
-        {
-            directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
-        }
+        editDirectoryBox(directoryComboBox->text());
     }
 }
 AdvancedPage::AdvancedPage(QWidget *parent)
