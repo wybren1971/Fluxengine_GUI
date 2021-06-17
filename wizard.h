@@ -141,7 +141,23 @@ public:
 
 private slots:
 private:
-    QLabel *bottomLabel;
+    QLabel *revolutionsLabel;
+    QLabel *revolutionsLabelexplain;
+    QLabel *retriesLabel;
+    QLabel *retriesLabelexplain;
+    QLabel *debounceLabelexplain;
+    QLabel *clock_intervalLabelexplain;
+    QLabel *debounceLabel;
+    QLabel *clock_intervalLabel;
+    QLabel *syncLabel;
+    QLabel *syncLabelexplain;
+
+    QLineEdit *revolutionsEdit;
+    QCheckBox *syncEdit;
+    QLineEdit *retriesEdit;
+    QLineEdit *debounceLabelEdit;
+    QLineEdit *clock_intervalLabelEdit;
+
 };
 
 //! [6]

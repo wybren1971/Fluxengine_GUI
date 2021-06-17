@@ -314,6 +314,7 @@ ReadPage::ReadPage(QWidget *parent)
     registerField("ReadPage.Save1flux", flux1ComboBox);
     registerField("ReadPage.Headstart*", HeadLineEditStart);
     registerField("ReadPage.Headstop*", HeadLineEditStop);
+    registerField("ReadPage.Advanced", Checkbox);
 
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(nameLabel, 0, 0);
@@ -912,15 +913,107 @@ void WritePage::Update(int index)
 AdvancedPage::AdvancedPage(QWidget *parent)
     : QWizardPage(parent)
 {
+    /*
+     * Other important flags
+     *
+     *   These flags apply to many operations and are useful for modifying the overall behaviour.
+     *
+     *   --input.flux.drive.revolutions=X
+     *
+     *  When reading, spin the disk X times. X can be a floating point number. The default is usually 1.2. Some formats default to 1. Increasing the number will sample more data, and can be useful on dubious disks to try and get a better read.
+     *
+     *  --input.flux.drive.sync_with_index=true|false
+     *   Wait for an index pulse before starting to read the disk. (Ignored for write operations.) By default FluxEngine doesn't, as it makes reads faster, but when diagnosing disk problems it's helpful to have all your data start at the same place each time.
+     *   --decoder.pulse_debounce_threshold controls whether FluxEngine ignores pairs of pulses in rapid succession. This is common on some disks (I've observed them on Brother word processor disks).
+     *
+     *   --decoder.clock_interval_bias adds a constant bias to the intervals between pulses before doing decodes. This is very occasionally necessary to get clean reads --- for example, if the machine which wrote the disk always writes pulses late. If you try this, use very small numbers (e.g. 0.02). Negative values are allowed.
+     */
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
 
-    bottomLabel = new QLabel;
-    bottomLabel->setWordWrap(true);
+    revolutionsLabelexplain = new QLabel;
+    retriesLabelexplain = new QLabel;
+    syncLabelexplain = new QLabel;
+    debounceLabelexplain = new QLabel;
+    clock_intervalLabelexplain = new QLabel;
 
-//    registerField("Fluxengine.command", bottomLabel);
+    revolutionsLabel = new QLabel;
+    syncLabel = new QLabel;
+    retriesLabel = new QLabel;
+    debounceLabel = new QLabel;
+    clock_intervalLabel = new QLabel;
 
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(bottomLabel);
+    revolutionsEdit = new QLineEdit;
+    syncEdit = new QCheckBox;
+    retriesEdit = new QLineEdit;
+    debounceLabelEdit = new QLineEdit;
+    clock_intervalLabelEdit = new QLineEdit;
+
+    revolutionsLabelexplain->setWordWrap(true);
+    retriesLabelexplain->setWordWrap(true);
+    syncLabelexplain->setWordWrap(true);
+    debounceLabelexplain->setWordWrap(true);
+    clock_intervalLabelexplain->setWordWrap(true);
+
+    revolutionsLabelexplain->setText("When reading, spin the disk X times. X can be a floating point number. The default is usually 1.2. Some formats default to 1. Increasing the number will sample more data, and can be useful on dubious disks to try and get a better read.");
+    retriesLabelexplain->setText("If the disk is particularly dodgy, you can force FluxEngine not to retry failed reads with --retries=0. This reduces head movement. This is not recommended.");
+    syncLabelexplain->setText("Wait for an index pulse before starting to read the disk. (Ignored for write operations.) By default FluxEngine doesn't, as it makes reads faster, but when diagnosing disk problems it's helpful to have all your data start at the same place each time.");
+    debounceLabelexplain->setText("pulse_debounce_threshold controls whether FluxEngine ignores pairs of pulses in rapid succession. This is common on some disks (I've observed them on Brother word processor disks). The value typically varies from 0.0 to 0.5; the default is 0.2.");
+    clock_intervalLabelexplain->setText("clock_interval_bias adds a constant bias to the intervals between pulses before doing decodes. This is very occasionally necessary to get clean reads --- for example, if the machine which wrote the disk always writes pulses late. If you try this, use very small numbers (e.g. 0.02). Negative values are allowed.");
+
+    QFont font = revolutionsLabelexplain->font();
+    font.setPointSize(8);
+    revolutionsLabelexplain->setFont(font);
+    retriesLabelexplain->setFont(font);
+    syncLabelexplain->setFont(font);
+    debounceLabelexplain->setFont(font);
+    clock_intervalLabelexplain->setFont(font);
+
+    revolutionsLabel->setText("Revolutions:");
+    syncLabel->setText("Wait for index pulse:");
+    retriesLabel->setText("Number of retries:");
+    debounceLabel->setText("Debounce value:");
+    clock_intervalLabel->setText("constant bias:");
+
+//    QValidator *validator = new QValidator(1, 99, this);
+
+    //"0?\\.\\d{0,10}"
+    QRegExp rx("[0-1]\\.\\d{1,2}");
+    QValidator *revolutionsvalidator = new QRegExpValidator(rx, this);
+    revolutionsEdit->setValidator(revolutionsvalidator);
+    QIntValidator *retriesvalidator= new QIntValidator(0,20);
+    retriesEdit->setValidator(retriesvalidator);
+//    QDoubleValidator *debouncevalidator= new QDoubleValidator(0.00, 0.50, 2);
+    QRegExp rx1("0?\\.\\d{0,2}");
+    QValidator *debouncevalidator = new QRegExpValidator(rx1, this);
+    debounceLabelEdit->setValidator(debouncevalidator);
+//    QDoubleValidator *clock_intervalvalidator= new QDoubleValidator(-1.000, 1.000, 3);
+    QRegExp rx2("-?0?\\.\\d{0,3}");
+    QValidator *clock_intervalvalidator = new QRegExpValidator(rx2, this);
+    clock_intervalLabelEdit->setValidator(clock_intervalvalidator);
+
+    registerField("AdvancedPage.revolutions", revolutionsEdit);
+    registerField("AdvancedPage.retries", retriesEdit);
+    registerField("AdvancedPage.sync", syncEdit);
+    registerField("AdvancedPage.clock_interval", clock_intervalLabelEdit);
+    registerField("AdvancedPage.debounce", debounceLabelEdit);
+
+    QGridLayout *layout = new QGridLayout;
+    layout->setSizeConstraint(layout->SetFixedSize);
+    layout->addWidget(revolutionsLabel, 0, 0);
+    layout->addWidget(revolutionsEdit, 0, 1);
+    layout->addWidget(revolutionsLabelexplain, 0, 2);
+    layout->addWidget(retriesLabel, 1, 0);
+    layout->addWidget(retriesEdit, 1, 1);
+    layout->addWidget(retriesLabelexplain, 1, 2);
+    layout->addWidget(syncLabel, 2, 0);
+    layout->addWidget(syncEdit, 2, 1);
+    layout->addWidget(syncLabelexplain, 2, 2);
+    layout->addWidget(clock_intervalLabel, 3, 0);
+    layout->addWidget(clock_intervalLabelEdit, 3, 1);
+    layout->addWidget(clock_intervalLabelexplain, 3, 2);
+    layout->addWidget(debounceLabel, 4, 0);
+    layout->addWidget(debounceLabelEdit, 4, 1);
+    layout->addWidget(debounceLabelexplain, 4, 2);
     setLayout(layout);
 
 
@@ -928,16 +1021,15 @@ AdvancedPage::AdvancedPage(QWidget *parent)
 
 void AdvancedPage::initializePage()
 {
-    bottomLabel->setText("advancedoptions");
     if (field("IntroPage.read") == "True")
     {
-        setTitle(tr("The fluxengine wizard had gathered all the necessary settings to proceed reading the disk."));
-        setSubTitle(tr("The command for fluxengine is shown below. Press finish to start reading"));
+        setTitle(tr("Set some advanced read option to tweak fluxengine when reading the disk."));
+        setSubTitle(tr("Be careful what you choose here. Leave empty to ignore"));
 
     } else
     {
-        setTitle(tr("The fluxengine wizard had gathered all the necessary settings to proceed writing the disk."));
-        setSubTitle(tr("The command for fluxengine is shown below. Press finish to start writing"));
+        setTitle(tr("Set some advanced write option to tweak fluxengine when reading the disk."));
+        setSubTitle(tr("Be careful what you choose here. Leave empty to ignore"));
     }
 
 }
@@ -1052,6 +1144,35 @@ QString ConclusionPage::getData()
        {
            strFormat.append(" --copy-flux-to ");
            strFormat.append(_strFluxFile);
+       }
+       if (field("ReadPage.Advanced") == "true")
+       {
+           QString retries = field("AdvancedPage.retries").toString();
+           QString revolutions = field("AdvancedPage.revolutions").toString();
+           QString sync = field("AdvancedPage.sync").toString();
+           QString clock_interval = field("AdvancedPage.clock_interval").toString();
+           QString debounce = field("AdvancedPage.debounce").toString();
+           qInfo() << retries;
+           if (retries != "")
+           {
+               strFormat.append(" --decoder.retries=" + retries);
+           }
+           if (revolutions != "")
+           {
+               strFormat.append(" --input.flux.drive.revolutions=" + revolutions);
+           }
+           if (clock_interval != "")
+           {
+               strFormat.append(" --decoder.clock_interval_bias " + clock_interval);
+           }
+           if (debounce != "")
+           {
+               strFormat.append(" --decoder.pulse_debounce_threshold " + debounce);
+           }
+           if (sync ==  "true")
+           {
+               strFormat.append(" --input.flux.drive.sync_with_index="+sync);
+           }
        }
        command.append(strFormat);
     }
