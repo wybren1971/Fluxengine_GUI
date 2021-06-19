@@ -26,6 +26,25 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
         ui->cmbFluxengineLocation->addItem(settings.value("fluxengine").toString());
     }
 
+    if (settings.value("csvlocation").toString() != "")
+    {
+        ui->cmbcsvlocation->addItem(settings.value("csvlocation").toString());
+    }
+
+    if (settings.value("showanalyzebutton").toString() != "")
+    {
+        ui->chkShowAnalyzeButton->setChecked(settings.value("showanalyzebutton").toBool());
+    }
+
+    if (settings.value("NUMBER_OF_COMMANDS").toString() == "")
+    {//set default
+        ui->intNumberofcommands->setText("10");
+    } else
+    {
+        ui->intNumberofcommands->setText(settings.value("NUMBER_OF_COMMANDS").toString());
+    }
+
+
     QList<QRadioButton *> allRadioButtons = ui->groupBox_2->findChildren<QRadioButton*>();
     for (auto RadioButton : allRadioButtons) {
         if (settings.value("drive0").toString() == RadioButton->text())
@@ -42,14 +61,18 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
         }
     }
 
+    QValidator *validator = new QIntValidator(10, 99, this);
+    ui->intNumberofcommands->setValidator(validator);
+
     connect(&m_fluxengine,&fluxengine::output,this,&DialogPreferences::output);
     connect(&m_fluxengine,&fluxengine::enableFluxengineCommands,this,&DialogPreferences::enablecommands);
     connect(ui->btndatalocation, SIGNAL(clicked()), SLOT(browse()));
+    connect(ui->btncsvlocation, SIGNAL(clicked()), SLOT(browsecsv()));
     connect(ui->btnfluxlocation, SIGNAL(clicked()), SLOT(browseflux()));
     connect(ui->btnfluxenginelocation, SIGNAL(clicked()), SLOT(browsefluxengine()));
     connect(ui->btnInitialize, SIGNAL(clicked()), SLOT(initializefluxengine()));
     connect(ui->buttonBox, SIGNAL(accepted()), SLOT(save()));
-    ui->tabWidget->setTabVisible(2, false);
+    ui->tabWidget->setTabVisible(2, true);
     ui->tabWidget->setCurrentIndex(0);
     State = 0;
 }
@@ -99,6 +122,26 @@ void DialogPreferences::browseflux()
         if (ui->cmbfluxlocation->findText(directory) == -1)
             ui->cmbfluxlocation->addItem(directory);
         ui->cmbfluxlocation->setCurrentIndex(ui->cmbfluxlocation->findText(directory));
+    }
+}
+
+void DialogPreferences::browsecsv()
+{
+    QString directory;
+    if (ui->cmbcsvlocation->count() == 0)
+    {
+        directory = QFileDialog::getExistingDirectory(this,
+                                tr("Set default csv output directory"), QDir::currentPath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    } else
+    {
+        directory = QFileDialog::getExistingDirectory(this,
+                                tr("Set default csv output directory"), ui->cmbcsvlocation->currentText(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    }
+
+    if (!directory.isEmpty()) {
+        if (ui->cmbcsvlocation->findText(directory) == -1)
+            ui->cmbcsvlocation->addItem(directory);
+        ui->cmbcsvlocation->setCurrentIndex(ui->cmbcsvlocation->findText(directory));
     }
 }
 
@@ -400,4 +443,7 @@ void DialogPreferences::save()
     settings.setValue("datalocation", ui->cmbdatalocation->currentText());
     settings.setValue("fluxlocation", ui->cmbfluxlocation->currentText());
     settings.setValue("fluxengine", ui->cmbFluxengineLocation->currentText());
+    settings.setValue("csvlocation", ui->cmbcsvlocation->currentText());
+    settings.setValue("showanalyzebutton", ui->chkShowAnalyzeButton->isChecked());
+    settings.setValue("NUMBER_OF_COMMANDS", ui->intNumberofcommands->text());
 }

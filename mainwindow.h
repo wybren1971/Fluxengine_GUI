@@ -79,6 +79,8 @@ protected:
         void showContextMenu(const QPoint &pt);
 
         void ClearText();
+        void on_btnAnalyse_clicked();
+
 private:
         void createActions();
         void createMenus();

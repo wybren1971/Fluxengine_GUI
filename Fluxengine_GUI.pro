@@ -27,17 +27,20 @@ SOURCES += \
     fluxengine.cpp \
     main.cpp \
     mainwindow.cpp \
+    showlayout.cpp \
     wizard.cpp
 
 HEADERS += \
     dialogpreferences.h \
     fluxengine.h \
     mainwindow.h \
+    showlayout.h \
     wizard.h
 
 FORMS += \
     dialogpreferences.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    showlayout.ui
 
 # Default rules for deployment.
 

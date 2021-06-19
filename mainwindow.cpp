@@ -5,12 +5,16 @@
 #include <qsettings.h>
 #include <dialogpreferences.h>
 #include <QApplication>
+#include <showlayout.h>
 
+
+int NUMBER_OF_COMMANDS;
 /*
  * To Do:
  * Aanpassen aan protobuf redesign V
  * inlezen van otpies uit protobuf tekstfiles
- * Vastleggen van type drives in preferences zodat goede settings gebruikt worden (40track HD 96tpi, 48 tpi ertc)
+ * Vastleggen van type drives in pre
+ * ferences zodat goede settings gebruikt worden (40track HD 96tpi, 48 tpi ertc)
  *
  *
  *
@@ -23,6 +27,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
     m_fluxengine.setWorkingDirectory(settings.value("fluxengine").toString());
+    if (settings.value("NUMBER_OF_COMMANDS").toString() == "")
+    {//set default
+        NUMBER_OF_COMMANDS = 10;
+    } else
+    {
+        NUMBER_OF_COMMANDS = settings.value("NUMBER_OF_COMMANDS").toInt();
+    }
     restoreGeometry(settings.value("myWidget/geometry").toByteArray());
     restoreState(settings.value("myWidget/windowState").toByteArray());
     ui->setupUi(this);
@@ -42,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent)
     int width = settings.value("WindowWidth").toInt();
     int height = settings.value("WindowHeight").toInt();
     this->resize(width, height);
+    ui->btnAnalyse->setEnabled(settings.value("showanalyzebutton").toBool());
     ui->btnReadDisk->setFocus();
     ui->plainTextEdit_2->completer();
     ReadItemList();
@@ -387,8 +399,8 @@ void MainWindow::output(QString data)
 
 void MainWindow::enableFluxengineCommands(bool blnStarted)
 {
-    qInfo() << Q_FUNC_INFO;
-    qInfo() << blnStarted;
+//    qInfo() << Q_FUNC_INFO;
+//    qInfo() << blnStarted;
 
     if (blnStarted)
     {
@@ -453,7 +465,7 @@ void MainWindow::on_btnDrive1_clicked()
 void MainWindow::ReadItemList()
 {
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
-    for (unsigned i = 0;i<10;i++)
+    for (int i = 0;i<NUMBER_OF_COMMANDS;i++)
     {
         QString setting = "Fluxengine.command";
         QString s = QString::number(i);
@@ -471,7 +483,7 @@ void MainWindow::WriteItemList()
 {
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
     //write to settings
-    for (unsigned i = 0;i<10;i++)
+    for (int i = 0;i<NUMBER_OF_COMMANDS;i++)
     {
         QString setting = "Fluxengine.command";
         QString s = QString::number(i);
@@ -487,7 +499,7 @@ void MainWindow::WriteItemList()
                 QString settingold = "Fluxengine.command";
                 //overwrite move everything up and loose first command.
                 //1 overschrijft 0, 2 overschrijft 1 3 overschrijft 2 etc 9 wordt toegevoegd
-                for (unsigned i = 0;i<9;i++)
+                for (int i = 0;i<(NUMBER_OF_COMMANDS-1);i++)
                 {
                     QString s = QString::number(i);
                     QString t = QString::number(i+1);
@@ -507,9 +519,11 @@ void MainWindow::on_bntStartFluxengine_clicked()
     //We dont want the test and rpm commands in the list because there are dedicated buttons for this.
     QString string1 = m_fluxengine.getAddress();
     QString string2 = m_fluxengine.getAddress();
+    QString string3 = m_fluxengine.getAddress();
     string1.truncate(4);
     string2.truncate(3);
-    if (( string1 != "test") && (string2 != "rpm"))
+    string3.truncate(7);
+    if (( string1 != "test") && (string2 != "rpm") && (string2 != "analyse"))
     {
         if (m_fluxengine.busy())
              m_fluxengine.stop();
@@ -580,3 +594,32 @@ void MainWindow::ClearText()
 {
     ui->txtOutput->clear();
 }
+
+void MainWindow::on_btnAnalyse_clicked()
+{
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    QDir dir;
+    QString strFilter = "*.csv";
+    QString directory = settings.value("csvlocation").toString();
+    //let the user choose a csv file
+    dir.setPath(QFileDialog::getOpenFileName(this,
+                            tr("Choose the csv file to analyze"), directory, strFilter));
+
+    // execute the analyse command
+//    qInfo() << "Dir path is " << dir.absolutePath() << (!dir.isEmpty());
+    if (dir.absolutePath() != "")
+    {
+//        qInfo() << "Dir path is " << dir.absolutePath();
+        m_fluxengine.setAddress("analyse layout --csv " + dir.absolutePath());
+        if (m_fluxengine.busy())
+             m_fluxengine.stop();
+        m_fluxengine.start();
+    }
+
+    //show the resulting png
+    showlayout *form = new showlayout();
+    form->setWindowTitle("Visual layout of the disk");
+    form->LoadFile("disklayout.png");
+    form->exec();
+}
+

@@ -60,6 +60,8 @@ private slots:
     void editFluxBox(QString dir);
     void editFlux1Box(QString dir);
     void editLineBox(QString dir);
+    void browseCSVComboBox();
+    void editCSVComboBox(QString dir);
 private:
     QLabel *nameLabel;
     QLabel *trackLabel;
@@ -71,14 +73,17 @@ private:
     QLabel *label1;
     QLabel *label2;
     QLabel *lblAdvancedSettings;
+    QLabel *label3;
 
     QPushButton *button;
     QPushButton *button1;
     QPushButton *button2;
+    QPushButton *button3;
     QComboBox *readFormatbox;
     QLineEdit *directoryComboBox;
     QLineEdit *fluxComboBox;
     QLineEdit *flux1ComboBox;
+    QLineEdit *CSVComboBox;
     QLineEdit *nameLineEdit;
     QLineEdit *trackLineEdit;
     QLineEdit *HeadLineEditStart;

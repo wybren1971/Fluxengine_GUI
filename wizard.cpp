@@ -25,6 +25,7 @@ QString _strOutputfile;
 QString _strInputfile;
 QString _strFluxFile;
 QString _strInputFluxFile;
+QString _strCSVfile;
 
 const int readformats = 20;
 const int writeformats = 18;
@@ -302,6 +303,13 @@ ReadPage::ReadPage(QWidget *parent)
     QObject::connect(flux1ComboBox, SIGNAL(textChanged(QString)), this, SLOT(editFlux1Box(QString)));
     connect(button2, SIGNAL(clicked()), SLOT(browsereadflux()));
 
+    label3 = new QLabel("CSV file");
+    button3 = new QPushButton("Browse...");
+    CSVComboBox = new QLineEdit();
+    QObject::connect(CSVComboBox, SIGNAL(textChanged(QString)), this, SIGNAL(completeChanged()));
+    QObject::connect(CSVComboBox, SIGNAL(textChanged(QString)), this, SLOT(editCSVComboBox(QString)));
+    connect(button3, SIGNAL(clicked()), SLOT(browseCSVComboBox()));
+
     lblAdvancedSettings = new QLabel("Advanced settings");
     Checkbox = new QCheckBox;
     Checkbox->setToolTip("check this to set advanced read settings");
@@ -315,29 +323,33 @@ ReadPage::ReadPage(QWidget *parent)
     registerField("ReadPage.Headstart*", HeadLineEditStart);
     registerField("ReadPage.Headstop*", HeadLineEditStop);
     registerField("ReadPage.Advanced", Checkbox);
+    registerField("ReadPage.SaveCSV", CSVComboBox);
 
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(nameLabel, 0, 0);
     layout->addWidget(readFormatbox, 0, 1);
-    layout->addWidget(trackLabelStart, 1, 0);
-    layout->addWidget(trackLineEditStart, 1, 1);
-    layout->addWidget(trackLabelStop, 1, 2);
-    layout->addWidget(trackLineEditStop, 1, 3);
-    layout->addWidget(HeadLineLabelStart, 2, 0);
-    layout->addWidget(HeadLineEditStart, 2, 1);
-    layout->addWidget(headLabelStop, 2, 2);
-    layout->addWidget(HeadLineEditStop, 2, 3);
-    layout->addWidget(label,3,0);
-    layout->addWidget(directoryComboBox, 3,1);
-    layout->addWidget(button, 3, 3);
-    layout->addWidget(label1,4,0);
-    layout->addWidget(fluxComboBox, 4,1);
-    layout->addWidget(button1, 4, 3);
-    layout->addWidget(label2,5,0);
-    layout->addWidget(flux1ComboBox, 5,1);
-    layout->addWidget(button2, 5, 3);
-    layout->addWidget(lblAdvancedSettings, 6,0);
-    layout->addWidget(Checkbox, 6, 1);
+    layout->addWidget(label2,1,0);
+    layout->addWidget(flux1ComboBox, 1,1);
+    layout->addWidget(button2, 1, 3);
+    layout->addWidget(trackLabelStart, 2, 0);
+    layout->addWidget(trackLineEditStart, 2, 1);
+    layout->addWidget(trackLabelStop, 2, 2);
+    layout->addWidget(trackLineEditStop, 2, 3);
+    layout->addWidget(HeadLineLabelStart, 3, 0);
+    layout->addWidget(HeadLineEditStart, 3, 1);
+    layout->addWidget(headLabelStop, 3, 2);
+    layout->addWidget(HeadLineEditStop, 3, 3);
+    layout->addWidget(label,4,0);
+    layout->addWidget(directoryComboBox, 4,1);
+    layout->addWidget(button, 4, 3);
+    layout->addWidget(label1,5,0);
+    layout->addWidget(fluxComboBox, 5,1);
+    layout->addWidget(button1, 5, 3);
+    layout->addWidget(label3,6,0);
+    layout->addWidget(CSVComboBox, 6,1);
+    layout->addWidget(button3, 6, 3);
+    layout->addWidget(lblAdvancedSettings, 7,0);
+    layout->addWidget(Checkbox, 7, 1);
 
     setLayout(layout);
 }
@@ -353,6 +365,8 @@ int ReadPage::nextId() const
     _strOutputfile = (directoryComboBox->text());
     _strFluxFile = fluxComboBox->text();
     _strInputFluxFile = flux1ComboBox->text();
+    _strCSVfile = CSVComboBox->text();
+
     if (Checkbox->isChecked())
     {
         return wizard::Page_Advanced;
@@ -490,6 +504,41 @@ void ReadPage::editFlux1Box(QString dir)
     } else
     {
         flux1ComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
+        emit completeChanged();
+    }
+}
+
+void ReadPage::editCSVComboBox(QString dir)
+{
+    QMessageBox msgBox;
+    //bepaal welke linedit the focus heeft
+    if (dir != "")
+    {
+        //haal het einde van de string af. De filenaam:-)
+        int last_dot = dir.lastIndexOf("/");
+        QString dir1 = dir.left(last_dot);
+        const QFileInfo outputDir(dir1);
+        if (!outputDir.isDir()) {
+            CSVComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
+            emit completeChanged();
+        } else
+        {
+            int last_dot = dir.lastIndexOf(".");
+            int size = dir.size();
+            if ((last_dot == -1) || ((size - last_dot) > 5))
+              //check for valid filenaam. ends with .xxx
+            {
+                CSVComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
+                emit completeChanged();
+            } else
+            {
+                CSVComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
+                emit completeChanged();
+            }
+        }
+    } else
+    {
+        CSVComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
         emit completeChanged();
     }
 }
@@ -653,6 +702,31 @@ void ReadPage::browsereadflux()
 
     if (!directory.isEmpty()) {
         flux1ComboBox->setText(directory);
+    }
+}
+
+void ReadPage::browseCSVComboBox()
+{
+    QString strFilter;
+    QString strFile;
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+
+    strFile = my_readformats[readFormatbox->currentIndex()].strDefaultfilenaam;
+    QString desired =  "/" + strFile.mid(0,strFile.indexOf(".")) + ".csv";
+    strFilter = my_readformats[readFormatbox->currentIndex()].strFilter;
+    QString directory = settings.value("csvlocation").toString();
+    if (directory == "")
+    {
+        directory = QFileDialog::getSaveFileName(this,
+                            tr("Find Files"), QDir::currentPath() + desired,strFilter);
+    } else
+    {
+        directory = QFileDialog::getSaveFileName(this,
+                            tr("Find Files"), directory + desired,strFilter);
+    }
+
+    if (!directory.isEmpty()) {
+        CSVComboBox->setText(directory);
     }
 }
 
@@ -977,7 +1051,7 @@ AdvancedPage::AdvancedPage(QWidget *parent)
 //    QValidator *validator = new QValidator(1, 99, this);
 
     //"0?\\.\\d{0,10}"
-    QRegExp rx("[0-1]\\.\\d{1,2}");
+    QRegExp rx("[0-9]\\.\\d{1,2}");
     QValidator *revolutionsvalidator = new QRegExpValidator(rx, this);
     revolutionsEdit->setValidator(revolutionsvalidator);
     QIntValidator *retriesvalidator= new QIntValidator(0,20);
@@ -999,12 +1073,12 @@ AdvancedPage::AdvancedPage(QWidget *parent)
 
     QGridLayout *layout = new QGridLayout;
     layout->setSizeConstraint(layout->SetFixedSize);
-    layout->addWidget(revolutionsLabel, 0, 0);
-    layout->addWidget(revolutionsEdit, 0, 1);
-    layout->addWidget(revolutionsLabelexplain, 0, 2);
-    layout->addWidget(retriesLabel, 1, 0);
-    layout->addWidget(retriesEdit, 1, 1);
-    layout->addWidget(retriesLabelexplain, 1, 2);
+    layout->addWidget(retriesLabel, 0, 0);
+    layout->addWidget(retriesEdit, 0, 1);
+    layout->addWidget(retriesLabelexplain, 0, 2);
+    layout->addWidget(revolutionsLabel, 1, 0);
+    layout->addWidget(revolutionsEdit, 1, 1);
+    layout->addWidget(revolutionsLabelexplain, 1, 2);
     layout->addWidget(syncLabel, 2, 0);
     layout->addWidget(syncEdit, 2, 1);
     layout->addWidget(syncLabelexplain, 2, 2);
@@ -1023,12 +1097,12 @@ void AdvancedPage::initializePage()
 {
     if (field("IntroPage.read") == "True")
     {
-        setTitle(tr("Set some advanced read option to tweak fluxengine when reading the disk."));
+        setTitle(tr("Set the advanced read option to tweak fluxengine when reading the disk."));
         setSubTitle(tr("Be careful what you choose here. Leave empty to ignore"));
 
     } else
     {
-        setTitle(tr("Set some advanced write option to tweak fluxengine when reading the disk."));
+        setTitle(tr("Set the advanced write option to tweak fluxengine when reading the disk."));
         setSubTitle(tr("Be careful what you choose here. Leave empty to ignore"));
     }
 
@@ -1145,6 +1219,11 @@ QString ConclusionPage::getData()
            strFormat.append(" --copy-flux-to ");
            strFormat.append(_strFluxFile);
        }
+       if (_strCSVfile != "")
+       {
+           strFormat.append(" --decoder.write_csv_to=");
+           strFormat.append(_strCSVfile);
+       }
        if (field("ReadPage.Advanced") == "true")
        {
            QString retries = field("AdvancedPage.retries").toString();
@@ -1152,7 +1231,7 @@ QString ConclusionPage::getData()
            QString sync = field("AdvancedPage.sync").toString();
            QString clock_interval = field("AdvancedPage.clock_interval").toString();
            QString debounce = field("AdvancedPage.debounce").toString();
-           qInfo() << retries;
+//           qInfo() << retries;
            if (retries != "")
            {
                strFormat.append(" --decoder.retries=" + retries);

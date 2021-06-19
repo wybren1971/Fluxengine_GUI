@@ -23,6 +23,7 @@ private slots:
     void initializefluxengine();
     void output(QString data);
     void enablecommands(bool running);
+    void browsecsv();
 private:
     Ui::DialogPreferences *ui;
     fluxengine m_fluxengine;
