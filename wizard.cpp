@@ -403,8 +403,6 @@ void ReadPage::editLineBox(QString dir)
 
 void ReadPage::editDirectoryBox(QString dir)
 {
-    QMessageBox msgBox;
-  {
     if (dir != "")
     {
         //haal het einde van de string af. De filenaam:-)
@@ -434,48 +432,41 @@ void ReadPage::editDirectoryBox(QString dir)
         directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
         emit completeChanged();
     }
-  }
 }
 void ReadPage::editFluxBox(QString dir)
 {
-    QMessageBox msgBox;
+    if (dir != "")
     {
-        if (dir != "")
+        //haal het einde van de string af. De filenaam:-)
+        int last_dot = dir.lastIndexOf("/");
+        QString dir1 = dir.left(last_dot);
+        const QFileInfo outputDir(dir1);
+        if (!outputDir.isDir()) {
+            fluxComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
+            emit completeChanged();
+        } else
         {
-            //haal het einde van de string af. De filenaam:-)
-            int last_dot = dir.lastIndexOf("/");
-            QString dir1 = dir.left(last_dot);
-            const QFileInfo outputDir(dir1);
-            if (!outputDir.isDir()) {
+            int last_dot = dir.lastIndexOf(".");
+            int size = dir.size();
+            if ((last_dot == -1) || ((size - last_dot) > 5))
+              //check for valid filenaam. ends with .xxx
+            {
                 fluxComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
                 emit completeChanged();
             } else
             {
-                int last_dot = dir.lastIndexOf(".");
-                int size = dir.size();
-                if ((last_dot == -1) || ((size - last_dot) > 5))
-                  //check for valid filenaam. ends with .xxx
-                {
-                    fluxComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
-                    emit completeChanged();
-                } else
-                {
-                    fluxComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
-                    emit completeChanged();
-                }
+                fluxComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
+                emit completeChanged();
             }
-        } else
-        {
-            fluxComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
-            emit completeChanged();
         }
+    } else
+    {
+        fluxComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
+        emit completeChanged();
     }
-
-
 }
 void ReadPage::editFlux1Box(QString dir)
 {
-    QMessageBox msgBox;
     //bepaal welke linedit the focus heeft
     if (dir != "")
     {
@@ -510,7 +501,6 @@ void ReadPage::editFlux1Box(QString dir)
 
 void ReadPage::editCSVComboBox(QString dir)
 {
-    QMessageBox msgBox;
     //bepaal welke linedit the focus heeft
     if (dir != "")
     {
@@ -713,7 +703,7 @@ void ReadPage::browseCSVComboBox()
 
     strFile = my_readformats[readFormatbox->currentIndex()].strDefaultfilenaam;
     QString desired =  "/" + strFile.mid(0,strFile.indexOf(".")) + ".csv";
-    strFilter = my_readformats[readFormatbox->currentIndex()].strFilter;
+    strFilter = "*.csv";
     QString directory = settings.value("csvlocation").toString();
     if (directory == "")
     {

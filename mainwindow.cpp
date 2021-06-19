@@ -614,12 +614,12 @@ void MainWindow::on_btnAnalyse_clicked()
         if (m_fluxengine.busy())
              m_fluxengine.stop();
         m_fluxengine.start();
-    }
 
-    //show the resulting png
-    showlayout *form = new showlayout();
-    form->setWindowTitle("Visual layout of the disk");
-    form->LoadFile("disklayout.png");
-    form->exec();
+        //show the resulting png
+        showlayout *form = new showlayout();
+        form->setWindowTitle("Visual layout of the disk");
+        form->LoadFile("disklayout.png");
+        form->exec();
+    }
 }
 
