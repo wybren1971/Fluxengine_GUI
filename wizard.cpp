@@ -738,8 +738,6 @@ bool WritePage::isComplete() const
         lineEditField = it.next(); // take each widget in the list
         if(QLineEdit *lineE = qobject_cast<QLineEdit*>(lineEditField))
         {  // check if iterated widget is of type QLineEdit
-            //
-            //qInfo() << "lineeditwidget";
             if (lineE->styleSheet() == "QLineEdit { background: rgb(255,0,0); }" )
             {
 
