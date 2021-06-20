@@ -135,6 +135,7 @@ void MainWindow::readdisk()
                ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->findText(Fwizard.getData()));
             }
            m_fluxengine.start();
+           callingfunction = "readdisk()";
         }
     }
 }
@@ -505,7 +506,7 @@ void MainWindow::on_btntestVoltages_clicked()
         return;
     m_fluxengine.setAddress("test voltages");
     m_fluxengine.start();
-}
+    callingfunction = "on_btntestVoltages_clicked()";}
 
 
 void MainWindow::on_btntestbandwidth_clicked()
@@ -514,7 +515,7 @@ void MainWindow::on_btntestbandwidth_clicked()
         return;
     m_fluxengine.setAddress("test bandwidth");
     m_fluxengine.start();
-}
+    callingfunction = "on_btntestbandwidth_clicked()";}
 
 
 void MainWindow::on_btnRPM_clicked()
@@ -530,6 +531,7 @@ void MainWindow::on_btnRPM_clicked()
     }
 
     m_fluxengine.start();
+    callingfunction = "on_btnRPM_clicked()";
 }
 
 
@@ -624,6 +626,8 @@ void MainWindow::on_bntStartFluxengine_clicked()
             m_fluxengine.start();
         }
     }
+    callingfunction = "on_bntStartFluxengine_clicked()";
+
 }
 
 void MainWindow::on_pushButton_clicked()
