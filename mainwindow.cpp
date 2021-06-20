@@ -121,7 +121,7 @@ void MainWindow::readdisk()
 
     if (Fwizard.exec() == QDialog::Accepted)
     {
-        if (Fwizard.hasVisitedPage(3))
+        if (Fwizard.hasVisitedPage(4))
         {
             m_fluxengine.setAddress(Fwizard.getData());
             //see if something needs to be added to the combobox
