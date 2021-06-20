@@ -5,7 +5,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++11
 unix {QMAKE_LFLAGS += -no-pie} #added so mimetype on linux is an executable and not a shared library
 
-VERSION = 0.3
+VERSION = 0.4
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 #DEFINES += "BUILDDATE=system(date -R)"
 #CONFIG += static
@@ -27,17 +27,20 @@ SOURCES += \
     fluxengine.cpp \
     main.cpp \
     mainwindow.cpp \
+    showlayout.cpp \
     wizard.cpp
 
 HEADERS += \
     dialogpreferences.h \
     fluxengine.h \
     mainwindow.h \
+    showlayout.h \
     wizard.h
 
 FORMS += \
     dialogpreferences.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    showlayout.ui
 
 # Default rules for deployment.
 

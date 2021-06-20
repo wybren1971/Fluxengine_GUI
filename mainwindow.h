@@ -22,9 +22,11 @@ class MainWindow : public QMainWindow
     public:
         MainWindow(QWidget *parent = nullptr);
         ~MainWindow();
-
+        bool waitforfluzenginetofinish;
+        QString callingfunction;
         void WriteItemList();
         void ReadItemList();
+        bool firsttimecheck();
 public slots:
 protected:
     #ifndef QT_NO_CONTEXTMENU
@@ -76,6 +78,11 @@ protected:
 
         void on_plainTextEdit_2_editTextChanged(const QString &arg1);
 
+        void showContextMenu(const QPoint &pt);
+
+        void ClearText();
+        void on_btnAnalyse_clicked();
+
 private:
         void createActions();
         void createMenus();
@@ -88,6 +95,7 @@ private:
         QMenu *helpMenu;
         QActionGroup *alignmentGroup;
         QAction *newAct;
+        QAction *clear;
         QAction *openAct;
         QAction *preferenceAct;
         QAction *exitAct;

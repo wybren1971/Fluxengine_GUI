@@ -9,7 +9,7 @@ class wizard : public QWizard
     Q_OBJECT
 
 public:
-    enum { Page_Intro , Page_Read, Page_Write,
+    enum { Page_Intro , Page_Read, Page_Write, Page_Advanced,
                  Page_Conclusion};
 
     wizard(QWidget *parent, int intDrive);
@@ -60,28 +60,40 @@ private slots:
     void editFluxBox(QString dir);
     void editFlux1Box(QString dir);
     void editLineBox(QString dir);
+    void browseCSVComboBox();
+    void editCSVComboBox(QString dir);
 private:
     QLabel *nameLabel;
     QLabel *trackLabel;
-    QLabel *HeadLineLabel;
+    QLabel *HeadLineLabelStart;
     QLabel *trackLabelStart;
     QLabel *trackLabelStop;
+    QLabel *headLabelStop;
     QLabel *label;
     QLabel *label1;
     QLabel *label2;
+    QLabel *lblAdvancedSettings;
+    QLabel *label3;
 
     QPushButton *button;
     QPushButton *button1;
     QPushButton *button2;
+    QPushButton *button3;
     QComboBox *readFormatbox;
     QLineEdit *directoryComboBox;
     QLineEdit *fluxComboBox;
     QLineEdit *flux1ComboBox;
+    QLineEdit *CSVComboBox;
     QLineEdit *nameLineEdit;
     QLineEdit *trackLineEdit;
-    QLineEdit *HeadLineEdit;
+    QLineEdit *HeadLineEditStart;
+    QLineEdit *HeadLineEditStop;
     QLineEdit *trackLineEditStart;
-    QLineEdit *trackLineEditStop;    
+    QLineEdit *trackLineEditStop;
+    QCheckBox *Checkbox;
+
+    QStringList ReadFormats;
+    QStringList ReadConfigs;
 
 };
 
@@ -105,10 +117,11 @@ private slots:
 private:
     QLabel *nameLabel;
     QLabel *trackLabel;
-    QLabel *HeadLineLabel;
+    QLabel *HeadLabelStart;
+    QLabel *headLabelStop;
+    QLabel *label;
     QLabel *trackLabelStart;
     QLabel *trackLabelStop;
-    QLabel *label;
     QLabel *DiskLabel;
     QLabel *namePresetLabel;
     QPushButton *button;
@@ -118,11 +131,42 @@ private:
     QCheckBox *DiskLineEdit;
     QLineEdit *nameLineEdit;
     QLineEdit *trackLineEdit;
-    QLineEdit *HeadLineEdit;
+    QLineEdit *HeadLineEditStart;
+    QLineEdit *HeadLineEditStop;
     QLineEdit *trackLineEditStart;
     QLineEdit *trackLineEditStop;
 };
 
+class AdvancedPage : public QWizardPage
+{
+    Q_OBJECT
+
+public:
+    AdvancedPage(QWidget *parent = nullptr);
+
+    int nextId() const override;
+    void initializePage() override;
+
+private slots:
+private:
+    QLabel *revolutionsLabel;
+    QLabel *revolutionsLabelexplain;
+    QLabel *retriesLabel;
+    QLabel *retriesLabelexplain;
+    QLabel *debounceLabelexplain;
+    QLabel *clock_intervalLabelexplain;
+    QLabel *debounceLabel;
+    QLabel *clock_intervalLabel;
+    QLabel *syncLabel;
+    QLabel *syncLabelexplain;
+
+    QLineEdit *revolutionsEdit;
+    QCheckBox *syncEdit;
+    QLineEdit *retriesEdit;
+    QLineEdit *debounceLabelEdit;
+    QLineEdit *clock_intervalLabelEdit;
+
+};
 
 //! [6]
 class ConclusionPage : public QWizardPage

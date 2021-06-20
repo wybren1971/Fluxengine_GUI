@@ -18,7 +18,6 @@ public:
     void setAddress(const QString &address);
     void setWorkingDirectory(const QString &Dir);
     QString getWorkingDirectory();
-
     void write(QByteArray comment);
 signals:
     void output(QString data);
@@ -44,6 +43,9 @@ private:
     bool m_listening;
     QString getProcess();
     void startFluxengine();
+    void initializeFluxengine();
+    QStringList initializeformats(QByteArray data);
+    QStringList getConfig(QString data);
 };
 
 #endif // FLUXENGINE_H

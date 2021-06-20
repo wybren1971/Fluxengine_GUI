@@ -1,5 +1,6 @@
 #include "fluxengine.h"
 #include <QDir>
+#include <qsettings.h>
 
 fluxengine::fluxengine(QObject *parent) : QObject(parent)
 {
@@ -16,7 +17,6 @@ fluxengine::fluxengine(QObject *parent) : QObject(parent)
     m_listening = false;
     m_address = "";
     m_workingdirectory = QDir::currentPath();
-
 }
 void fluxengine::write(QByteArray comment)
 {
@@ -54,7 +54,7 @@ QString fluxengine::getWorkingDirectory()
 
 void fluxengine::start()
 {
-
+//    qInfo() << Q_FUNC_INFO;
     m_listening = true;
     QString program = getProcess();
     QStringList Arguments;
@@ -82,39 +82,67 @@ bool fluxengine::busy()
 void fluxengine::errorOccured(QProcess::ProcessError error)
 {
     if(!m_listening) return;
-    Q_UNUSED(error);
-    emit output("Error");
+    switch (error) {
+        case QProcess::FailedToStart:
+            emit output("Error: Failed to start");
+            break;
+        case QProcess::Crashed:
+            emit output("Error: Crashed");
+            break;
+        case QProcess::Timedout:
+            emit output("Error: Timedout");
+            break;
+        case QProcess::WriteError:
+            emit output("Error: Write error");
+            break;
+        case QProcess::ReadError:
+            emit output("Error: Read error");
+            break;
+        default:
+            emit output("Error: Unknown error");
+    }
 }
 
 void fluxengine::finished(int exitcode, QProcess::ExitStatus exitStatus)
 {
+//    qInfo() << Q_FUNC_INFO;
+//    qInfo() << exitcode;
     if(!m_listening) return;
     Q_UNUSED(exitcode);
     Q_UNUSED(exitStatus);
-    emit output("Complete");
-
+    m_listening = false;
+    QString message = "  ";
+    emit output(message);
 }
 
 void fluxengine::readyReadStandardError()
 {
     if(!m_listening) return;
     QByteArray data = m_process.readAllStandardError();
-    QString message = "Standard Error: ";
-    message.append(data);
-    if (message.contains("No such file or directory", Qt::CaseInsensitive) || message.contains("Is a directory", Qt::CaseInsensitive))
+    if (data.size() > 1)
     {
-        //fluxengine could not be located. Set the location to fluxengine
-        message = "Error: No such file or directory. Fluxengine could not be located. Use \"Ctrl+P\" to specify where fluxengine can be found.";
+        QString message = "Standard Error: ";
+
+        message.append(data);
+        if (message.contains("No such file or directory", Qt::CaseInsensitive) || message.contains("Is a directory", Qt::CaseInsensitive))
+        {
+            //fluxengine could not be located. Set the location to fluxengine
+            message = "Error: No such file or directory. Fluxengine could not be located. Use \"Ctrl+P\" to specify where fluxengine can be found.";
+        }
+        emit output(message);
     }
-    emit output(message);
 }
 
 void fluxengine::readyReadStandardOutput()
 {
+//    qInfo() << Q_FUNC_INFO;
+//    qInfo() << m_process.readAllStandardOutput().size();
     if(!m_listening) return;
     QByteArray data = m_process.readAllStandardOutput();
-    emit output(QString(data.trimmed()));
-
+    if (data.size() > 1)
+    {
+        emit output(QString(data.trimmed()));
+    }
 }
 
 void fluxengine::started()
@@ -125,15 +153,18 @@ void fluxengine::started()
 
 void fluxengine::stateChanged(QProcess::ProcessState newState)
 {
+//    qInfo() << Q_FUNC_INFO;
     switch (newState) {
     case QProcess::NotRunning:
+//        qInfo() << "NotRunning";
         emit enableFluxengineCommands(false);
-
         break;
     case QProcess::Starting:
-        emit enableFluxengineCommands(true);
+//        qInfo() << "Starting";
+//        emit enableFluxengineCommands(false);
         break;
     case QProcess::Running:
+//        qInfo() << "Running";
         startFluxengine();
         emit enableFluxengineCommands(true);
         break;
@@ -143,10 +174,15 @@ void fluxengine::stateChanged(QProcess::ProcessState newState)
 
 void fluxengine::readyRead()
 {
+
+//    qInfo() << Q_FUNC_INFO;
+//    qInfo() << "readyRead: " + m_address;
     if(!m_listening) return;
     QByteArray data = m_process.readAll().trimmed();
-    emit output(data);
-
+    if (data.size() > 1)
+    {
+        emit output(data);
+    }
 }
 
 QString fluxengine::getProcess()
@@ -160,7 +196,15 @@ void fluxengine::startFluxengine()
 {
     QByteArray command;
 
-    command = (m_workingdirectory + "/fluxengine " + m_address).toUtf8();
+//    qInfo() << Q_FUNC_INFO;
+    command = (m_workingdirectory + " " + m_address).toUtf8();
+//    qInfo() << command;
+    if(QSysInfo::productType() == "windows") command.append("\r");
+    command.append("\n");
+    m_process.write(command);
+//    m_process.waitForFinished(500);
+    command.clear();
+    command.append("exit");
     if(QSysInfo::productType() == "windows") command.append("\r");
     command.append("\n");
     m_process.write(command);
