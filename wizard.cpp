@@ -808,7 +808,7 @@ void WritePage::initializePage()
         my_writeformat[i][type] = x;
         settings.endGroup();
 
-        settings.beginGroup("readformatsdescription");
+        settings.beginGroup("writeformatsdescription");
         my_writeformat[i][description] = settings.value(QString::number(i)).toString();
         settings.endGroup();
     }
