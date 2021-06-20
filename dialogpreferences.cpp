@@ -74,7 +74,8 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
     ui->tabWidget->setTabVisible(2, true);
     ui->tabWidget->setCurrentIndex(0);
     ui->progressBar->setMinimum(0);
-    ui->progressBar->setMaximum(5);
+    ui->progressBar->setMaximum(40); //near enough it gets updated when we now it precise
+    ui->progressBar->setValue(0);
     readcounter = 0;
     writecounter = 0;
     State = 0;
@@ -199,7 +200,7 @@ void DialogPreferences::initializefluxengine()
             m_fluxengine.setWorkingDirectory(ui->cmbFluxengineLocation->currentText());
         }
     }
-
+    ui->btnInitialize->setEnabled(false);
     if (!waitforfluzenginetofinish)
     {
         switch (State)
@@ -224,36 +225,45 @@ void DialogPreferences::initializefluxengine()
             }
             case 2:
             {
-                ui->progressBar->setValue(3);
                 QString m_address = "read";
                 int intTotal = readformats.size();
+//                if (readcounter == 0)
+//                   ui->progressBar->setMaximum(ui->progressBar->maximum()+intTotal);
                 if (readcounter < intTotal)
                 {
                     m_fluxengine.setAddress(m_address + " " + readformats.at(readcounter) + " -C");
                     qInfo() << State;
                     m_fluxengine.start();
                     waitforfluzenginetofinish = true;
+                    if ((readcounter +3) > ui->progressBar->maximum())
+                        ui->progressBar->setMaximum(readcounter +3);
+                    ui->progressBar->setValue(readcounter +3);
                     break;
                 }
             }
             case 3:
             {
-                ui->progressBar->setValue(4);
                 QString m_address = "write";
                 int intTotal = writeformats.size();
+//                if (writecounter == 0)
+//                   ui->progressBar->setMaximum(ui->progressBar->maximum()+intTotal);
                 if (writecounter < intTotal)
                 {
                     m_fluxengine.setAddress(m_address + " " + writeformats.at(writecounter) + " -C");
                     qInfo() << State;
                     m_fluxengine.start();
                     waitforfluzenginetofinish = true;
+                    if ((readcounter + writecounter +3) > ui->progressBar->maximum())
+                        ui->progressBar->setMaximum(readcounter + writecounter +3);
+                    ui->progressBar->setValue(readcounter + writecounter +3);
                     break;
                 }
             }
             case 4:
             {
                 //ready
-                ui->progressBar->setValue(5);
+                ui->progressBar->setValue(ui->progressBar->maximum());
+                ui->btnInitialize->setEnabled(true);
                 break;
             }
         default: //
@@ -270,6 +280,56 @@ QStringList DialogPreferences::initializeformats(QString data)
     //returns a stringlist with read or write formats.
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
     qInfo() << data;
+
+//    [readformats]
+//    0=acornadfs: Acorn ADFS L/D/E/F 640kB/800kB/1600kB 3.5\" or 5.25\" 80-track double-sided
+//    1=acorndfs: Acorn DFS 100kB/200kB 3.5\" or 5.25\" 40- or 80-track singled sided
+//    10=eco1: VDS Eco1 1210kB 77-track mixed format double sided
+//    11=f85: Durango F85 461kB 5.25\" 77-track single sided
+//    12=fb100: Brother FB-100 100kB 3.5\" 40-track single-sided
+//    13=ibm: PC 3.5\"/5.25\" any double sided format
+//    14=macintosh: Macintosh 800kB 3.5\" GCR double-sided
+//    15=micropolis: Micropolis MetaFloppy 630kB 5.25\" double-sided hard-sectored
+//    16=mx: DVK MX 110kB/220kB/440kB 5.25\"
+//    17=northstar: Northstar 87kB/175kB/350kB 5.25\" 35-track 10-sector hard sectored
+//    18=tids990: Texas Instruments DS990 1126kB 8\" double-sided
+//    19=victor9k: Victor 9000 / Sirius One 1224kB GCR variable sector double-sided
+//    2=aeslanier: AES Lanier \"No Problem\" 616kB 5.25\" 77-track single sided hard sectored
+//    20=zilogmcz: Zilog MCZ 320kB 8\" 77-track single-sided hard-sectored
+//    3=amiga: Amiga 880kB 3.5\" double sided
+//    4=ampro: Ampro 400kB/800kB 5.25\" 40/80 track double sided
+//    5=apple2: Apple II 140kB DOS 3.3 5.25\" 40 track single sided
+//    6=atarist: Atari ST any 3.5\" double sided
+//    7=brother: Brother 120kB/240kB 3.5\" GCR
+//    8=commodore1541: Commodore 1541 170kB 5.25\" GCR disks
+//    9=commodore1581: Commodore 1581 800kB 3.5\" MFM disks
+
+//    [writeformats]
+//    0=amiga: Amiga 880kB 3.5\" double sided
+//    1=atarist360: Atari ST 360kB 3.5\" 80-track 9-sector single sided
+//    10=brother240: Brother 240kB 3.5\" 78-track GCR disks
+//    11=commodore1541: Commodore 1541 170kB 5.25\" GCR disks
+//    12=commodore1581: Commodore 1581 800kB 3.5\" MFM disks
+//    13=hplif770: Hewlett-Packard LIF 770kB 3.5\" disks
+//    14=ibm1200_525: PC 1200kB 5.25\" 80-track 15-sector double-sided
+//    15=ibm1440: PC 1440kB 3.5\" 80-track 18-sector double-sided
+//    16=ibm180_525: PC 180kB 5.25\" 40-track 9-sector single-sided
+//    17=ibm360_525: PC 360kB 5.25\" 40-track 9-sector double-sided
+//    18=ibm720: PC 720kB 3.5\" 80-track 9-sector double-sided
+//    19=ibm720_525: PC 720kB 5.25\" 80-track 9-sector double-sided
+//    2=atarist370: Atari ST 370kB 3.5\" 82-track 9-sector single sided
+//    20=macintosh: Macintosh 800kB 3.5\" GCR double-sided
+//    21=northstar175: Northstar 175kB 5.25\" 35-track single-sided double-density hard-sectored
+//    22=northstar350: Northstar 350kB 5.25\" 35-track double-sided double-density hard-sectored
+//    23=northstar87: Northstar 87.5kB 5.25\" 35-track single-sided single-density hard-sectored
+//    24=tids990: Texas Instruments DS990 1126kB 8\" double-sided
+//    3=atarist400: Atari ST 400kB 3.5\" 80-track 10-sector single sided
+//    4=atarist410: Atari ST 410kB 3.5\" 82-track 10-sector single sided
+//    5=atarist720: Atari ST 720kB 3.5\" 80-track 9-sector double sided
+//    6=atarist740: Atari ST 740kB 3.5\" 82-track 9-sector double sided
+//    7=atarist800: Atari ST 800kB 3.5\" 80-track 10-sector double sided
+//    8=atarist820: Atari ST 820kB 3.5\" 82-track 10-sector double sided
+//    9=brother120: Brother 120kB 3.5\" 39-track GCR disks
    if (data.contains("syntax: fluxengine read ") || (data.contains("syntax: fluxengine write ")))
    {
         int i = data.indexOf(":",0);
@@ -278,8 +338,19 @@ QStringList DialogPreferences::initializeformats(QString data)
         {
             i = data.indexOf("\n", j);
             j = data.indexOf("\n", i+1);
+            qInfo() << data.mid(i, j+1 - i).trimmed();
+//"acornadfs: Acorn ADFS L/D/E/F 640kB/800kB/1600kB 3.5\" or 5.25\" 80-track double-sided"
+            QString typedescription = data.mid(i, j+1 - i).trimmed();
+            int k = typedescription.indexOf(":",0);
+
             if (j == -1) break;
-            Formats.append(data.mid(i, j+1 - i).trimmed());
+            //append type
+            int length = typedescription.size();
+            Formats.append(typedescription.left(k).trimmed());
+            qInfo() << "type: " + typedescription.left(k).trimmed();
+            Formats.append(typedescription.right(length - k-1).trimmed());
+            qInfo() << "description: " + typedescription.right(length - k-1).trimmed();
+
         }
    }
    return Formats;
@@ -316,19 +387,31 @@ void DialogPreferences::output(QString data)
 {
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
     int i = 0;
+    int j = 0;
     if (data.trimmed() != "")
     {
 
         if (State == 0)
         {
             readformats = initializeformats(data);
-            settings.beginGroup("readformats");
             foreach (QString x, readformats)
             {
-                settings.setValue(QString::number(i), x);
+                qInfo() << "j: " << j << "i: " << i;
+                if (i % 2)
+                { //if odd then description
+//                    qInfo() << "Odd" << i;
+                    settings.beginGroup("readformatsdescription");
+                    settings.setValue(QString::number(j), x);
+                    settings.endGroup();
+                } else
+                { //if even then type
+                    j = i/2;
+                    settings.beginGroup("readformats");
+                    settings.setValue(QString::number(j), x);
+                    settings.endGroup();
+                }
                 i++;
             }
-            settings.endGroup();
             State = 1;
             //save formats somewhere
         } else
@@ -336,13 +419,24 @@ void DialogPreferences::output(QString data)
             if (State == 1)
             {
                 writeformats = initializeformats(data);
-                settings.beginGroup("writeformats");
                 foreach (QString x, writeformats)
                 {
-                    settings.setValue(QString::number(i), x);
+                    qInfo() << "j: " << j << "i: " << i;
+                    if (i % 2)
+                    { //if odd then description
+    //                    qInfo() << "Odd" << i;
+                        settings.beginGroup("writeformatsdescription");
+                        settings.setValue(QString::number(j), x);
+                        settings.endGroup();
+                    } else
+                    { //if even then type
+                        j = i/2;
+                        settings.beginGroup("writeformats");
+                        settings.setValue(QString::number(j), x);
+                        settings.endGroup();
+                    }
                     i++;
                 }
-                settings.endGroup();
                 State = 2;
                 //save formats somewhere
             } else
@@ -352,6 +446,7 @@ void DialogPreferences::output(QString data)
                     readconfigs = getConfig(data);
                     if (readcounter < readformats.size())
                     {
+                        //types are add even
                         settings.beginGroup("readconfigs-" + readformats.at(readcounter));
                         foreach (QString x, readconfigs)
                         {
@@ -359,6 +454,7 @@ void DialogPreferences::output(QString data)
                             i++;
                         }
                         settings.endGroup();
+                        readcounter++;
                         readcounter++;
                     } else {
                         State = 3;
@@ -377,6 +473,7 @@ void DialogPreferences::output(QString data)
                                     i++;
                                 }
                                 settings.endGroup();
+                                writecounter++;
                                 writecounter++;
                              } else
                             {
