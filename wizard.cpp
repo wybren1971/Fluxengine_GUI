@@ -16,7 +16,7 @@ QString _strInputFluxFile;
 QString _strCSVfile;
 
 const int ReadFormatDefault = 13; //IBM
-const int WriteFormatDefault = 14; //IBM 1440
+const int WriteFormatDefault = 15; //IBM 1440
 
 const int filename = 0;
 const int trackstart = 1;
