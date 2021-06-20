@@ -22,9 +22,11 @@ class MainWindow : public QMainWindow
     public:
         MainWindow(QWidget *parent = nullptr);
         ~MainWindow();
-
+        bool waitforfluzenginetofinish;
+        QString callingfunction;
         void WriteItemList();
         void ReadItemList();
+        bool firsttimecheck();
 public slots:
 protected:
     #ifndef QT_NO_CONTEXTMENU

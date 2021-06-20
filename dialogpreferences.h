@@ -13,6 +13,10 @@ class DialogPreferences : public QDialog
     Q_OBJECT 
 public:
     explicit DialogPreferences(QWidget *parent = nullptr);
+    QString callingfunction;
+    bool waitforfluzenginetofinish;
+    int readcounter;
+    int writecounter;
     ~DialogPreferences();
 
 private slots:
@@ -28,7 +32,10 @@ private:
     Ui::DialogPreferences *ui;
     fluxengine m_fluxengine;
     int State;
-    QStringList formats;
+    QStringList readformats;
+    QStringList writeformats;
+    QStringList readconfigs;
+    QStringList writeconfigs;
     QStringList initializeformats(QString data);
     QStringList getConfig(QString data);
 };

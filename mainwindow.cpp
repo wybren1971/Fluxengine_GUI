@@ -7,6 +7,7 @@
 #include <QApplication>
 #include <showlayout.h>
 
+bool blnFirsttime;
 
 int NUMBER_OF_COMMANDS;
 /*
@@ -50,10 +51,19 @@ MainWindow::MainWindow(QWidget *parent)
     createMenus();
     setDrive();
     setWindowTitle(tr("Fluxengine-GUI"));
+    if (settings.value("fluxengine").toString() == "")
+        blnFirsttime = true;
+
     int width = settings.value("WindowWidth").toInt();
     int height = settings.value("WindowHeight").toInt();
     this->resize(width, height);
-    ui->btnAnalyse->setEnabled(settings.value("showanalyzebutton").toBool());
+    if (settings.value("showanalyzebutton").toString() == "")
+    {
+        ui->btnAnalyse->setVisible(false);
+    } else
+    {
+        ui->btnAnalyse->setVisible(settings.value("showanalyzebutton").toBool());
+    }
     ui->btnReadDisk->setFocus();
     ui->plainTextEdit_2->completer();
     ReadItemList();
@@ -77,9 +87,27 @@ void MainWindow::newFile()
 
 void MainWindow::readdisk()
 {
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    if (!firsttimecheck())
+        return;
+
+    settings.beginGroup("readformats");
+    if (settings.childKeys().size() == 0)
+    {
+        //fluxengine not initialized
+        QString message;
+        message = tr("Welcome to fluxengine_gui\n"
+                     "Please initialize fluxengine in preferences on the tab 'Advanced' and press initialize fluxengine.\nThis is needed to use the Wizard");
+
+        QMessageBox::information(this, tr("Fluxengine Wizard Info"), message);
+
+        preference();
+        if (settings.childKeys().size() == 0)
+            return;
+
+    }
+
     int intDrive;
-    if (m_fluxengine.busy())
-         m_fluxengine.stop();
     if (ui->btnDrive0->isChecked())
     {
         intDrive= 0;
@@ -119,6 +147,11 @@ void MainWindow::preference()
     form->setWindowTitle("Preferences Fluxengine_GUI");
     form->exec();
     setDrive();
+    if (settings.value("fluxengine").toString() == "")
+    {
+        if (!firsttimecheck())
+            return;
+    }
     m_fluxengine.setWorkingDirectory(settings.value("fluxengine").toString());
 
 }
@@ -397,19 +430,66 @@ void MainWindow::output(QString data)
     }
 }
 
+bool MainWindow::firsttimecheck()
+{
+    if (blnFirsttime)
+    {
+        QString message;
+        message = tr("Welcome to fluxengine_gui\n"
+                     "Set the location of fluxengine in preferences on the tab 'My Locations'\nand then go to tab 'Advanced' and initialize fluxengine.\nThese are the minimum steps needed to use the Fluxengine_GUI");
+
+        QMessageBox::information(this, tr("Fluxengine Wizard Info"), message);
+
+        preference();
+        if (m_fluxengine.getWorkingDirectory() != "")
+        {
+            blnFirsttime = false;
+            return false;
+        } else
+        {
+            return true;
+        }
+    }
+    return true;
+
+}
+
 void MainWindow::enableFluxengineCommands(bool blnStarted)
 {
-//    qInfo() << Q_FUNC_INFO;
-//    qInfo() << blnStarted;
+    qInfo() << Q_FUNC_INFO;
+    qInfo() << blnStarted;
 
     if (blnStarted)
     {
         ui->Fluxengineinput->setEnabled(true);
         ui->btnStop->setEnabled(true);
+        ui->btnRPM->setEnabled(false);
+        ui->btnAnalyse->setEnabled(false);
+        ui->btnReadDisk->setEnabled(false);
+        ui->btntestVoltages->setEnabled(false);
+        ui->btntestbandwidth->setEnabled(false);
+        ui->bntStartFluxengine->setEnabled(false);
+
+        waitforfluzenginetofinish=true;
     } else
     {
         ui->Fluxengineinput->setEnabled(false);
         ui->btnStop->setEnabled(false);
+        ui->btnRPM->setEnabled(true);
+        ui->btnAnalyse->setEnabled(true);
+        ui->btnReadDisk->setEnabled(true);
+        ui->btntestVoltages->setEnabled(true);
+        ui->btntestbandwidth->setEnabled(true);
+        ui->bntStartFluxengine->setEnabled(true);
+        if (waitforfluzenginetofinish)
+        {
+            if (callingfunction == "on_btnAnalyse_clicked()")
+            {
+                on_btnAnalyse_clicked();
+            }
+
+            waitforfluzenginetofinish=false;
+        }
     }
 }
 
@@ -421,8 +501,8 @@ void MainWindow::on_btnReadDisk_clicked()
 
 void MainWindow::on_btntestVoltages_clicked()
 {
-    if (m_fluxengine.busy())
-        m_fluxengine.stop();
+    if (!firsttimecheck())
+        return;
     m_fluxengine.setAddress("test voltages");
     m_fluxengine.start();
 }
@@ -430,8 +510,8 @@ void MainWindow::on_btntestVoltages_clicked()
 
 void MainWindow::on_btntestbandwidth_clicked()
 {
-    if (m_fluxengine.busy())
-         m_fluxengine.stop();
+    if (!firsttimecheck())
+        return;
     m_fluxengine.setAddress("test bandwidth");
     m_fluxengine.start();
 }
@@ -439,6 +519,8 @@ void MainWindow::on_btntestbandwidth_clicked()
 
 void MainWindow::on_btnRPM_clicked()
 {
+    if (!firsttimecheck())
+        return;
     if (ui->btnDrive0->isChecked())
     {
         m_fluxengine.setAddress("rpm -s drive:0");
@@ -447,8 +529,6 @@ void MainWindow::on_btnRPM_clicked()
         m_fluxengine.setAddress("rpm -s drive:1");
     }
 
-    if (m_fluxengine.busy())
-         m_fluxengine.stop();
     m_fluxengine.start();
 }
 
@@ -516,6 +596,9 @@ void MainWindow::WriteItemList()
 }
 void MainWindow::on_bntStartFluxengine_clicked()
 {
+    if (!firsttimecheck())
+        return;
+
     //We dont want the test and rpm commands in the list because there are dedicated buttons for this.
     QString string1 = m_fluxengine.getAddress();
     QString string2 = m_fluxengine.getAddress();
@@ -525,8 +608,6 @@ void MainWindow::on_bntStartFluxengine_clicked()
     string3.truncate(7);
     if (( string1 != "test") && (string2 != "rpm") && (string2 != "analyse"))
     {
-        if (m_fluxengine.busy())
-             m_fluxengine.stop();
         if (ui->plainTextEdit_2->findText(m_fluxengine.getAddress()) == -1)
         {
             ui->plainTextEdit_2->addItem(m_fluxengine.getAddress());
@@ -539,8 +620,6 @@ void MainWindow::on_bntStartFluxengine_clicked()
         //if there is a valid command in the listbox execute that
         if (ui->plainTextEdit_2->currentText() != "")
         {
-            if (m_fluxengine.busy())
-                 m_fluxengine.stop();
             m_fluxengine.setAddress(ui->plainTextEdit_2->currentText());
             m_fluxengine.start();
         }
@@ -599,25 +678,30 @@ void MainWindow::on_btnAnalyse_clicked()
 {
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
     QDir dir;
-    QString strFilter = "*.csv";
-    QString directory = settings.value("csvlocation").toString();
-    //let the user choose a csv file
-    dir.setPath(QFileDialog::getOpenFileName(this,
-                            tr("Choose the csv file to analyze"), directory, strFilter));
+    if (!firsttimecheck())
+        return;
 
-    // execute the analyse command
-//    qInfo() << "Dir path is " << dir.absolutePath() << (!dir.isEmpty());
-    if (dir.absolutePath() != "")
+    if (!waitforfluzenginetofinish)
     {
-//        qInfo() << "Dir path is " << dir.absolutePath();
-        m_fluxengine.setAddress("analyse layout --csv " + dir.absolutePath());
-        if (m_fluxengine.busy())
-             m_fluxengine.stop();
-        m_fluxengine.start();
+        QString strFilter = "*.csv";
+        QString directory = settings.value("csvlocation").toString();
+        //let the user choose a csv file
+        dir.setPath(QFileDialog::getOpenFileName(this,
+                                tr("Choose the csv file to analyze"), directory, strFilter));
 
+        if (dir.absolutePath() != "")
+        {
+            m_fluxengine.setAddress("analyse layout --csv " + dir.absolutePath());
+            m_fluxengine.start();
+            waitforfluzenginetofinish = true;
+            callingfunction = "on_btnAnalyse_clicked()";
+        }
+    } else
+    {
         //show the resulting png
         showlayout *form = new showlayout();
-        form->setWindowTitle("Visual layout of the disk");
+        form->setWindowTitle("Visual layout of the csv: " + dir.absolutePath());
+        //we have to wait for fluxengine to finish...
         form->LoadFile("disklayout.png");
         form->exec();
     }

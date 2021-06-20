@@ -92,6 +92,9 @@ private:
     QLineEdit *trackLineEditStop;
     QCheckBox *Checkbox;
 
+    QStringList ReadFormats;
+    QStringList ReadConfigs;
+
 };
 
 class WritePage : public QWizardPage

@@ -161,7 +161,7 @@ void fluxengine::stateChanged(QProcess::ProcessState newState)
         break;
     case QProcess::Starting:
 //        qInfo() << "Starting";
-        emit enableFluxengineCommands(false);
+//        emit enableFluxengineCommands(false);
         break;
     case QProcess::Running:
 //        qInfo() << "Running";

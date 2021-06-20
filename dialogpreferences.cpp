@@ -6,7 +6,6 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DialogPreferences)
 {
-
     ui->setupUi(this);
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
     m_fluxengine.setWorkingDirectory(settings.value("fluxengine").toString());
@@ -74,7 +73,12 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
     connect(ui->buttonBox, SIGNAL(accepted()), SLOT(save()));
     ui->tabWidget->setTabVisible(2, true);
     ui->tabWidget->setCurrentIndex(0);
+    ui->progressBar->setMinimum(0);
+    ui->progressBar->setMaximum(5);
+    readcounter = 0;
+    writecounter = 0;
     State = 0;
+    waitforfluzenginetofinish=false;
 }
 
 DialogPreferences::~DialogPreferences()
@@ -171,41 +175,103 @@ void DialogPreferences::enablecommands(bool running)
     qInfo() << running;
     if (running)
     {
-        //
+        waitforfluzenginetofinish = true;
+    } else
+    {
+        waitforfluzenginetofinish = false;
     }
 }
+
 void DialogPreferences::initializefluxengine()
 {
     qInfo() << Q_FUNC_INFO;
-    qInfo() << State;
-    switch (State) {
-        case 0:
-            m_fluxengine.setAddress("read");
-            m_fluxengine.start();
-            break;
-        case 1:
-//           if (m_fluxengine.busy())
-//                m_fluxengine.stop();
-            m_fluxengine.setAddress("write");
-            m_fluxengine.start();
-            break;
-        case 2:
-            {
-                QString m_address = m_fluxengine.getAddress();
-                foreach (QString x, formats)
-                {
-                    qInfo() << Q_FUNC_INFO;
-                    qInfo() << m_address + " " + x + " -C";
-//                    if (m_fluxengine.busy())
-//                         m_fluxengine.stop();
-                    m_fluxengine.setAddress(m_address + " " + x + " -C");
-                    m_fluxengine.start();
-                }
+    qInfo() << "State: " << State;
+    qInfo() << "Wait for fluxengine?" << waitforfluzenginetofinish;
+    if (m_fluxengine.getWorkingDirectory() == "")
+    {
+        if (ui->cmbFluxengineLocation->currentText()== "")
+        {
+            QString message;
+            message = tr("Welcome to fluxengine_gui "
+                         "first set the location of the fluxengine");
 
-            break;
+            QMessageBox::information(this, tr("Fluxengine Wizard Info"), message);
+            return;
+        } else
+        {
+            m_fluxengine.setWorkingDirectory(ui->cmbFluxengineLocation->currentText());
+        }
+    }
+
+    if (!waitforfluzenginetofinish)
+    {
+        switch (State)
+            {
+            case 0:
+            {
+                m_fluxengine.setAddress("read");
+                qInfo() << State;
+                m_fluxengine.start();
+                waitforfluzenginetofinish = true;
+                ui->progressBar->setValue(1);
+                break;
+            }
+            case 1:
+            {
+                m_fluxengine.setAddress("write");
+                qInfo() << "address" << m_fluxengine.getAddress();
+                m_fluxengine.start();
+                waitforfluzenginetofinish = true;
+                ui->progressBar->setValue(2);
+                break;
+            }
+            case 2:
+            {
+                ui->progressBar->setValue(3);
+                QString m_address = "read";
+                int intTotal = readformats.size();
+                if (readcounter < intTotal)
+                {
+//                    qInfo() << Q_FUNC_INFO;
+//                    qInfo() << m_address + " " + readformats.at(readcounter) + " -C";
+//                    qInfo() << "counter" << readcounter;
+//                    qInfo() << "total" << intTotal;
+                    m_fluxengine.setAddress(m_address + " " + readformats.at(readcounter) + " -C");
+                    qInfo() << State;
+                    m_fluxengine.start();
+                    waitforfluzenginetofinish = true;
+                    break;
+                }
+            }
+            case 3:
+            {
+                ui->progressBar->setValue(4);
+                QString m_address = "write";
+                int intTotal = writeformats.size();
+                if (writecounter < intTotal)
+                {
+//                    qInfo() << Q_FUNC_INFO;
+//                    qInfo() << m_address + " " + writeformats.at(writecounter) + " -C";
+//                    qInfo() << "counter" << writecounter;
+//                    qInfo() << "total" << intTotal;
+                    m_fluxengine.setAddress(m_address + " " + writeformats.at(writecounter) + " -C");
+                    qInfo() << State;
+                    m_fluxengine.start();
+                    waitforfluzenginetofinish = true;
+                    break;
+                }
+            }
+            case 4:
+            {
+                //ready
+                ui->progressBar->setValue(5);
+                break;
             }
         default: //
+            {
             break;
+            }
+        }
     }
 }
 
@@ -216,7 +282,7 @@ QStringList DialogPreferences::initializeformats(QString data)
         QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
         qInfo() << data;
        if (data.contains("syntax: fluxengine read ") || (data.contains("syntax: fluxengine write ")))
-        {
+       {
            /*syntax: fluxengine read <profile> [<options>...]
             Use --help for option help.
             Available profiles include:
@@ -243,7 +309,7 @@ QStringList DialogPreferences::initializeformats(QString data)
             Or use a text file containing your own configuration.
             */
             qInfo() << Q_FUNC_INFO;
-
+            //my_readformats[0].strType = ;
             //get the readformats and store in section
             int i = data.indexOf(":",0);
             int j = data.indexOf(":", i+1);
@@ -258,64 +324,42 @@ QStringList DialogPreferences::initializeformats(QString data)
                 //i = j+1;
 
             }
-            return Formats;
-    //        foreach (QString x, Formats) {
-    //            qInfo() << x;
-    //        }
-            //get the config for each readformat and store in section
-            /*
-             * input {
-                  flux {
-                    drive {
-                    }
-                  }
-                }
-                output {
-                  image {
-                    filename: "acornadfs.img"
-                    img {
-                    }
-                  }
-                }
-                decoder {
-                  ibm {
-                    sector_id_base: 0
-                  }
-                }
-                cylinders {
-                  start: 0
-                  end: 79
-                }
-                heads {
-                  start: 0
-                  end: 1
-                }
-                */
-            foreach (QString x, Formats) {
-                qInfo() << x;
-            }
-        }
+       }
        return Formats;
-
 }
 
 QStringList DialogPreferences::getConfig(QString data)
 {
     QStringList Configs;
-    struct FormatsDescription
-    {
-        QString strType;
-        QString strDescription;
-        QString strFilter;
-        QString strDefaultfilenaam;
-        QString trackstart;
-        QString trackstop;
-        QString headstart;
-        QString headstop;
-    };
-
+//    input {
+//      flux {
+//        drive {
+//        }
+//      }
+//    }
+//    output {
+//      image {
+//        filename: "acornadfs.img"
+//        img {
+//        }
+//      }
+//    }
+//    decoder {
+//      ibm {
+//        sector_id_base: 0
+//      }
+//    }
+//    cylinders {
+//      start: 0
+//      end: 79
+//    }
+//    heads {
+//      start: 0
+//      end: 1
+//    }
     if (data.contains("encoder") || (data.contains("decoder")))
     {
+//        FormatsDescription format;
         int i = data.indexOf(":",0);
         int j;
 //        for (int x=0; x < data.count(); x++)
@@ -324,64 +368,117 @@ QStringList DialogPreferences::getConfig(QString data)
             j = data.indexOf("\n", i+1);
 //            if (j == -1) break;
             qInfo() << j;
-            qInfo() << data.mid(i, j+1 - i).trimmed();
-            Configs.append(data.mid(i, j+1 - i).trimmed());
+            qInfo() << data.mid(i+3, j-4 - i).trimmed();
+            Configs.append(data.mid(i+3, j-4 - i).trimmed());
+            i = data.indexOf(QRegExp("start: "),0);
+            j = data.indexOf("\n", i+1);
+            qInfo() << data.mid(i+7, j-7 - i).trimmed();
+            Configs.append(data.mid(i+7, j-7 - i).trimmed());
+            i = data.indexOf(QRegExp("end: "),i);
+            j = data.indexOf("\n", i+1);
+            qInfo() << data.mid(i+5, j-5 - i).trimmed();
+            Configs.append(data.mid(i+5, j-5 - i).trimmed());
+            i = data.indexOf(QRegExp("start: "),i);
+            j = data.indexOf("\n", i+1);
+            qInfo() << data.mid(i+7, j-7 - i).trimmed();
+            Configs.append(data.mid(i+7, j-7 - i).trimmed());
+            i = data.indexOf(QRegExp("end: "),i);
+            j = data.indexOf("\n", i+1);
+            qInfo() << data.mid(i+5, j-5 - i).trimmed();
+            Configs.append(data.mid(i+5, j-5 - i).trimmed());
+
+
+//            Configs.append(format);
             //i = j+1;
 
-//        }
         return Configs;
 //        foreach (QString x, Configs) {
 //            qInfo() << x;
 //        }
 
     }
-    //get the config for each readformat and store in section
-    /*
-     * input {
-          flux {
-            drive {
-            }
-          }
-        }
-        output {
-          image {
-            filename: "acornadfs.img"
-            img {
-            }
-          }
-        }
-        decoder {
-          ibm {
-            sector_id_base: 0
-          }
-        }
-        cylinders {
-          start: 0
-          end: 79
-        }
-        heads {
-          start: 0
-          end: 1
-        }
-        */
     //stringlist contains filename, start cylinder, stop cylinder, start Head, stop head.
     return Configs;
 }
 
 void DialogPreferences::output(QString data)
 {
-    if (data != "")
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    qInfo() << Q_FUNC_INFO;
+    qInfo() << "Data: " << data;
+    int i = 0;
+    if (data.trimmed() != "")
     {
-        if (m_fluxengine.getAddress().contains("read") || m_fluxengine.getAddress().contains("write"))
+
+        if (State == 0)
         {
-            formats = initializeformats(data);
+            readformats = initializeformats(data);
+            settings.beginGroup("readformats");
+            foreach (QString x, readformats)
+            {
+                settings.setValue(QString::number(i), x);
+                i++;
+            }
+            settings.endGroup();
+            State = 1;
             //save formats somewhere
-        }
-        if (m_fluxengine.getAddress().contains("-C"))
+        } else
         {
-            qInfo() << Q_FUNC_INFO;
-            formats = getConfig(data);
+            if (State == 1)
+            {
+                writeformats = initializeformats(data);
+                settings.beginGroup("writeformats");
+                foreach (QString x, writeformats)
+                {
+                    settings.setValue(QString::number(i), x);
+                    i++;
+                }
+                settings.endGroup();
+                State = 2;
+                //save formats somewhere
+            } else
+            {
+                if (State == 2)
+                {
+                    readconfigs = getConfig(data);
+                    if (readcounter < readformats.size())
+                    {
+                        settings.beginGroup("readconfigs-" + readformats.at(readcounter));
+                        foreach (QString x, readconfigs)
+                        {
+                            settings.setValue(QString::number(i), x);
+                            i++;
+                        }
+                        settings.endGroup();
+                        readcounter++;
+                    } else {
+                        State = 3;
+                    }
+                 }   else
+                    {
+                        if (State == 3)
+                        {
+                            writeconfigs = getConfig(data);
+                            if (writecounter < writeformats.size())
+                            {
+                                settings.beginGroup("writeconfigs-" + writeformats.at(writecounter));
+                                foreach (QString x, writeconfigs)
+                                {
+                                    settings.setValue(QString::number(i), x);
+                                    i++;
+                                }
+                                settings.endGroup();
+                                writecounter++;
+                             } else
+                            {
+                               State = 4;
+                            }
+                        }
+                    }
+            }
         }
+    }
+        qInfo() << "State: " << State;
 
     //    foreach (QString x, formats) {
     //        qInfo() << Q_FUNC_INFO;
@@ -393,10 +490,9 @@ void DialogPreferences::output(QString data)
     //        m_fluxengine.start();
     //    }
 
-        State = State + 1; //Data from fluxengine is processed.
+//        State = State + 1; //Data from fluxengine is processed.
 //        m_fluxengine.stop();
         initializefluxengine();
-   }
 }
 
 void DialogPreferences::save()
