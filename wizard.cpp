@@ -279,12 +279,15 @@ void ReadPage::initializePage()
         my_readformat[i][trackstop] =settings.value("2").toString();
         my_readformat[i][headstart] =settings.value("3").toString();
         my_readformat[i][headstop] =settings.value("4").toString();
-        my_readformat[i][description] ="Reads " + x + " disks";
 
         int last_dot = x.indexOf(".");
         QString strfilter = x.right(last_dot);
         my_readformat[i][filter] ="*." + strfilter + ", *.flux";
         my_readformat[i][type] = x;
+        settings.endGroup();
+
+        settings.beginGroup("readformatsdescription");
+        my_readformat[i][description] = settings.value(QString::number(i)).toString();
         settings.endGroup();
     }
      for (i=0;i<my_readformat.size();i++)
