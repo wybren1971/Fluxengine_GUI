@@ -352,9 +352,14 @@ void ReadPage::editDirectoryBox(QString dir)
             emit completeChanged();
         } else
         {
+           //get extension
+            QString filenaam = my_readformat[readFormatbox->currentIndex()][filename];
+            int Last_dot = filenaam.lastIndexOf(".");
+            QString extension = filenaam.right(filenaam.size() - Last_dot);
+
             int last_dot = dir.lastIndexOf(".");
             int size = dir.size();
-            if ((last_dot == -1) || ((size - last_dot) > 5))
+            if ((last_dot == -1) || ((size - last_dot) > extension.size()))
               //check for valid filenaam. ends with .xxxx
             {
                 directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
