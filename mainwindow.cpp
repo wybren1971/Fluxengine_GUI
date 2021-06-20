@@ -704,7 +704,7 @@ void MainWindow::on_btnAnalyse_clicked()
     {
         //show the resulting png
         showlayout *form = new showlayout();
-        form->setWindowTitle("Visual layout of the csv: " + dir.absolutePath());
+        form->setWindowTitle("Visual layout of the csv: " + dir.absolutePath() + "/disklayout.png");
         //we have to wait for fluxengine to finish...
         form->LoadFile("disklayout.png");
         form->exec();
