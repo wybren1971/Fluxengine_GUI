@@ -7,7 +7,7 @@ unix {QMAKE_LFLAGS += -no-pie} #added so mimetype on linux is an executable and 
 
 VERSION = 0.5
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
-#DEFINES += "BUILDDATE=system(date -R)"
+DEFINES += "BUILDDATE=system(date -R)"
 #CONFIG += static
 
 #static { #//Everything below takes effect with CONFIG += static
