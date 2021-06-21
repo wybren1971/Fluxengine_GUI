@@ -232,7 +232,7 @@ void DialogPreferences::initializefluxengine()
                 if (readcounter < intTotal)
                 {
                     m_fluxengine.setAddress(m_address + " " + readformats.at(readcounter) + " -C");
-                    qInfo() << State;
+//                    qInfo() << State;
                     m_fluxengine.start();
                     waitforfluzenginetofinish = true;
                     if ((intTotal +3 + intTotalWrite) > ui->progressBar->maximum())
@@ -338,7 +338,7 @@ QStringList DialogPreferences::initializeformats(QString data)
         {
             i = data.indexOf("\n", j);
             j = data.indexOf("\n", i+1);
-            qInfo() << data.mid(i, j+1 - i).trimmed();
+//            qInfo() << data.mid(i, j+1 - i).trimmed();
 //"acornadfs: Acorn ADFS L/D/E/F 640kB/800kB/1600kB 3.5\" or 5.25\" 80-track double-sided"
             QString typedescription = data.mid(i, j+1 - i).trimmed();
             int k = typedescription.indexOf(":",0);
@@ -347,9 +347,9 @@ QStringList DialogPreferences::initializeformats(QString data)
             //append type
             int length = typedescription.size();
             Formats.append(typedescription.left(k).trimmed());
-            qInfo() << "type: " + typedescription.left(k).trimmed();
+//            qInfo() << "type: " + typedescription.left(k).trimmed();
             Formats.append(typedescription.right(length - k-1).trimmed());
-            qInfo() << "description: " + typedescription.right(length - k-1).trimmed();
+//            qInfo() << "description: " + typedescription.right(length - k-1).trimmed();
 
         }
    }
@@ -461,9 +461,9 @@ void DialogPreferences::output(QString data)
                     {
                         State = 3;
                     }
-                    qInfo() << "State" << State;
-                    qInfo() << "readcounter" << readcounter;
-                    qInfo() << "readformats.size()" << readformats.size();
+//                    qInfo() << "State" << State;
+//                    qInfo() << "readcounter" << readcounter;
+//                    qInfo() << "readformats.size()" << readformats.size();
                  }   else
                     {
                         if (State == 3)
@@ -486,9 +486,9 @@ void DialogPreferences::output(QString data)
                                State = 4;
                             }
                         }
-                        qInfo() << "State" << State;
-                        qInfo() << "writecounter" << writecounter;
-                        qInfo() << "writeformats.size()" << writeformats.size();
+//                        qInfo() << "State" << State;
+//                        qInfo() << "writecounter" << writecounter;
+//                        qInfo() << "writeformats.size()" << writeformats.size();
                     }
             }
         }

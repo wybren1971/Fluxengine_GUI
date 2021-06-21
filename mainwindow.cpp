@@ -225,6 +225,7 @@ void MainWindow::setParagraphSpacing()
 void MainWindow::about()
 {
     QString yourAppVersion = QCoreApplication::applicationVersion();
+
     QString datetime = QStringLiteral(__DATE__) + QStringLiteral(" ") + QStringLiteral(__TIME__);
  //   infoLabel->setText(tr("Invoked <b>Help|About</b>"));
     QMessageBox::about(this, tr("About Menu"),
