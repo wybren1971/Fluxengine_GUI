@@ -201,13 +201,13 @@ void DialogPreferences::initializefluxengine()
         }
     }
     ui->btnInitialize->setEnabled(false);
+    this->setCursor(Qt::WaitCursor);
     if (!waitforfluzenginetofinish)
     {
         switch (State)
             {
             case 0:
             {
-                this->setCursor(Qt::WaitCursor);
                 m_fluxengine.setAddress("read");
                 qInfo() << State;
                 m_fluxengine.start();
@@ -228,48 +228,46 @@ void DialogPreferences::initializefluxengine()
             {
                 QString m_address = "read";
                 int intTotal = readformats.size();
-//                if (readcounter == 0)
-//                   ui->progressBar->setMaximum(ui->progressBar->maximum()+intTotal);
+                int intTotalWrite = writeformats.size();
                 if (readcounter < intTotal)
                 {
                     m_fluxengine.setAddress(m_address + " " + readformats.at(readcounter) + " -C");
                     qInfo() << State;
                     m_fluxengine.start();
                     waitforfluzenginetofinish = true;
-                    if ((readcounter +3) > ui->progressBar->maximum())
-                        ui->progressBar->setMaximum(readcounter +3);
+                    if ((intTotal +3 + intTotalWrite) > ui->progressBar->maximum())
+                        ui->progressBar->setMaximum(intTotal +3 + intTotalWrite);
                     ui->progressBar->setValue(readcounter +3);
-                    break;
                 }
+                break;
             }
             case 3:
             {
                 QString m_address = "write";
                 int intTotal = writeformats.size();
-//                if (writecounter == 0)
-//                   ui->progressBar->setMaximum(ui->progressBar->maximum()+intTotal);
                 if (writecounter < intTotal)
                 {
                     m_fluxengine.setAddress(m_address + " " + writeformats.at(writecounter) + " -C");
                     qInfo() << State;
                     m_fluxengine.start();
                     waitforfluzenginetofinish = true;
-                    if ((readcounter + writecounter +3) > ui->progressBar->maximum())
-                        ui->progressBar->setMaximum(readcounter + writecounter +3);
                     ui->progressBar->setValue(readcounter + writecounter +3);
-                    break;
                 }
+                break;
             }
             case 4:
             {
                 //ready
+                qInfo() << "State" << State;
                 ui->progressBar->setValue(ui->progressBar->maximum());
-                ui->btnInitialize->setEnabled(true);
                 this->setCursor(Qt::ArrowCursor);
+                ui->btnInitialize->setEnabled(true);
                 break;
             }
         default: //
             {
+            this->setCursor(Qt::ArrowCursor);
+            ui->btnInitialize->setEnabled(true);
             break;
             }
         }
@@ -458,9 +456,14 @@ void DialogPreferences::output(QString data)
                         settings.endGroup();
                         readcounter++;
                         readcounter++;
-                    } else {
+                    }
+                    if (readcounter >= readformats.size())
+                    {
                         State = 3;
                     }
+                    qInfo() << "State" << State;
+                    qInfo() << "readcounter" << readcounter;
+                    qInfo() << "readformats.size()" << readformats.size();
                  }   else
                     {
                         if (State == 3)
@@ -477,11 +480,15 @@ void DialogPreferences::output(QString data)
                                 settings.endGroup();
                                 writecounter++;
                                 writecounter++;
-                             } else
+                            }
+                            if (writecounter >= writeformats.size())
                             {
                                State = 4;
                             }
                         }
+                        qInfo() << "State" << State;
+                        qInfo() << "writecounter" << writecounter;
+                        qInfo() << "writeformats.size()" << writeformats.size();
                     }
             }
         }
