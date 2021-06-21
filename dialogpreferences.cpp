@@ -266,9 +266,9 @@ void DialogPreferences::initializefluxengine()
             }
         default: //
             {
-            this->setCursor(Qt::ArrowCursor);
-            ui->btnInitialize->setEnabled(true);
-            break;
+                this->setCursor(Qt::ArrowCursor);
+                ui->btnInitialize->setEnabled(true);
+                break;
             }
         }
     }
