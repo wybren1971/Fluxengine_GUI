@@ -207,6 +207,7 @@ void DialogPreferences::initializefluxengine()
             {
             case 0:
             {
+                this->setCursor(Qt::WaitCursor);
                 m_fluxengine.setAddress("read");
                 qInfo() << State;
                 m_fluxengine.start();
@@ -264,6 +265,7 @@ void DialogPreferences::initializefluxengine()
                 //ready
                 ui->progressBar->setValue(ui->progressBar->maximum());
                 ui->btnInitialize->setEnabled(true);
+                this->setCursor(Qt::ArrowCursor);
                 break;
             }
         default: //
