@@ -12,8 +12,7 @@ bool blnFirsttime;
 int NUMBER_OF_COMMANDS;
 /*
  * To Do:
- * Aanpassen aan protobuf redesign V
- * inlezen van otpies uit protobuf tekstfiles
+ *
  * Vastleggen van type drives in pre
  * ferences zodat goede settings gebruikt worden (40track HD 96tpi, 48 tpi ertc)
  *
@@ -88,25 +87,9 @@ void MainWindow::newFile()
 void MainWindow::readdisk()
 {
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
-    if (!firsttimecheck())
+    if (!firsttimecheck(""))
         return;
-
-    settings.beginGroup("readformats");
-    if (settings.childKeys().size() == 0)
-    {
-        //fluxengine not initialized
-        QString message;
-        message = tr("Welcome to fluxengine_gui\n"
-                     "Please initialize fluxengine in preferences on the tab 'Advanced' and press initialize fluxengine.\nThis is needed to use the Wizard");
-
-        QMessageBox::information(this, tr("Fluxengine Wizard Info"), message);
-
-        preference();
-        if (settings.childKeys().size() == 0)
-            return;
-
-    }
-
+    qInfo() << "readinfo rest";
     int intDrive;
     if (ui->btnDrive0->isChecked())
     {
@@ -148,12 +131,13 @@ void MainWindow::preference()
     form->setWindowTitle("Preferences Fluxengine_GUI");
     form->exec();
     setDrive();
-    if (settings.value("fluxengine").toString() == "")
-    {
-        if (!firsttimecheck())
-            return;
-    }
-    m_fluxengine.setWorkingDirectory(settings.value("fluxengine").toString());
+//    if (settings.value("fluxengine").toString() == "")
+//    {
+//        if (!firsttimecheck(""))
+//            return;
+//    }
+    if (settings.value("fluxengine").toString() != "")
+        m_fluxengine.setWorkingDirectory(settings.value("fluxengine").toString());
 
 }
 
@@ -432,28 +416,71 @@ void MainWindow::output(QString data)
     }
 }
 
-bool MainWindow::firsttimecheck()
+bool MainWindow::firsttimecheck(QString message)
 {
+    qInfo() << "Firsttime" << blnFirsttime;
     if (blnFirsttime)
     {
-        QString message;
-        message = tr("Welcome to fluxengine_gui\n"
-                     "Set the location of fluxengine in preferences on the tab 'My Locations'\nand then go to tab 'Advanced' and initialize fluxengine.\nThese are the minimum steps needed to use the Fluxengine_GUI");
+        if (message == "")
+        {
+            message = tr("Welcome to fluxengine_gui\n"
+                         "Set the location of fluxengine in preferences on the tab 'My Locations'\nand then go to tab 'Advanced' and initialize fluxengine.\nThese are the minimum steps needed to use the Fluxengine_GUI");
+        }
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, tr("Fluxengine Wizard Info"), message);
 
-        QMessageBox::information(this, tr("Fluxengine Wizard Info"), message);
-
-        preference();
+        //if cancel then dont go to preferences
+        if (reply == QMessageBox::Yes)
+        {
+            preference();
+        } else
+        {
+            return false;
+        }
+        qInfo() << "workingdirectory"  << m_fluxengine.getWorkingDirectory();
         if (m_fluxengine.getWorkingDirectory() != "")
         {
             blnFirsttime = false;
-            return false;
+            return true;
         } else
         {
-            return true;
+             return false;
+        }
+    } else
+    {
+        QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+
+        settings.beginGroup("readformats");
+        if (settings.childKeys().size() == 0)
+        {
+            //fluxengine not initialized
+            if (message == "")
+            {
+                message = tr("Welcome to fluxengine_gui\n"
+                             "Please initialize fluxengine in preferences on the tab 'Advanced' and press initialize fluxengine.\nThis is needed to use the Wizard");
+            }
+            QMessageBox::StandardButton reply;
+            reply = QMessageBox::question(this, tr("Fluxengine Wizard Info"), message);
+
+            //if cancel then dont go to preferences
+            if (reply == QMessageBox::Yes)
+            {
+                preference();
+
+            } else
+            {
+                return true;
+            }
+            if (settings.childKeys().size() == 0)
+            {
+                return false;
+            } else
+            {
+                return true;
+            }
         }
     }
     return true;
-
 }
 
 void MainWindow::enableFluxengineCommands(bool blnStarted)
@@ -503,7 +530,7 @@ void MainWindow::on_btnReadDisk_clicked()
 
 void MainWindow::on_btntestVoltages_clicked()
 {
-    if (!firsttimecheck())
+    if (!firsttimecheck(""))
         return;
     m_fluxengine.setAddress("test voltages");
     m_fluxengine.start();
@@ -512,7 +539,7 @@ void MainWindow::on_btntestVoltages_clicked()
 
 void MainWindow::on_btntestbandwidth_clicked()
 {
-    if (!firsttimecheck())
+    if (!firsttimecheck(""))
         return;
     m_fluxengine.setAddress("test bandwidth");
     m_fluxengine.start();
@@ -521,7 +548,7 @@ void MainWindow::on_btntestbandwidth_clicked()
 
 void MainWindow::on_btnRPM_clicked()
 {
-    if (!firsttimecheck())
+    if (!firsttimecheck(""))
         return;
     if (ui->btnDrive0->isChecked())
     {
@@ -599,7 +626,7 @@ void MainWindow::WriteItemList()
 }
 void MainWindow::on_bntStartFluxengine_clicked()
 {
-    if (!firsttimecheck())
+    if (!firsttimecheck(""))
         return;
 
     //We dont want the test and rpm commands in the list because there are dedicated buttons for this.
@@ -683,7 +710,7 @@ void MainWindow::on_btnAnalyse_clicked()
 {
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
     QDir dir;
-    if (!firsttimecheck())
+    if (!firsttimecheck(""))
         return;
 
     if (!waitforfluzenginetofinish)
