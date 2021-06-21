@@ -7,6 +7,7 @@ unix {QMAKE_LFLAGS += -no-pie} #added so mimetype on linux is an executable and 
 
 VERSION = 0.5
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
+
 #DEFINES += "BUILDDATE=$$system(date -R)"
 HOST_MACHINE = $$[QMAKE_SPEC]
 contains (HOST_MACHINE, .*win32.*) {
