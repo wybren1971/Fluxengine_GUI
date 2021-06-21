@@ -55,6 +55,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     int width = settings.value("WindowWidth").toInt();
     int height = settings.value("WindowHeight").toInt();
+    if (width == 0)
+        width = 800;
+    if (height == 0)
+        height = 600;
     this->resize(width, height);
     if (settings.value("showanalyzebutton").toString() == "")
     {
@@ -469,7 +473,7 @@ bool MainWindow::firsttimecheck(QString message)
 
             } else
             {
-                return true;
+                return false;
             }
             if (settings.childKeys().size() == 0)
             {
