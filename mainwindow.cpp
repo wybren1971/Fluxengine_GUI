@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     //m_fluxengine.setAddress(ui->plainTextEdit->text());
     connect(ui->btnStop,&QPushButton::clicked,&m_fluxengine,&fluxengine::stop);
+//    QObject::connect(qApp, &QGuiApplication::applicationStateChanged, this, [=](Qt::ApplicationState state){qDebug() << state;});
     connect(&m_fluxengine,&fluxengine::output,this,&MainWindow::output);
     connect(ui->Fluxengineinput,&QLineEdit::returnPressed,this,&MainWindow::on_pushButton_clicked);
     connect(ui->Fluxengineinput, &QLineEdit::textChanged, this, &MainWindow::buttonenable);
@@ -135,14 +136,10 @@ void MainWindow::preference()
     form->setWindowTitle("Preferences Fluxengine_GUI");
     form->exec();
     setDrive();
-//    if (settings.value("fluxengine").toString() == "")
-//    {
-//        if (!firsttimecheck(""))
-//            return;
-//    }
+    ui->btnAnalyse->setVisible(settings.value("showanalyzebutton") == "true");
+
     if (settings.value("fluxengine").toString() != "")
         m_fluxengine.setWorkingDirectory(settings.value("fluxengine").toString());
-
 }
 
 void MainWindow::undo()
