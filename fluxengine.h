@@ -24,6 +24,7 @@ signals:
     void enableFluxengineCommands(bool blnStarted);
 public slots:
     void start();
+    void startdirect();
     void stop();
     bool busy();
 

@@ -39,12 +39,20 @@ QString fluxengine::getAddress() const
 
 void fluxengine::setAddress(const QString &address)
 {
-    m_address = address;
+    m_address = """" + address + """";
 }
 
 void fluxengine::setWorkingDirectory(const QString &Dir)
 {
-    m_workingdirectory = Dir;
+
+//    if(QSysInfo::productType() == "windows")
+//    {
+        m_workingdirectory = """" + Dir + """";
+        qInfo() << m_workingdirectory;
+//    } else
+//    {
+//        m_workingdirectory = Dir;
+//    }
 }
 
 QString fluxengine::getWorkingDirectory()
@@ -58,6 +66,26 @@ void fluxengine::start()
     m_listening = true;
     QString program = getProcess();
     QStringList Arguments;
+    m_process.start(program, Arguments, QIODevice::ReadWrite);
+}
+
+void fluxengine::startdirect()
+{
+    m_listening = true;
+    QString program = getProcess();
+    QByteArray command;
+    command = (m_workingdirectory + " " + m_address).toUtf8();
+    if(QSysInfo::productType() == "windows") command.append("\r");
+    command.append("\n");
+    QStringList Arguments;
+    if(QSysInfo::productType() == "windows")
+    {
+        Arguments << "/c" << command;
+
+    } else
+    {
+        Arguments << "-c" << command;
+    }
     m_process.start(program, Arguments, QIODevice::ReadWrite);
 }
 
@@ -196,13 +224,12 @@ void fluxengine::startFluxengine()
 {
     QByteArray command;
 
-//    qInfo() << Q_FUNC_INFO;
-    command = ("""" + m_workingdirectory + """" + " " + m_address).toUtf8();
-//    qInfo() << command;
+    command = (m_workingdirectory + " " + m_address).toUtf8();
+    qInfo() << QSysInfo::productType();
     if(QSysInfo::productType() == "windows") command.append("\r");
     command.append("\n");
+    qInfo() << command;
     m_process.write(command);
-//    m_process.waitForFinished(500);
     command.clear();
     command.append("exit");
     if(QSysInfo::productType() == "windows") command.append("\r");
