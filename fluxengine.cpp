@@ -197,7 +197,7 @@ void fluxengine::startFluxengine()
     QByteArray command;
 
 //    qInfo() << Q_FUNC_INFO;
-    command = (m_workingdirectory + " " + m_address).toUtf8();
+    command = ("""" + m_workingdirectory + """" + " " + m_address).toUtf8();
 //    qInfo() << command;
     if(QSysInfo::productType() == "windows") command.append("\r");
     command.append("\n");
