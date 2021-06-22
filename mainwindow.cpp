@@ -94,7 +94,7 @@ void MainWindow::readdisk()
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
     if (!firsttimecheck(""))
         return;
-    qInfo() << "readinfo rest";
+//    qInfo() << "readinfo rest";
     int intDrive;
     if (ui->btnDrive0->isChecked())
     {
@@ -419,7 +419,7 @@ void MainWindow::output(QString data)
 
 bool MainWindow::firsttimecheck(QString message)
 {
-    qInfo() << "Firsttime" << blnFirsttime;
+//    qInfo() << "Firsttime" << blnFirsttime;
     if (blnFirsttime)
     {
         if (message == "")
@@ -438,7 +438,7 @@ bool MainWindow::firsttimecheck(QString message)
         {
             return false;
         }
-        qInfo() << "workingdirectory"  << m_fluxengine.getWorkingDirectory();
+//        qInfo() << "workingdirectory"  << m_fluxengine.getWorkingDirectory();
         if (m_fluxengine.getWorkingDirectory() != "")
         {
             blnFirsttime = false;
@@ -486,8 +486,8 @@ bool MainWindow::firsttimecheck(QString message)
 
 void MainWindow::enableFluxengineCommands(bool blnStarted)
 {
-    qInfo() << Q_FUNC_INFO;
-    qInfo() << blnStarted;
+//    qInfo() << Q_FUNC_INFO;
+//    qInfo() << blnStarted;
 
     if (blnStarted)
     {
