@@ -48,7 +48,7 @@ void fluxengine::setWorkingDirectory(const QString &Dir)
 //    if(QSysInfo::productType() == "windows")
 //    {
         m_workingdirectory = """" + Dir + """";
-        qInfo() << m_workingdirectory;
+//        qInfo() << m_workingdirectory;
 //    } else
 //    {
 //        m_workingdirectory = Dir;
@@ -225,10 +225,10 @@ void fluxengine::startFluxengine()
     QByteArray command;
 
     command = (m_workingdirectory + " " + m_address).toUtf8();
-    qInfo() << QSysInfo::productType();
+//    qInfo() << QSysInfo::productType();
     if(QSysInfo::productType() == "windows") command.append("\r");
     command.append("\n");
-    qInfo() << command;
+//    qInfo() << command;
     m_process.write(command);
     command.clear();
     command.append("exit");

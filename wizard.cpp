@@ -274,6 +274,7 @@ void ReadPage::initializePage()
     {
        QString x = readformat[i];
         settings.beginGroup("readconfigs-" + x);
+//        qInfo() << x;
         my_readformat[i][filename] =settings.value("0").toString();
         my_readformat[i][trackstart] =settings.value("1").toString();
         my_readformat[i][trackstop] =settings.value("2").toString();
@@ -793,7 +794,7 @@ void WritePage::initializePage()
         }
     }
     settings.endGroup();
-\
+
     my_writeformat = CreateMatrix(writeformat.size(),8);
 //    qInfo() << "size " << my_writeformat.size();
     for (i=0;i<writeformat.size();i++)
@@ -1155,7 +1156,7 @@ QString ConclusionPage::getData()
 
        if (_strInputFluxFile != "")
        {
-           strFormat.append(" -s " + _strInputFluxFile);
+           strFormat.append(" -s \"" + _strInputFluxFile + "\"");
        } else
        {
            strFormat.append(" -s drive:" + QString::number(intSelectedDrive));
@@ -1190,19 +1191,19 @@ QString ConclusionPage::getData()
            strFormat.append("-" + Headstop);
        }
 
-       strFormat.append(" -o ");
-       strFormat.append(_strOutputfile);
+       strFormat.append(" -o \"");
+       strFormat.append(_strOutputfile + "\"");
 
 //read ibm -s :d=0:s=0:t=0-39 --overwrite -f ARK.flux -o ARK.imd'
        if (_strFluxFile != "")
        {
-           strFormat.append(" --copy-flux-to ");
-           strFormat.append(_strFluxFile);
+           strFormat.append(" --copy-flux-to \"");
+           strFormat.append(_strFluxFile + "\"");
        }
        if (_strCSVfile != "")
        {
-           strFormat.append(" --decoder.write_csv_to=");
-           strFormat.append(_strCSVfile);
+           strFormat.append(" --decoder.write_csv_to=\"");
+           strFormat.append(_strCSVfile + "\"");
        }
        if (field("ReadPage.Advanced") == "true")
        {
@@ -1241,8 +1242,8 @@ QString ConclusionPage::getData()
 
         strDisk = my_writeformat[index][type];
         strFormat.append(strDisk);
-        strFormat.append(" -i ");
-        strFormat.append(_strInputfile);
+        strFormat.append(" -i \"");
+        strFormat.append(_strInputfile + "\"");
 
         QString TrackStart = field("WritePage.TrackStart").toString();
         QString TrackStop = field("WritePage.TrackStop").toString();

@@ -452,7 +452,7 @@ bool MainWindow::firsttimecheck(QString message)
         QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
 
         settings.beginGroup("readformats");
-        if (settings.childKeys().size() == 0)
+        if (!settings.contains("0"))
         {
             //fluxengine not initialized
             if (message == "")
@@ -472,7 +472,7 @@ bool MainWindow::firsttimecheck(QString message)
             {
                 return false;
             }
-            if (settings.childKeys().size() == 0)
+            if (!settings.contains("readformats0"))
             {
                 return false;
             } else
@@ -480,6 +480,7 @@ bool MainWindow::firsttimecheck(QString message)
                 return true;
             }
         }
+        settings.endGroup();
     }
     return true;
 }
@@ -627,8 +628,8 @@ void MainWindow::WriteItemList()
 }
 void MainWindow::on_bntStartFluxengine_clicked()
 {
-    if (!firsttimecheck(""))
-        return;
+//    if (!firsttimecheck(""))
+//        return;
 
     //We dont want the test and rpm commands in the list because there are dedicated buttons for this.
     QString string1 = m_fluxengine.getAddress();
