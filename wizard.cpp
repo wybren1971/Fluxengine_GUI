@@ -16,7 +16,7 @@ QString _strInputFluxFile;
 QString _strCSVfile;
 
 const int ReadFormatDefault = 13; //IBM
-const int WriteFormatDefault = 14; //IBM 1440
+const int WriteFormatDefault = 15; //IBM 1440
 
 const int filename = 0;
 const int trackstart = 1;
@@ -250,7 +250,7 @@ void ReadPage::initializePage()
     QStringList readformat;
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
     int i =0;
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     settings.beginGroup("readformats");
     while (settings.value(QString::number(i)) != "")
     {
@@ -261,19 +261,20 @@ void ReadPage::initializePage()
         {
             readformat.append(settings.value(QString::number(i)).toString());
 
-            qInfo() << "Readformat " << settings.value(QString::number(i)).toString();
-            qInfo() << "i: " << i;
+//            qInfo() << "Readformat " << settings.value(QString::number(i)).toString();
+//            qInfo() << "i: " << i;
             i++;
         }
     }
     settings.endGroup();
 \
     my_readformat = CreateMatrix(readformat.size(),8);
-    qInfo() << "size " << my_readformat.size();
+//    qInfo() << "size " << my_readformat.size();
     for (i=0;i<readformat.size();i++)
     {
        QString x = readformat[i];
         settings.beginGroup("readconfigs-" + x);
+//        qInfo() << x;
         my_readformat[i][filename] =settings.value("0").toString();
         my_readformat[i][trackstart] =settings.value("1").toString();
         my_readformat[i][trackstop] =settings.value("2").toString();
@@ -352,9 +353,14 @@ void ReadPage::editDirectoryBox(QString dir)
             emit completeChanged();
         } else
         {
+           //get extension
+            QString filenaam = my_readformat[readFormatbox->currentIndex()][filename];
+            int Last_dot = filenaam.lastIndexOf(".");
+            QString extension = filenaam.right(filenaam.size() - Last_dot);
+
             int last_dot = dir.lastIndexOf(".");
             int size = dir.size();
-            if ((last_dot == -1) || ((size - last_dot) > 5))
+            if ((last_dot == -1) || ((size - last_dot) > extension.size()))
               //check for valid filenaam. ends with .xxxx
             {
                 directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
@@ -506,13 +512,13 @@ void ReadPage::updatedirectorybox(int index)
     QString strFilter;
     QString strFile;
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
-    qInfo() << Q_FUNC_INFO;
-    qInfo() << "index: " << index;
+//    qInfo() << Q_FUNC_INFO;
+//    qInfo() << "index: " << index;
     if (index >= 0)
     {
         trackLineEditStart->setFocus();
         trackLineEditStart->setText(my_readformat[index][trackstart]);
-        qInfo() << "index: " << my_readformat[index][trackstart];
+//        qInfo() << "index: " << my_readformat[index][trackstart];
 
         QString drivetext = "drive" + QString::number(intSelectedDrive)+ "40track";
         if (settings.value(drivetext).toBool())
@@ -771,7 +777,7 @@ void WritePage::initializePage()
     QStringList writeformat;
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
     int i =0;
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     settings.beginGroup("writeformats");
     while (settings.value(QString::number(i)) != "")
     {
@@ -782,15 +788,15 @@ void WritePage::initializePage()
         {
             writeformat.append(settings.value(QString::number(i)).toString());
 
-            qInfo() << "Writeformat " << settings.value(QString::number(i)).toString();
-            qInfo() << "i: " << i;
+//            qInfo() << "Writeformat " << settings.value(QString::number(i)).toString();
+//            qInfo() << "i: " << i;
             i++;
         }
     }
     settings.endGroup();
-\
+
     my_writeformat = CreateMatrix(writeformat.size(),8);
-    qInfo() << "size " << my_writeformat.size();
+//    qInfo() << "size " << my_writeformat.size();
     for (i=0;i<writeformat.size();i++)
     {
        QString x = writeformat[i];
@@ -802,13 +808,13 @@ void WritePage::initializePage()
         my_writeformat[i][headstop] =settings.value("4").toString();
 
         int last_dot = my_writeformat[i][filename].indexOf(".");
-        qInfo() << last_dot;
+//        qInfo() << last_dot;
         QString strfilter = my_writeformat[i][filename].right(my_writeformat[i][filename].size() - last_dot);
         my_writeformat[i][filter] ="*" + strfilter;
         my_writeformat[i][type] = x;
         settings.endGroup();
 
-        settings.beginGroup("readformatsdescription");
+        settings.beginGroup("writeformatsdescription");
         my_writeformat[i][description] = settings.value(QString::number(i)).toString();
         settings.endGroup();
     }
@@ -1150,7 +1156,7 @@ QString ConclusionPage::getData()
 
        if (_strInputFluxFile != "")
        {
-           strFormat.append(" -s " + _strInputFluxFile);
+           strFormat.append(" -s \"" + _strInputFluxFile + "\"");
        } else
        {
            strFormat.append(" -s drive:" + QString::number(intSelectedDrive));
@@ -1185,19 +1191,19 @@ QString ConclusionPage::getData()
            strFormat.append("-" + Headstop);
        }
 
-       strFormat.append(" -o ");
-       strFormat.append(_strOutputfile);
+       strFormat.append(" -o \"");
+       strFormat.append(_strOutputfile + "\"");
 
 //read ibm -s :d=0:s=0:t=0-39 --overwrite -f ARK.flux -o ARK.imd'
        if (_strFluxFile != "")
        {
-           strFormat.append(" --copy-flux-to ");
-           strFormat.append(_strFluxFile);
+           strFormat.append(" --copy-flux-to \"");
+           strFormat.append(_strFluxFile + "\"");
        }
        if (_strCSVfile != "")
        {
-           strFormat.append(" --decoder.write_csv_to=");
-           strFormat.append(_strCSVfile);
+           strFormat.append(" --decoder.write_csv_to=\"");
+           strFormat.append(_strCSVfile + "\"");
        }
        if (field("ReadPage.Advanced") == "true")
        {
@@ -1236,8 +1242,8 @@ QString ConclusionPage::getData()
 
         strDisk = my_writeformat[index][type];
         strFormat.append(strDisk);
-        strFormat.append(" -i ");
-        strFormat.append(_strInputfile);
+        strFormat.append(" -i \"");
+        strFormat.append(_strInputfile + "\"");
 
         QString TrackStart = field("WritePage.TrackStart").toString();
         QString TrackStop = field("WritePage.TrackStop").toString();

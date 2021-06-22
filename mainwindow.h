@@ -27,6 +27,7 @@ class MainWindow : public QMainWindow
         void WriteItemList();
         void ReadItemList();
         bool firsttimecheck();
+        bool firsttimecheck(QString message);
 public slots:
 protected:
     #ifndef QT_NO_CONTEXTMENU

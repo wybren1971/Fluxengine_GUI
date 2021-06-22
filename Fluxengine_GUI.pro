@@ -5,9 +5,17 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++11
 unix {QMAKE_LFLAGS += -no-pie} #added so mimetype on linux is an executable and not a shared library
 
-VERSION = 0.41
+VERSION = 0.5
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
-#DEFINES += "BUILDDATE=system(date -R)"
+
+#DEFINES += "BUILDDATE=$$system(date -R)"
+HOST_MACHINE = $$[QMAKE_SPEC]
+contains (HOST_MACHINE, .*win32.*) {
+    BUILD_DATE=$$system(powershell -Command "Get-Date -format yyyy-MM-dd")
+} else {
+    BUILD_DATE = $$system(date +%Y-%m-%d)
+}
+DEFINES += BuildDate=\\\\\\"$$BUILD_DATE\\\\\\"
 #CONFIG += static
 
 #static { #//Everything below takes effect with CONFIG += static

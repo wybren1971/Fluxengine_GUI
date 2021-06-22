@@ -76,6 +76,7 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
     ui->progressBar->setMinimum(0);
     ui->progressBar->setMaximum(40); //near enough it gets updated when we now it precise
     ui->progressBar->setValue(0);
+    ui->txtoutput->setVisible(false); //for debug purposes on windows
     readcounter = 0;
     writecounter = 0;
     State = 0;
@@ -172,8 +173,8 @@ void DialogPreferences::browse()
 
 void DialogPreferences::enablecommands(bool running)
 {
-    qInfo() << Q_FUNC_INFO;
-    qInfo() << running;
+//    qInfo() << Q_FUNC_INFO;
+//    qInfo() << running;
     if (running)
     {
         waitforfluzenginetofinish = true;
@@ -201,6 +202,7 @@ void DialogPreferences::initializefluxengine()
         }
     }
     ui->btnInitialize->setEnabled(false);
+    this->setCursor(Qt::WaitCursor);
     if (!waitforfluzenginetofinish)
     {
         switch (State)
@@ -208,8 +210,8 @@ void DialogPreferences::initializefluxengine()
             case 0:
             {
                 m_fluxengine.setAddress("read");
-                qInfo() << State;
-                m_fluxengine.start();
+//                qInfo() << State;
+                m_fluxengine.startdirect();
                 waitforfluzenginetofinish = true;
                 ui->progressBar->setValue(1);
                 break;
@@ -217,8 +219,8 @@ void DialogPreferences::initializefluxengine()
             case 1:
             {
                 m_fluxengine.setAddress("write");
-                qInfo() << "address" << m_fluxengine.getAddress();
-                m_fluxengine.start();
+//                qInfo() << "address" << m_fluxengine.getAddress();
+                m_fluxengine.startdirect();
                 waitforfluzenginetofinish = true;
                 ui->progressBar->setValue(2);
                 break;
@@ -227,48 +229,47 @@ void DialogPreferences::initializefluxengine()
             {
                 QString m_address = "read";
                 int intTotal = readformats.size();
-//                if (readcounter == 0)
-//                   ui->progressBar->setMaximum(ui->progressBar->maximum()+intTotal);
+                int intTotalWrite = writeformats.size();
                 if (readcounter < intTotal)
                 {
                     m_fluxengine.setAddress(m_address + " " + readformats.at(readcounter) + " -C");
-                    qInfo() << State;
-                    m_fluxengine.start();
+//                    qInfo() << State;
+                    m_fluxengine.startdirect();
                     waitforfluzenginetofinish = true;
-                    if ((readcounter +3) > ui->progressBar->maximum())
-                        ui->progressBar->setMaximum(readcounter +3);
+                    if ((intTotal +3 + intTotalWrite) > ui->progressBar->maximum())
+                        ui->progressBar->setMaximum(intTotal +3 + intTotalWrite);
                     ui->progressBar->setValue(readcounter +3);
-                    break;
                 }
+                break;
             }
             case 3:
             {
                 QString m_address = "write";
                 int intTotal = writeformats.size();
-//                if (writecounter == 0)
-//                   ui->progressBar->setMaximum(ui->progressBar->maximum()+intTotal);
                 if (writecounter < intTotal)
                 {
                     m_fluxengine.setAddress(m_address + " " + writeformats.at(writecounter) + " -C");
-                    qInfo() << State;
-                    m_fluxengine.start();
+//                    qInfo() << State;
+                    m_fluxengine.startdirect();
                     waitforfluzenginetofinish = true;
-                    if ((readcounter + writecounter +3) > ui->progressBar->maximum())
-                        ui->progressBar->setMaximum(readcounter + writecounter +3);
                     ui->progressBar->setValue(readcounter + writecounter +3);
-                    break;
                 }
+                break;
             }
             case 4:
             {
                 //ready
+//                qInfo() << "State" << State;
                 ui->progressBar->setValue(ui->progressBar->maximum());
+                this->setCursor(Qt::ArrowCursor);
                 ui->btnInitialize->setEnabled(true);
                 break;
             }
         default: //
             {
-            break;
+                this->setCursor(Qt::ArrowCursor);
+                ui->btnInitialize->setEnabled(true);
+                break;
             }
         }
     }
@@ -279,7 +280,7 @@ QStringList DialogPreferences::initializeformats(QString data)
     QStringList Formats;
     //returns a stringlist with read or write formats.
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
-    qInfo() << data;
+//    qInfo() << data;
 
 //    [readformats]
 //    0=acornadfs: Acorn ADFS L/D/E/F 640kB/800kB/1600kB 3.5\" or 5.25\" 80-track double-sided
@@ -332,13 +333,30 @@ QStringList DialogPreferences::initializeformats(QString data)
 //    9=brother120: Brother 120kB 3.5\" 39-track GCR disks
    if (data.contains("syntax: fluxengine read ") || (data.contains("syntax: fluxengine write ")))
    {
-        int i = data.indexOf(":",0);
-        int j = data.indexOf(":", i+1);
-        for (int x=0; x < data.count(); x++)
+       int i = 0;
+        if (data.contains("fluxengine read "))
         {
-            i = data.indexOf("\n", j);
-            j = data.indexOf("\n", i+1);
-            qInfo() << data.mid(i, j+1 - i).trimmed();
+            i = data.indexOf("fluxengine read ",0);
+        } else
+        {
+            i = data.indexOf("fluxengine write ",0);
+        }
+//        ui->txtoutput->appendPlainText("i: " + QString::number(i));
+        int j = data.indexOf(":", i+1);
+//        ui->txtoutput->appendPlainText("j: " + QString::number(j));
+        for (int x=0; x < data.size(); x++)
+        {
+            if(QSysInfo::productType() == "windows")
+            {
+                i = data.indexOf("\r", j);
+                j = data.indexOf("\r", i+1);
+            } else
+            {
+                i = data.indexOf("\n", j);
+                j = data.indexOf("\n", i+1);
+            }
+//            ui->txtoutput->appendPlainText("enter at position: " + QString::number(i));
+//            qInfo() << data.mid(i, j+1 - i).trimmed();
 //"acornadfs: Acorn ADFS L/D/E/F 640kB/800kB/1600kB 3.5\" or 5.25\" 80-track double-sided"
             QString typedescription = data.mid(i, j+1 - i).trimmed();
             int k = typedescription.indexOf(":",0);
@@ -347,9 +365,9 @@ QStringList DialogPreferences::initializeformats(QString data)
             //append type
             int length = typedescription.size();
             Formats.append(typedescription.left(k).trimmed());
-            qInfo() << "type: " + typedescription.left(k).trimmed();
+//            qInfo() << "type: " + typedescription.left(k).trimmed();
             Formats.append(typedescription.right(length - k-1).trimmed());
-            qInfo() << "description: " + typedescription.right(length - k-1).trimmed();
+//            qInfo() << "description: " + typedescription.right(length - k-1).trimmed();
 
         }
    }
@@ -363,20 +381,50 @@ QStringList DialogPreferences::getConfig(QString data)
     {
         int i = data.indexOf(":",0);
         int j;
+        if(QSysInfo::productType() == "windows")
+        {
+            j = data.indexOf("\r", i+1);
+        } else
+        {
             j = data.indexOf("\n", i+1);
-            Configs.append(data.mid(i+3, j-4 - i).trimmed());
-            i = data.indexOf(QRegExp("start: "),0);
+        }
+        Configs.append(data.mid(i+3, j-4 - i).trimmed());
+        i = data.indexOf(QRegExp("start: "),0);
+        if(QSysInfo::productType() == "windows")
+        {
+            j = data.indexOf("\r", i+1);
+        } else
+        {
             j = data.indexOf("\n", i+1);
-            Configs.append(data.mid(i+7, j-7 - i).trimmed());
-            i = data.indexOf(QRegExp("end: "),i);
+        }
+        Configs.append(data.mid(i+7, j-7 - i).trimmed());
+        i = data.indexOf(QRegExp("end: "),i);
+        if(QSysInfo::productType() == "windows")
+        {
+            j = data.indexOf("\r", i+1);
+        } else
+        {
             j = data.indexOf("\n", i+1);
-            Configs.append(data.mid(i+5, j-5 - i).trimmed());
-            i = data.indexOf(QRegExp("start: "),i);
+        }
+        Configs.append(data.mid(i+5, j-5 - i).trimmed());
+        i = data.indexOf(QRegExp("start: "),i);
+        if(QSysInfo::productType() == "windows")
+        {
+            j = data.indexOf("\r", i+1);
+        } else
+        {
             j = data.indexOf("\n", i+1);
-            Configs.append(data.mid(i+7, j-7 - i).trimmed());
-            i = data.indexOf(QRegExp("end: "),i);
+        }
+        Configs.append(data.mid(i+7, j-7 - i).trimmed());
+        i = data.indexOf(QRegExp("end: "),i);
+        if(QSysInfo::productType() == "windows")
+        {
+            j = data.indexOf("\r", i+1);
+        } else
+        {
             j = data.indexOf("\n", i+1);
-            Configs.append(data.mid(i+5, j-5 - i).trimmed());
+        }
+        Configs.append(data.mid(i+5, j-5 - i).trimmed());
         return Configs;
     }
     //stringlist contains filename, start cylinder, stop cylinder, start Head, stop head.
@@ -386,6 +434,10 @@ QStringList DialogPreferences::getConfig(QString data)
 void DialogPreferences::output(QString data)
 {
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    if (data.size() > 1)
+    {
+        ui->txtoutput->appendPlainText(data.trimmed());
+    }
     int i = 0;
     int j = 0;
     if (data.trimmed() != "")
@@ -394,9 +446,10 @@ void DialogPreferences::output(QString data)
         if (State == 0)
         {
             readformats = initializeformats(data);
-            foreach (QString x, readformats)
+            ui->txtoutput->appendPlainText("size:  "+ QString::number(readformats.size()));
+            for (int l = 0; l < readformats.size() ;l++ )
             {
-                qInfo() << "j: " << j << "i: " << i;
+                QString x = readformats[l];
                 if (i % 2)
                 { //if odd then description
 //                    qInfo() << "Odd" << i;
@@ -421,7 +474,7 @@ void DialogPreferences::output(QString data)
                 writeformats = initializeformats(data);
                 foreach (QString x, writeformats)
                 {
-                    qInfo() << "j: " << j << "i: " << i;
+//                    qInfo() << "j: " << j << "i: " << i;
                     if (i % 2)
                     { //if odd then description
     //                    qInfo() << "Odd" << i;
@@ -456,9 +509,14 @@ void DialogPreferences::output(QString data)
                         settings.endGroup();
                         readcounter++;
                         readcounter++;
-                    } else {
+                    }
+                    if (readcounter >= readformats.size())
+                    {
                         State = 3;
                     }
+//                    qInfo() << "State" << State;
+//                    qInfo() << "readcounter" << readcounter;
+//                    qInfo() << "readformats.size()" << readformats.size();
                  }   else
                     {
                         if (State == 3)
@@ -475,11 +533,15 @@ void DialogPreferences::output(QString data)
                                 settings.endGroup();
                                 writecounter++;
                                 writecounter++;
-                             } else
+                            }
+                            if (writecounter >= writeformats.size())
                             {
                                State = 4;
                             }
                         }
+//                        qInfo() << "State" << State;
+//                        qInfo() << "writecounter" << writecounter;
+//                        qInfo() << "writeformats.size()" << writeformats.size();
                     }
             }
         }
