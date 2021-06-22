@@ -250,7 +250,7 @@ void ReadPage::initializePage()
     QStringList readformat;
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
     int i =0;
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     settings.beginGroup("readformats");
     while (settings.value(QString::number(i)) != "")
     {
@@ -261,15 +261,15 @@ void ReadPage::initializePage()
         {
             readformat.append(settings.value(QString::number(i)).toString());
 
-            qInfo() << "Readformat " << settings.value(QString::number(i)).toString();
-            qInfo() << "i: " << i;
+//            qInfo() << "Readformat " << settings.value(QString::number(i)).toString();
+//            qInfo() << "i: " << i;
             i++;
         }
     }
     settings.endGroup();
 \
     my_readformat = CreateMatrix(readformat.size(),8);
-    qInfo() << "size " << my_readformat.size();
+//    qInfo() << "size " << my_readformat.size();
     for (i=0;i<readformat.size();i++)
     {
        QString x = readformat[i];
@@ -511,13 +511,13 @@ void ReadPage::updatedirectorybox(int index)
     QString strFilter;
     QString strFile;
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
-    qInfo() << Q_FUNC_INFO;
-    qInfo() << "index: " << index;
+//    qInfo() << Q_FUNC_INFO;
+//    qInfo() << "index: " << index;
     if (index >= 0)
     {
         trackLineEditStart->setFocus();
         trackLineEditStart->setText(my_readformat[index][trackstart]);
-        qInfo() << "index: " << my_readformat[index][trackstart];
+//        qInfo() << "index: " << my_readformat[index][trackstart];
 
         QString drivetext = "drive" + QString::number(intSelectedDrive)+ "40track";
         if (settings.value(drivetext).toBool())
@@ -776,7 +776,7 @@ void WritePage::initializePage()
     QStringList writeformat;
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
     int i =0;
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     settings.beginGroup("writeformats");
     while (settings.value(QString::number(i)) != "")
     {
@@ -787,15 +787,15 @@ void WritePage::initializePage()
         {
             writeformat.append(settings.value(QString::number(i)).toString());
 
-            qInfo() << "Writeformat " << settings.value(QString::number(i)).toString();
-            qInfo() << "i: " << i;
+//            qInfo() << "Writeformat " << settings.value(QString::number(i)).toString();
+//            qInfo() << "i: " << i;
             i++;
         }
     }
     settings.endGroup();
 \
     my_writeformat = CreateMatrix(writeformat.size(),8);
-    qInfo() << "size " << my_writeformat.size();
+//    qInfo() << "size " << my_writeformat.size();
     for (i=0;i<writeformat.size();i++)
     {
        QString x = writeformat[i];
@@ -807,7 +807,7 @@ void WritePage::initializePage()
         my_writeformat[i][headstop] =settings.value("4").toString();
 
         int last_dot = my_writeformat[i][filename].indexOf(".");
-        qInfo() << last_dot;
+//        qInfo() << last_dot;
         QString strfilter = my_writeformat[i][filename].right(my_writeformat[i][filename].size() - last_dot);
         my_writeformat[i][filter] ="*" + strfilter;
         my_writeformat[i][type] = x;
