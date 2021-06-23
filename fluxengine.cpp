@@ -56,7 +56,7 @@ void fluxengine::start()
     m_listening = true;
     QString program = getProcess();
     QStringList Arguments;
-    if(QSysInfo::productType() == "windows") Arguments << "/Q";
+    if(QSysInfo::productType() == "windows") Arguments << "/Q"; // /Q turns echo of on windows.
 
     m_process.start(program, Arguments, QIODevice::ReadWrite);
 
@@ -151,7 +151,7 @@ void fluxengine::readyReadStandardError()
     if (data.size() > 1)
     {
         QString message = "Standard Error: ";
-        data.append("readyReadStandardError");
+//        data.append("readyReadStandardError");
         message.append(data);
         if (message.contains("No such file or directory", Qt::CaseInsensitive) || message.contains("Is a directory", Qt::CaseInsensitive))
         {
@@ -168,7 +168,7 @@ void fluxengine::readyReadStandardOutput()
     QByteArray data = m_process.readAllStandardOutput();
     if (data.size() > 1)
     {
-        data.append("readyReadStandardOutput");
+//        data.append("readyReadStandardOutput");
         emit output(QString(data.trimmed()));
     }
 }
