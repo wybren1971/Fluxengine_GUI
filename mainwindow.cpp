@@ -43,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&m_fluxengine,&fluxengine::output,this,&MainWindow::output);
     connect(ui->Fluxengineinput,&QLineEdit::returnPressed,this,&MainWindow::on_pushButton_clicked);
     connect(ui->Fluxengineinput, &QLineEdit::textChanged, this, &MainWindow::buttonenable);
+    connect(ui->plainTextEdit_2->lineEdit(), SIGNAL(returnPressed()), this, SLOT(on_bntStartFluxengine_clicked()));
     connect(&m_fluxengine,&fluxengine::enableFluxengineCommands,this,&MainWindow::enableFluxengineCommands);
     ui->txtOutput->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->txtOutput,&QPlainTextEdit::customContextMenuRequested,this,&MainWindow::showContextMenu);
@@ -212,6 +213,7 @@ void MainWindow::about()
     QString yourAppVersion = QCoreApplication::applicationVersion();
 
     QString datetime = QStringLiteral(__DATE__) + QStringLiteral(" ") + QStringLiteral(__TIME__);
+//    QString datetime = BuildDate;
  //   infoLabel->setText(tr("Invoked <b>Help|About</b>"));
     QMessageBox::about(this, tr("About Menu"),
             tr("This is the fluxengine-GUI created by Wybren van Duinen."
