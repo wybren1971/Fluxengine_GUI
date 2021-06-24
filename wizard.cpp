@@ -282,8 +282,15 @@ void ReadPage::initializePage()
         my_readformat[i][headstop] =settings.value("4").toString();
 
         int last_dot = my_readformat[i][filename].indexOf(".");
-        QString strfilter = my_readformat[i][filename].right(my_readformat[i][filename].size() - last_dot);
-        my_readformat[i][filter] ="*" + strfilter + " *.flux";
+//        qInfo() << "last_dot: " << last_dot;
+        if (last_dot > -1)
+        {
+            QString strfilter = my_readformat[i][filename].right(my_readformat[i][filename].size() - last_dot);
+            my_readformat[i][filter] ="*" + strfilter + " *.flux";
+        } else
+        {   //fluxengine has not specified a format. so we show everything
+            my_readformat[i][filter] ="*.* *.flux";
+        }
         my_readformat[i][type] = x;
         settings.endGroup();
 
@@ -814,8 +821,14 @@ void WritePage::initializePage()
 
         int last_dot = my_writeformat[i][filename].indexOf(".");
 //        qInfo() << last_dot;
-        QString strfilter = my_writeformat[i][filename].right(my_writeformat[i][filename].size() - last_dot);
-        my_writeformat[i][filter] ="*" + strfilter;
+        if (last_dot > -1)
+        {
+            QString strfilter = my_writeformat[i][filename].right(my_writeformat[i][filename].size() - last_dot);
+            my_writeformat[i][filter] ="*" + strfilter;
+        } else
+        {   //fluxengine has not specified a format. so we show everything
+            my_writeformat[i][filter] ="*.*";
+        }
         my_writeformat[i][type] = x;
         settings.endGroup();
 
