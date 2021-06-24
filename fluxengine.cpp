@@ -52,7 +52,6 @@ QString fluxengine::getWorkingDirectory()
 
 void fluxengine::start()
 {
-//    qInfo() << Q_FUNC_INFO;
     m_listening = true;
     QString program = getProcess();
     QStringList Arguments;
@@ -134,8 +133,6 @@ void fluxengine::errorOccured(QProcess::ProcessError error)
 
 void fluxengine::finished(int exitcode, QProcess::ExitStatus exitStatus)
 {
-//    qInfo() << Q_FUNC_INFO;
-//    qInfo() << exitcode;
     if(!m_listening) return;
     Q_UNUSED(exitcode);
     Q_UNUSED(exitStatus);
@@ -151,7 +148,6 @@ void fluxengine::readyReadStandardError()
     if (data.size() > 1)
     {
         QString message = "Standard Error: ";
-//        data.append("readyReadStandardError");
         message.append(data);
         if (message.contains("No such file or directory", Qt::CaseInsensitive) || message.contains("Is a directory", Qt::CaseInsensitive))
         {
@@ -186,8 +182,6 @@ void fluxengine::stateChanged(QProcess::ProcessState newState)
         emit enableFluxengineCommands(false);
         break;
     case QProcess::Starting:
-//        qInfo() << "Starting";
-//        emit enableFluxengineCommands(false);
         break;
     case QProcess::Running:
         if(QSysInfo::productType() == "windows")
@@ -198,7 +192,6 @@ void fluxengine::stateChanged(QProcess::ProcessState newState)
         startFluxengine();
         emit enableFluxengineCommands(true);
         break;
-
     }
 }
 
