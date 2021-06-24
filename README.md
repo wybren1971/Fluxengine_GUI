@@ -20,7 +20,7 @@ The mainwindow of Fluxengine_GUI:
 The wizard for easy reading and writing disks with fluxengine:
 
 ![Screenshot from 2021-05-31 21-47-51](https://user-images.githubusercontent.com/14984509/120235278-f8624600-c259-11eb-8a21-fd52ad9493f8.png)
-![Screenshot from 2021-06-20 15-06-26](https://user-images.githubusercontent.com/14984509/122675330-33142a00-d1d9-11eb-8af4-3b6b504bf324.png)
+![Screenshot from 2021-06-24 08-32-19](https://user-images.githubusercontent.com/14984509/123220110-ea58bb80-d4cd-11eb-888d-00556fb47ff0.png)
 
 With an advanced settings page for reading:
 
