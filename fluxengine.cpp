@@ -221,7 +221,6 @@ QString fluxengine::getProcess()
 {
     if(QSysInfo::productType() == "windows") return "cmd";
     return "bash";
-
 }
 
 void fluxengine::startFluxengine()
