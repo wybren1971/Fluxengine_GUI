@@ -8,9 +8,34 @@ unix {QMAKE_LFLAGS += -no-pie} #added so mimetype on linux is an executable and 
 VERSION = 0.7
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
-#DEFINES += "BUILDDATE=$$system(date -R)"
-BUILD_DATE = $$system(date +%Y-%m-%d)
-DEFINES += BuildDate=\\\\\\"$$BUILD_DATE\\\\\\"
+
+#HOST_MACHINE = $$[QMAKE_SPEC]
+#contains (HOST_MACHINE, .*win32.*) {
+#    BUILD_DATE=$$system(powershell -Command "Get-Date -format yyyy-MM-dd")
+#} else {
+#    BUILD_DATE = $$system(date +%Y-%m-%d)
+#}
+
+#DEFINES += BuildDate=\\\\\\"$$BUILD_DATE\\\\\\"
+
+#APP_VERSION = "$$VERSION"
+APP_NAME = "%{ProjectName}"
+COMPANY_NAME = "Wybren van Duinen"
+#COMPANY_DOMAIN = "milosolutions.com"
+
+# add defines
+#DEFINES += AppVersion='"\\\\\\"$$APP_VERSION\\\\\\""'
+DEFINES += AppName='"\\\\\\"$$APP_NAME\\\\\\""'
+DEFINES += CompanyName='"\\\\\\"COMPANY_NAME\\\\\\""'
+#DEFINES += CompanyDomain='"\\\\\\"COMPANY_DOMAIN\\\\\\""'
+#DEFINES += BuildDate=\\\\\\"$$BUILD_DATE\\\\\\"
+#DEFINES += GitCommit=\\\\\\"$$COMMIT\\\\\\"
+
+
+
+DEFINES += "BUILDDATE=$$system(date -R)"
+#BUILD_DATE = $$system(date +%Y-%m-%d)
+#DEFINES += BuildDate=\\\\\\"$$BUILD_DATE\\\\\\"
 #CONFIG += static
 
 #static { #//Everything below takes effect with CONFIG += static

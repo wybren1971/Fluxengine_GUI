@@ -71,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
     ui->btnReadDisk->setFocus();
     ui->plainTextEdit_2->completer();
+    ui->plainTextEdit_2->setInsertPolicy(QComboBox::NoInsert);
     ReadItemList();
 }
 
@@ -141,6 +142,7 @@ void MainWindow::preference()
 
     if (settings.value("fluxengine").toString() != "")
         m_fluxengine.setWorkingDirectory(settings.value("fluxengine").toString());
+    ReadItemList();
 }
 
 void MainWindow::undo()
@@ -579,6 +581,7 @@ void MainWindow::on_btnDrive1_clicked()
 void MainWindow::ReadItemList()
 {
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    ui->plainTextEdit_2->clear();
     for (int i = 0;i<NUMBER_OF_COMMANDS;i++)
     {
         QString setting = "Fluxengine.command";
@@ -594,37 +597,45 @@ void MainWindow::ReadItemList()
 }
 
 void MainWindow::WriteItemList()
-{
+{   //work todo...
+    qInfo() << Q_FUNC_INFO;
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
     //write to settings
+
     for (int i = 0;i<NUMBER_OF_COMMANDS;i++)
     {
         QString setting = "Fluxengine.command";
         QString s = QString::number(i);
         setting = setting + s;
-        if (settings.value(setting).toString() == "")
-        {//i kleiner dan 10 and nog geen command.
-            settings.setValue(setting,m_fluxengine.getAddress());
-            break;
-        } else
+        qInfo() << setting;
+
+//        if (settings.value(setting).toString() == "")
+//        {//i kleiner dan 10 and nog geen command.
+        if (i < ui->plainTextEdit_2->count())
         {
-            if (i == 9)
-            {
-                QString settingold = "Fluxengine.command";
-                //overwrite move everything up and loose first command.
-                //1 overschrijft 0, 2 overschrijft 1 3 overschrijft 2 etc 9 wordt toegevoegd
-                for (int i = 0;i<(NUMBER_OF_COMMANDS-1);i++)
-                {
-                    QString s = QString::number(i);
-                    QString t = QString::number(i+1);
-                    settings.setValue(settingold +s,settings.value(settingold +t));
-                }
-                settings.setValue(setting,m_fluxengine.getAddress());
-                ui->plainTextEdit_2->clear();
-                ReadItemList();
-                ui->plainTextEdit_2->setCurrentIndex(i);
-            }
+            ui->plainTextEdit_2->setCurrentIndex(i);
+            settings.setValue(setting, ui->plainTextEdit_2->currentText());
         }
+//            break;
+//        } else
+//        {
+//            if (i == (NUMBER_OF_COMMANDS-1))
+//            {
+//                QString settingold = "Fluxengine.command";
+//                //overwrite move everything up and loose first command.
+//                //1 overschrijft 0, 2 overschrijft 1 3 overschrijft 2 etc 9 wordt toegevoegd
+//                for (int i = 0;i<(NUMBER_OF_COMMANDS-1);i++)
+//                {
+//                    QString s = QString::number(i);
+//                    QString t = QString::number(i+1);
+//                    settings.setValue(settingold +s,settings.value(settingold +t));
+//                }
+//                settings.setValue(setting,m_fluxengine.getAddress());
+//                ui->plainTextEdit_2->clear();
+//                ReadItemList();
+//                ui->plainTextEdit_2->setCurrentIndex(i);
+//            }
+//        }
     }
 
 }
@@ -642,6 +653,7 @@ void MainWindow::on_bntStartFluxengine_clicked()
     string3.truncate(7);
     if (( string1 != "test") && (string2 != "rpm") && (string2 != "analyse"))
     {
+        qInfo() << (ui->plainTextEdit_2->findText(m_fluxengine.getAddress()) == -1);
         if (ui->plainTextEdit_2->findText(m_fluxengine.getAddress()) == -1)
         {
             ui->plainTextEdit_2->addItem(m_fluxengine.getAddress());
