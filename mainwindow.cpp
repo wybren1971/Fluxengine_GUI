@@ -725,7 +725,7 @@ void MainWindow::on_btnAnalyse_clicked()
 
         if (dir.absolutePath() != "")
         {
-            m_fluxengine.setAddress("analyse layout --csv " + dir.absolutePath());
+            m_fluxengine.setAddress("analyse layout --csv \"" + dir.absolutePath() + "\"");
             m_fluxengine.start();
             waitforfluzenginetofinish = true;
             callingfunction = "on_btnAnalyse_clicked()";
@@ -734,7 +734,7 @@ void MainWindow::on_btnAnalyse_clicked()
     {
         //show the resulting png
         showlayout *form = new showlayout();
-        form->setWindowTitle("Visual layout of the csv: " + dir.absolutePath() + "/disklayout.png");
+        form->setWindowTitle("Visual layout of the csv: \"" + dir.absolutePath() + "/disklayout.png\"");
         //we have to wait for fluxengine to finish...
         form->LoadFile("disklayout.png");
         form->exec();

@@ -281,9 +281,9 @@ void ReadPage::initializePage()
         my_readformat[i][headstart] =settings.value("3").toString();
         my_readformat[i][headstop] =settings.value("4").toString();
 
-        int last_dot = x.indexOf(".");
-        QString strfilter = x.right(last_dot);
-        my_readformat[i][filter] ="*." + strfilter + ", *.flux";
+        int last_dot = my_readformat[i][filename].indexOf(".");
+        QString strfilter = my_readformat[i][filename].right(my_readformat[i][filename].size() - last_dot);
+        my_readformat[i][filter] ="*" + strfilter + " *.flux";
         my_readformat[i][type] = x;
         settings.endGroup();
 
@@ -301,10 +301,10 @@ void ReadPage::initializePage()
 
 int ReadPage::nextId() const
 {
-    _strOutputfile = (directoryComboBox->text());
-    _strFluxFile = fluxComboBox->text();
-    _strInputFluxFile = flux1ComboBox->text();
-    _strCSVfile = CSVComboBox->text();
+    _strOutputfile = QDir::toNativeSeparators(directoryComboBox->text());
+    _strFluxFile = QDir::toNativeSeparators(fluxComboBox->text());
+    _strInputFluxFile = QDir::toNativeSeparators(flux1ComboBox->text());
+    _strCSVfile = QDir::toNativeSeparators(CSVComboBox->text());
 
     if (Checkbox->isChecked())
     {
@@ -342,12 +342,13 @@ void ReadPage::editLineBox(QString dir)
 
 void ReadPage::editDirectoryBox(QString dir)
 {
+    dir = QDir::fromNativeSeparators(dir);
     if (dir != "")
     {
         //haal het einde van de string af. De filenaam:-)
         int last_dot = dir.lastIndexOf("/");
         QString dir1 = dir.left(last_dot);
-        const QFileInfo outputDir(dir1);
+        const QFileInfo outputDir(QDir::toNativeSeparators(dir1));
         if (!outputDir.isDir()) {
             directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
             emit completeChanged();
@@ -379,12 +380,13 @@ void ReadPage::editDirectoryBox(QString dir)
 }
 void ReadPage::editFluxBox(QString dir)
 {
+    dir = QDir::fromNativeSeparators(dir);
     if (dir != "")
     {
         //haal het einde van de string af. De filenaam:-)
         int last_dot = dir.lastIndexOf("/");
         QString dir1 = dir.left(last_dot);
-        const QFileInfo outputDir(dir1);
+        const QFileInfo outputDir(QDir::toNativeSeparators(dir1));
         if (!outputDir.isDir()) {
             fluxComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
             emit completeChanged();
@@ -411,13 +413,14 @@ void ReadPage::editFluxBox(QString dir)
 }
 void ReadPage::editFlux1Box(QString dir)
 {
+    dir = QDir::fromNativeSeparators(dir);
     //bepaal welke linedit the focus heeft
     if (dir != "")
     {
         //haal het einde van de string af. De filenaam:-)
         int last_dot = dir.lastIndexOf("/");
         QString dir1 = dir.left(last_dot);
-        const QFileInfo outputDir(dir1);
+        const QFileInfo outputDir(QDir::toNativeSeparators(dir1));
         if (!outputDir.isDir()) {
             flux1ComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
             emit completeChanged();
@@ -445,6 +448,7 @@ void ReadPage::editFlux1Box(QString dir)
 
 void ReadPage::editCSVComboBox(QString dir)
 {
+    dir = QDir::fromNativeSeparators(dir);
     //bepaal welke linedit the focus heeft
     if (dir != "")
     {
@@ -452,6 +456,7 @@ void ReadPage::editCSVComboBox(QString dir)
         int last_dot = dir.lastIndexOf("/");
         QString dir1 = dir.left(last_dot);
         const QFileInfo outputDir(dir1);
+        qInfo() << outputDir.isDir() << dir1 << outputDir;
         if (!outputDir.isDir()) {
             CSVComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
             emit completeChanged();
@@ -459,7 +464,7 @@ void ReadPage::editCSVComboBox(QString dir)
         {
             int last_dot = dir.lastIndexOf(".");
             int size = dir.size();
-            if ((last_dot == -1) || ((size - last_dot) > 5))
+            if ((last_dot == -1) || ((size - last_dot) > 4))
               //check for valid filenaam. ends with .xxx
             {
                 CSVComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
@@ -560,11 +565,11 @@ void ReadPage::updatedirectorybox(int index)
         directoryComboBox->clear();
         if (directory != "")
         {
-            directoryComboBox->setText(directory + strFile);
+            directoryComboBox->setText(QDir::toNativeSeparators(directory + strFile));
 
         } else
         {
-            directoryComboBox->setText(QDir::currentPath() + strFile);
+            directoryComboBox->setText(QDir::toNativeSeparators(QDir::currentPath() + strFile));
         }
         directoryComboBox->setFocus();
     }
@@ -589,7 +594,7 @@ void ReadPage::browse()
                             tr("Find Files"), directory + strFile,strFilter);
     }
     if (!directory.isEmpty()) {
-        directoryComboBox->setText(directory);
+        directoryComboBox->setText(QDir::toNativeSeparators(directory));
     }
 }
 
@@ -614,7 +619,7 @@ void ReadPage::browseflux()
     }
 
     if (!directory.isEmpty()) {
-        fluxComboBox->setText(directory);
+        fluxComboBox->setText(QDir::toNativeSeparators(directory));
     }
 }
 
@@ -637,7 +642,7 @@ void ReadPage::browsereadflux()
     }
 
     if (!directory.isEmpty()) {
-        flux1ComboBox->setText(directory);
+        flux1ComboBox->setText(QDir::toNativeSeparators(directory));
     }
 }
 
@@ -662,7 +667,7 @@ void ReadPage::browseCSVComboBox()
     }
 
     if (!directory.isEmpty()) {
-        CSVComboBox->setText(directory);
+        CSVComboBox->setText(QDir::toNativeSeparators(directory));
     }
 }
 
@@ -844,7 +849,7 @@ void WritePage::editDirectoryBox(QString dir)
             } else
             {
                 directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
-                _strInputfile = dir;
+                _strInputfile = QDir::toNativeSeparators(dir);
                 emit completeChanged();
             }
         } else
@@ -905,7 +910,7 @@ void WritePage::browse()
     if (!directory.isEmpty()) {
         directoryComboBox->setText(directory);
         directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
-        _strInputfile = directory;
+        _strInputfile = QDir::toNativeSeparators(directory);
     } else
     {
         directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
@@ -1103,7 +1108,6 @@ ConclusionPage::ConclusionPage(QWidget *parent)
 
     bottomLabel = new QLabel;
     bottomLabel->setWordWrap(true);
-
     registerField("Fluxengine.command", bottomLabel);
 
     QVBoxLayout *layout = new QVBoxLayout;

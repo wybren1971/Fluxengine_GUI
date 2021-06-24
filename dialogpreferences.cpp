@@ -2,6 +2,8 @@
 #include "ui_dialogpreferences.h"
 #include <QtWidgets>
 
+QString numberofcommands;
+
 DialogPreferences::DialogPreferences(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DialogPreferences)
@@ -35,6 +37,7 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
         ui->chkShowAnalyzeButton->setChecked(settings.value("showanalyzebutton").toBool());
     }
 
+    numberofcommands = settings.value("NUMBER_OF_COMMANDS").toString();
     if (settings.value("NUMBER_OF_COMMANDS").toString() == "")
     {//set default
         ui->intNumberofcommands->setText("10");
@@ -595,5 +598,34 @@ void DialogPreferences::save()
     settings.setValue("fluxengine", ui->cmbFluxengineLocation->currentText());
     settings.setValue("csvlocation", ui->cmbcsvlocation->currentText());
     settings.setValue("showanalyzebutton", ui->chkShowAnalyzeButton->isChecked());
+    if (ui->intNumberofcommands->text().toInt() < numberofcommands.toInt())
+    {
+        //Clear the remaining
+        // 0 = command 1        new number of commands =2 so delete 0 en 1 en copy 2 to 0 en copy 3 to 1 en delete 2
+        // 1 = command 2
+        // 2 = command 3
+        // 3 = command 4
+        int i = numberofcommands.toInt() - ui->intNumberofcommands->text().toInt(); //4-2 = 2 = i
+        int numberofnewcommands = ui->intNumberofcommands->text().toInt();
+        qInfo() << "i: " << i;
+        qInfo() << "numberofnewcommands: " << numberofnewcommands;
+
+        for (int t = 0; t < i; t++)
+        { //delete first commands
+            settings.setValue("Fluxengine.command" + QString::number(t), "");
+            qInfo() << "t pass 1: " << t;
+        }
+        for (int t = 0; t < numberofnewcommands; t++)
+        {   //copy old commands to new position
+            settings.setValue("Fluxengine.command" + QString::number(t), settings.value("Fluxengine.command" + QString::number(t + i)));
+            qInfo() << "t pass 2: " << t;
+        }
+        qInfo() << "numberofcommands.toInt() pass 3: " << numberofcommands.toInt();
+        for (int t = numberofnewcommands; t<numberofcommands.toInt() ;t++ )
+        {
+            settings.remove("Fluxengine.command" + QString::number(t));
+             qInfo() << "t pass 3: " << t;
+        }
+    }
     settings.setValue("NUMBER_OF_COMMANDS", ui->intNumberofcommands->text());
 }

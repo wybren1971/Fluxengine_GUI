@@ -20,9 +20,6 @@ fluxengine::fluxengine(QObject *parent) : QObject(parent)
 }
 void fluxengine::write(QByteArray comment)
 {
-//    qInfo() << Q_FUNC_INFO;
-//    qInfo() << comment;
-
     if(QSysInfo::productType() == "windows") comment.append("\r");
     m_process.write(comment+"\n");
 }
@@ -39,20 +36,13 @@ QString fluxengine::getAddress() const
 
 void fluxengine::setAddress(const QString &address)
 {
-    m_address = """" + address + """";
+    m_address = address;
 }
 
 void fluxengine::setWorkingDirectory(const QString &Dir)
 {
 
-//    if(QSysInfo::productType() == "windows")
-//    {
-        m_workingdirectory = """" + Dir + """";
-//        qInfo() << m_workingdirectory;
-//    } else
-//    {
-//        m_workingdirectory = Dir;
-//    }
+    m_workingdirectory = QDir::toNativeSeparators(Dir);
 }
 
 QString fluxengine::getWorkingDirectory()
@@ -62,11 +52,13 @@ QString fluxengine::getWorkingDirectory()
 
 void fluxengine::start()
 {
-//    qInfo() << Q_FUNC_INFO;
     m_listening = true;
     QString program = getProcess();
     QStringList Arguments;
+    if(QSysInfo::productType() == "windows") Arguments << "/Q"; // /Q turns echo of on windows.
+
     m_process.start(program, Arguments, QIODevice::ReadWrite);
+
 }
 
 void fluxengine::startdirect()
@@ -92,7 +84,15 @@ void fluxengine::startdirect()
 void fluxengine::stop()
 {
     m_listening = false;
-    m_process.close();
+    if(QSysInfo::productType() == "windows")
+    {
+        //on windows fluxengine starts as a separate process and cannot be stopped bij killing the cmd...
+        m_process.terminate();
+        m_process.kill();
+    } else
+    {
+        m_process.close();
+    }
 }
 
 bool fluxengine::busy()
@@ -133,8 +133,6 @@ void fluxengine::errorOccured(QProcess::ProcessError error)
 
 void fluxengine::finished(int exitcode, QProcess::ExitStatus exitStatus)
 {
-//    qInfo() << Q_FUNC_INFO;
-//    qInfo() << exitcode;
     if(!m_listening) return;
     Q_UNUSED(exitcode);
     Q_UNUSED(exitStatus);
@@ -150,7 +148,6 @@ void fluxengine::readyReadStandardError()
     if (data.size() > 1)
     {
         QString message = "Standard Error: ";
-
         message.append(data);
         if (message.contains("No such file or directory", Qt::CaseInsensitive) || message.contains("Is a directory", Qt::CaseInsensitive))
         {
@@ -163,12 +160,11 @@ void fluxengine::readyReadStandardError()
 
 void fluxengine::readyReadStandardOutput()
 {
-//    qInfo() << Q_FUNC_INFO;
-//    qInfo() << m_process.readAllStandardOutput().size();
     if(!m_listening) return;
     QByteArray data = m_process.readAllStandardOutput();
     if (data.size() > 1)
     {
+//        data.append("readyReadStandardOutput");
         emit output(QString(data.trimmed()));
     }
 }
@@ -181,32 +177,40 @@ void fluxengine::started()
 
 void fluxengine::stateChanged(QProcess::ProcessState newState)
 {
-//    qInfo() << Q_FUNC_INFO;
     switch (newState) {
     case QProcess::NotRunning:
-//        qInfo() << "NotRunning";
         emit enableFluxengineCommands(false);
         break;
     case QProcess::Starting:
-//        qInfo() << "Starting";
-//        emit enableFluxengineCommands(false);
         break;
     case QProcess::Running:
-//        qInfo() << "Running";
+        if(QSysInfo::productType() == "windows")
+        {
+            QByteArray command = "prompt $g\r\n";
+            m_process.write(command); //get rid of the prompt in windows
+        }
         startFluxengine();
         emit enableFluxengineCommands(true);
         break;
-
     }
 }
 
 void fluxengine::readyRead()
 {
 
-//    qInfo() << Q_FUNC_INFO;
-//    qInfo() << "readyRead: " + m_address;
     if(!m_listening) return;
     QByteArray data = m_process.readAll().trimmed();
+
+    // In windows cmd shows first the windows version and copyright. we dont need to show these.
+    //also the exit command is shown. No need to worry the user with that.
+    if(QSysInfo::productType() == "windows")
+    {
+        if (data.contains("Microsoft Corporation."))
+            data = "";
+        if (data.right(4) == "exit")
+            data = "";
+    }
+    data = QDir::toNativeSeparators(data).toUtf8();
     if (data.size() > 1)
     {
         emit output(data);
@@ -225,10 +229,8 @@ void fluxengine::startFluxengine()
     QByteArray command;
 
     command = (m_workingdirectory + " " + m_address).toUtf8();
-//    qInfo() << QSysInfo::productType();
     if(QSysInfo::productType() == "windows") command.append("\r");
     command.append("\n");
-//    qInfo() << command;
     m_process.write(command);
     command.clear();
     command.append("exit");
