@@ -831,7 +831,7 @@ void WritePage::initializePage()
         if (last_dot > -1)
         {
             QString strfilter = my_writeformat[i][filename].right(my_writeformat[i][filename].size() - last_dot);
-            my_writeformat[i][filter] ="*" + strfilter;
+            my_writeformat[i][filter] ="*.* *" + strfilter;
         } else
         {   //fluxengine has not specified a format. so we show everything
             my_writeformat[i][filter] ="*.*";
