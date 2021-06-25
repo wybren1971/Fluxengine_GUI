@@ -147,7 +147,7 @@ void fluxengine::readyReadStandardError()
     QByteArray data = m_process.readAllStandardError();
     if (data.size() > 1)
     {
-        QString message = "Standard Error: ";
+        QString message = "";
         message.append(data);
         if (message.contains("No such file or directory", Qt::CaseInsensitive) || message.contains("Is a directory", Qt::CaseInsensitive))
         {
