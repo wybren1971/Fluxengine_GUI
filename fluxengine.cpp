@@ -66,7 +66,13 @@ void fluxengine::startdirect()
     m_listening = true;
     QString program = getProcess();
     QByteArray command;
-    command = (m_workingdirectory + " " + m_address).toUtf8();
+    if(QSysInfo::productType() == "windows")
+    {
+        command = (QStringLiteral("\"") + m_workingdirectory + ("\" " + m_address)).toUtf8();
+    } else
+    {
+        command = (m_workingdirectory + " " + m_address).toUtf8();
+    }
     if(QSysInfo::productType() == "windows") command.append("\r");
     command.append("\n");
     QStringList Arguments;
