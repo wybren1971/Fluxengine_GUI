@@ -238,7 +238,7 @@ void fluxengine::startFluxengine()
     if(QSysInfo::productType() == "windows") command.append("\r");
     command.append("\n");
     m_process.write(command);
-    if (m_address.contains(".imd", Qt::CaseInsensitive))
+    if (m_address.contains(".imd", Qt::CaseInsensitive) || m_address.isEmpty())
         //give user option to write comment for an imd file
     {
         //dont close fluxengine proces. Fluxengine process will be closed from the mainwindow.

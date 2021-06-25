@@ -487,7 +487,7 @@ bool MainWindow::firsttimecheck(QString message)
 
 void MainWindow::enableFluxengineCommands(bool blnStarted)
 {
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     if (blnStarted)
     {
         ui->Fluxengineinput->setEnabled(true);
@@ -663,6 +663,11 @@ void MainWindow::on_bntStartFluxengine_clicked()
         {
             m_fluxengine.setAddress(ui->plainTextEdit_2->currentText());
             m_fluxengine.start();
+        } else
+        {
+            //open an empty session
+            m_fluxengine.setAddress("");
+            m_fluxengine.start();
         }
     }
     callingfunction = "on_bntStartFluxengine_clicked()";
@@ -671,7 +676,7 @@ void MainWindow::on_bntStartFluxengine_clicked()
 
 void MainWindow::on_pushButton_clicked()
 {
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     QByteArray Input;
     //input = ui->Fluxengineinput->text();
     if (!waitforfluzenginetofinish)
@@ -683,14 +688,23 @@ void MainWindow::on_pushButton_clicked()
             Input = ui->Fluxengineinput->text().toUtf8();
             m_fluxengine.write(Input);
             ui->Fluxengineinput->clear();
+        } else
+        {
+            //do nothing
         }
     } else
     {
+        if (m_fluxengine.getAddress() == "")
+        {
+
+        } else
+        {
         Input.clear();
         Input.append("exit");
         if(QSysInfo::productType() == "windows") Input.append("\r");
         Input.append("\n");
         m_fluxengine.write(Input);
+        }
     }
 }
 
