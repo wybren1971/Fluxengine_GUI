@@ -350,6 +350,7 @@ void ReadPage::editLineBox(QString dir)
 void ReadPage::editDirectoryBox(QString dir)
 {
     dir = QDir::fromNativeSeparators(dir);
+    QString extension;
     if (dir != "")
     {
         //haal het einde van de string af. De filenaam:-)
@@ -364,22 +365,28 @@ void ReadPage::editDirectoryBox(QString dir)
            //get extension
             QString filenaam = my_readformat[readFormatbox->currentIndex()][filename];
             int Last_dot = filenaam.lastIndexOf(".");
-            QString extension = filenaam.right(filenaam.size() - Last_dot);
-
-            int last_dot = dir.lastIndexOf(".");
-            int size = dir.size();
-            if ((last_dot == -1) || ((size - last_dot) > extension.size()))
-              //check for valid filenaam. ends with .xxxx
+            if (Last_dot > -1)
             {
-                directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
-                emit completeChanged();
+                extension = filenaam.right(filenaam.size() - Last_dot);
             } else
             {
-                directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
-                emit completeChanged();
+                extension = ".xxx";
             }
         }
-    } else
+        last_dot = dir.lastIndexOf(".");
+        int size = dir.size();
+        if ((last_dot == -1) || ((size - last_dot) > extension.size()) || ((size - last_dot) < 2))
+          //check for valid filenaam. ends with .xxxx
+        {
+            directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
+            emit completeChanged();
+        } else
+        {
+            directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
+            emit completeChanged();
+        }
+    }
+     else
     {
         directoryComboBox->setStyleSheet("QLineEdit { background: rgb(255,255,255); }");
         emit completeChanged();
@@ -401,7 +408,7 @@ void ReadPage::editFluxBox(QString dir)
         {
             int last_dot = dir.lastIndexOf(".");
             int size = dir.size();
-            if ((last_dot == -1) || ((size - last_dot) > 5))
+            if ((last_dot == -1) || ((size - last_dot) > 5)  || ((size - last_dot) < 2))
               //check for valid filenaam. ends with .xxx
             {
                 fluxComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
@@ -435,7 +442,7 @@ void ReadPage::editFlux1Box(QString dir)
         {
             int last_dot = dir.lastIndexOf(".");
             int size = dir.size();
-            if ((last_dot == -1) || ((size - last_dot) > 5))
+            if ((last_dot == -1) || ((size - last_dot) > 5) || ((size - last_dot) < 2))
               //check for valid filenaam. ends with .xxx
             {
                 flux1ComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
@@ -471,7 +478,7 @@ void ReadPage::editCSVComboBox(QString dir)
         {
             int last_dot = dir.lastIndexOf(".");
             int size = dir.size();
-            if ((last_dot == -1) || ((size - last_dot) > 4))
+            if ((last_dot == -1) || ((size - last_dot) > 4) || ((size - last_dot) < 2))
               //check for valid filenaam. ends with .xxx
             {
                 CSVComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
