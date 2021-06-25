@@ -579,13 +579,13 @@ void MainWindow::ReadItemList()
 
 void MainWindow::WriteItemList()
 {
-    qInfo() << Q_FUNC_INFO;
+//    qInfo() << Q_FUNC_INFO;
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
     QString setting = "Fluxengine.command";
 
     //write to settings
     QStringList Commands[NUMBER_OF_COMMANDS];
-    qInfo() << ui->plainTextEdit_2->count() << NUMBER_OF_COMMANDS;
+//    qInfo() << ui->plainTextEdit_2->count() << NUMBER_OF_COMMANDS;
     if (ui->plainTextEdit_2->count() < NUMBER_OF_COMMANDS)
     {
         //add item to the list
@@ -619,7 +619,7 @@ void MainWindow::WriteItemList()
         QString setting = "Fluxengine.command";
         QString s = QString::number(i);
         setting = setting + s;
-        qInfo() << setting << "command: " << Commands->at(i);
+//        qInfo() << setting << "command: " << Commands->at(i);
         settings.setValue(setting, Commands->at(i));
     }
 }
@@ -637,7 +637,7 @@ void MainWindow::on_bntStartFluxengine_clicked()
     string3.truncate(7);
     if (( string1 != "test") && (string2 != "rpm") && (string2 != "analyse"))
     {
-        qInfo() << (ui->plainTextEdit_2->findText(m_fluxengine.getAddress()) == -1);
+//        qInfo() << (ui->plainTextEdit_2->findText(m_fluxengine.getAddress()) == -1);
         if (ui->plainTextEdit_2->findText(m_fluxengine.getAddress()) == -1)
         {
             WriteItemList();
