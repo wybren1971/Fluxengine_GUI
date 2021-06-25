@@ -409,6 +409,14 @@ void MainWindow::output(QString data)
     {
         ui->txtOutput->appendPlainText(data);
     }
+    if (waitforfluzenginetofinish)
+    {
+        if (callingfunction == "on_pushButton_clicked()")
+        {
+           on_pushButton_clicked();
+        }
+        waitforfluzenginetofinish = false;
+    }
 }
 
 bool MainWindow::firsttimecheck(QString message)
@@ -479,6 +487,7 @@ bool MainWindow::firsttimecheck(QString message)
 
 void MainWindow::enableFluxengineCommands(bool blnStarted)
 {
+    qInfo() << Q_FUNC_INFO;
     if (blnStarted)
     {
         ui->Fluxengineinput->setEnabled(true);
@@ -508,6 +517,10 @@ void MainWindow::enableFluxengineCommands(bool blnStarted)
                 on_btnAnalyse_clicked();
             }
 
+            if (callingfunction == "on_pushButton_clicked()")
+            {
+                on_pushButton_clicked();
+            }
             waitforfluzenginetofinish=false;
         }
     }
@@ -658,13 +671,26 @@ void MainWindow::on_bntStartFluxengine_clicked()
 
 void MainWindow::on_pushButton_clicked()
 {
+    qInfo() << Q_FUNC_INFO;
     QByteArray Input;
     //input = ui->Fluxengineinput->text();
-    if ((ui->Fluxengineinput->text() != "") && (m_fluxengine.busy()))
+    if (!waitforfluzenginetofinish)
     {
-        Input = ui->Fluxengineinput->text().toUtf8();
+        if ((ui->Fluxengineinput->text() != "") && (m_fluxengine.busy()))
+        {
+            waitforfluzenginetofinish = true;
+            callingfunction = "on_pushButton_clicked()"; // works with the output signal. the process will give back what it hgas written.
+            Input = ui->Fluxengineinput->text().toUtf8();
+            m_fluxengine.write(Input);
+            ui->Fluxengineinput->clear();
+        }
+    } else
+    {
+        Input.clear();
+        Input.append("exit");
+        if(QSysInfo::productType() == "windows") Input.append("\r");
+        Input.append("\n");
         m_fluxengine.write(Input);
-        ui->Fluxengineinput->clear();
     }
 }
 
