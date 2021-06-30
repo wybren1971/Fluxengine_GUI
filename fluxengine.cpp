@@ -61,25 +61,33 @@ void fluxengine::start()
 
 }
 
-void fluxengine::startdirect()
-{
-    m_listening = true;
-    QString program = getProcess();
-    QByteArray command;
-    command = (m_workingdirectory + " " + m_address).toUtf8();
-    if(QSysInfo::productType() == "windows") command.append("\r");
-    command.append("\n");
-    QStringList Arguments;
-    if(QSysInfo::productType() == "windows")
-    {
-        Arguments << "/c" << command;
+//void fluxengine::startdirect()
+//{   //ToDo spaces in strings to cmd
+//    m_listening = true;
+//    QString program = getProcess();
+//    QString command;
+//    command = m_workingdirectory;
+////    if(QSysInfo::productType() == "windows") command.prepend(""");
+//    if(QSysInfo::productType() != "windows") command.prepend("\"");
+////    if(QSysInfo::productType() == "windows") command.append(""");
+//    if(QSysInfo::productType() != "windows") command.append("\" ");
 
-    } else
-    {
-        Arguments << "-c" << command;
-    }
-    m_process.start(program, Arguments, QIODevice::ReadWrite);
-}
+//    command = (command + " " + m_address);
+
+//    if(QSysInfo::productType() == "windows") command.append("\r");
+//    command.append("\n");
+//    QStringList Arguments;
+//    if(QSysInfo::productType() == "windows")
+//    {
+//        Arguments << "/c" << command;
+//    } else
+//    {
+//        Arguments << "-c" << command;
+//    }
+//    qInfo() << Arguments;
+//    m_process.start(program, Arguments);
+
+//}
 
 void fluxengine::stop()
 {
@@ -137,7 +145,7 @@ void fluxengine::finished(int exitcode, QProcess::ExitStatus exitStatus)
     Q_UNUSED(exitcode);
     Q_UNUSED(exitStatus);
     m_listening = false;
-    QString message = "  ";
+    QString message = "   ";
     emit output(message);
 }
 
@@ -147,7 +155,7 @@ void fluxengine::readyReadStandardError()
     QByteArray data = m_process.readAllStandardError();
     if (data.size() > 1)
     {
-        QString message = "Standard Error: ";
+        QString message = "";
         message.append(data);
         if (message.contains("No such file or directory", Qt::CaseInsensitive) || message.contains("Is a directory", Qt::CaseInsensitive))
         {
@@ -210,7 +218,7 @@ void fluxengine::readyRead()
         if (data.right(4) == "exit")
             data = "";
     }
-    data = QDir::toNativeSeparators(data).toUtf8();
+    //data = QDir::toNativeSeparators(data).toUtf8();
     if (data.size() > 1)
     {
         emit output(data);
@@ -221,7 +229,6 @@ QString fluxengine::getProcess()
 {
     if(QSysInfo::productType() == "windows") return "cmd";
     return "bash";
-
 }
 
 void fluxengine::startFluxengine()
@@ -233,15 +240,22 @@ void fluxengine::startFluxengine()
         command = (QStringLiteral("\"") + m_workingdirectory + ("\" " + m_address)).toUtf8();
     } else
     {
-        command = (m_workingdirectory + " " + m_address).toUtf8();
+        command = ("\"" + m_workingdirectory + "\" " + m_address).toUtf8();
     }
 //    qInfo() << "command: " << command;
     if(QSysInfo::productType() == "windows") command.append("\r");
     command.append("\n");
     m_process.write(command);
-    command.clear();
-    command.append("exit");
-    if(QSysInfo::productType() == "windows") command.append("\r");
-    command.append("\n");
-    m_process.write(command);
+    if (m_address.contains(".imd", Qt::CaseInsensitive) || m_address.isEmpty())
+        //give user option to write comment for an imd file
+    {
+        //dont close fluxengine proces. Fluxengine process will be closed from the mainwindow.
+    }   else
+    {
+        command.clear();
+        command.append("exit");
+        if(QSysInfo::productType() == "windows") command.append("\r");
+        command.append("\n");
+        m_process.write(command);
+    }
 }

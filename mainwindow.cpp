@@ -13,8 +13,7 @@ int NUMBER_OF_COMMANDS;
 /*
  * To Do:
  *
- * Vastleggen van type drives in pre
- * ferences zodat goede settings gebruikt worden (40track HD 96tpi, 48 tpi ertc)
+ * Vastleggen van type drives in preferences zodat goede settings gebruikt worden (40track HD 96tpi, 48 tpi ertc)
  *
  *
  *
@@ -37,12 +36,12 @@ MainWindow::MainWindow(QWidget *parent)
     restoreGeometry(settings.value("myWidget/geometry").toByteArray());
     restoreState(settings.value("myWidget/windowState").toByteArray());
     ui->setupUi(this);
-    //m_fluxengine.setAddress(ui->plainTextEdit->text());
     connect(ui->btnStop,&QPushButton::clicked,&m_fluxengine,&fluxengine::stop);
 //    QObject::connect(qApp, &QGuiApplication::applicationStateChanged, this, [=](Qt::ApplicationState state){qDebug() << state;});
     connect(&m_fluxengine,&fluxengine::output,this,&MainWindow::output);
     connect(ui->Fluxengineinput,&QLineEdit::returnPressed,this,&MainWindow::on_pushButton_clicked);
     connect(ui->Fluxengineinput, &QLineEdit::textChanged, this, &MainWindow::buttonenable);
+    connect(ui->plainTextEdit_2->lineEdit(), SIGNAL(returnPressed()), this, SLOT(on_bntStartFluxengine_clicked()));
     connect(&m_fluxengine,&fluxengine::enableFluxengineCommands,this,&MainWindow::enableFluxengineCommands);
     ui->txtOutput->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->txtOutput,&QPlainTextEdit::customContextMenuRequested,this,&MainWindow::showContextMenu);
@@ -70,6 +69,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
     ui->btnReadDisk->setFocus();
     ui->plainTextEdit_2->completer();
+    ui->plainTextEdit_2->setInsertPolicy(QComboBox::NoInsert);
     ReadItemList();
 }
 
@@ -140,6 +140,8 @@ void MainWindow::preference()
 
     if (settings.value("fluxengine").toString() != "")
         m_fluxengine.setWorkingDirectory(settings.value("fluxengine").toString());
+    NUMBER_OF_COMMANDS = settings.value("NUMBER_OF_COMMANDS").toInt();
+    ReadItemList();
 }
 
 void MainWindow::undo()
@@ -212,7 +214,6 @@ void MainWindow::about()
     QString yourAppVersion = QCoreApplication::applicationVersion();
 
     QString datetime = QStringLiteral(__DATE__) + QStringLiteral(" ") + QStringLiteral(__TIME__);
- //   infoLabel->setText(tr("Invoked <b>Help|About</b>"));
     QMessageBox::about(this, tr("About Menu"),
             tr("This is the fluxengine-GUI created by Wybren van Duinen."
                "\nApplication version: ") +yourAppVersion + "\nBuilddate and time: " + datetime);
@@ -240,11 +241,6 @@ void MainWindow::setDrive()
 
 void MainWindow::createActions()
 {
-//    newAct = new QAction(tr("&Set location of Fluxengine"), this);
-//    newAct->setShortcuts(QKeySequence::Save);
-//    newAct->setStatusTip(tr("Set the working directory of fluxengine"));
-//    connect(newAct, &QAction::triggered, this, &MainWindow::newFile);
-
     openAct = new QAction(tr("&Fluxengine wizard..."), this);
     openAct->setShortcuts(QKeySequence::Find);
     openAct->setStatusTip(tr("Read or write a disk"));
@@ -363,7 +359,6 @@ void MainWindow::createActions()
 void MainWindow::createMenus()
 {
     fileMenu = menuBar()->addMenu(tr("&File"));
-//    fileMenu->addAction(newAct);
     fileMenu->addAction(openAct);
     fileMenu->addAction(preferenceAct);
     fileMenu->addSeparator();
@@ -410,22 +405,28 @@ MainWindow::~MainWindow()
 
 void MainWindow::output(QString data)
 {
-//    ui->txtOutput->clear();
     if (data.size() > 1)
     {
         ui->txtOutput->appendPlainText(data);
+    }
+    if (waitforfluzenginetofinish)
+    {
+        if (callingfunction == "on_pushButton_clicked()")
+        {
+           on_pushButton_clicked();
+        }
+        waitforfluzenginetofinish = false;
     }
 }
 
 bool MainWindow::firsttimecheck(QString message)
 {
-//    qInfo() << "Firsttime" << blnFirsttime;
     if (blnFirsttime)
     {
         if (message == "")
         {
             message = tr("Welcome to fluxengine_gui\n"
-                         "Set the location of fluxengine in preferences on the tab 'My Locations'\nand then go to tab 'Advanced' and initialize fluxengine.\nThese are the minimum steps needed to use the Fluxengine_GUI");
+                         "Set the location of fluxengine in preferences and initialize fluxengine on the tab 'My Locations'.\nThese are the minimum steps needed to use the Fluxengine_GUI");
         }
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, tr("Fluxengine Wizard Info"), message);
@@ -438,7 +439,6 @@ bool MainWindow::firsttimecheck(QString message)
         {
             return false;
         }
-//        qInfo() << "workingdirectory"  << m_fluxengine.getWorkingDirectory();
         if (m_fluxengine.getWorkingDirectory() != "")
         {
             blnFirsttime = false;
@@ -458,7 +458,7 @@ bool MainWindow::firsttimecheck(QString message)
             if (message == "")
             {
                 message = tr("Welcome to fluxengine_gui\n"
-                             "Please initialize fluxengine in preferences on the tab 'Advanced' and press initialize fluxengine.\nThis is needed to use the Wizard");
+                             "Please initialize fluxengine in preferences on the tab 'My Locations' and press initialize fluxengine.\nThis is needed to use the Wizard");
             }
             QMessageBox::StandardButton reply;
             reply = QMessageBox::question(this, tr("Fluxengine Wizard Info"), message);
@@ -488,8 +488,6 @@ bool MainWindow::firsttimecheck(QString message)
 void MainWindow::enableFluxengineCommands(bool blnStarted)
 {
 //    qInfo() << Q_FUNC_INFO;
-//    qInfo() << blnStarted;
-
     if (blnStarted)
     {
         ui->Fluxengineinput->setEnabled(true);
@@ -519,6 +517,10 @@ void MainWindow::enableFluxengineCommands(bool blnStarted)
                 on_btnAnalyse_clicked();
             }
 
+            if (callingfunction == "on_pushButton_clicked()")
+            {
+                on_pushButton_clicked();
+            }
             waitforfluzenginetofinish=false;
         }
     }
@@ -528,7 +530,6 @@ void MainWindow::on_btnReadDisk_clicked()
 {
    MainWindow::readdisk();
 }
-
 
 void MainWindow::on_btntestVoltages_clicked()
 {
@@ -564,11 +565,9 @@ void MainWindow::on_btnRPM_clicked()
     callingfunction = "on_btnRPM_clicked()";
 }
 
-
 void MainWindow::on_btnDrive0_clicked()
 {
 }
-
 
 void MainWindow::on_btnDrive1_clicked()
 {
@@ -577,6 +576,7 @@ void MainWindow::on_btnDrive1_clicked()
 void MainWindow::ReadItemList()
 {
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    ui->plainTextEdit_2->clear();
     for (int i = 0;i<NUMBER_OF_COMMANDS;i++)
     {
         QString setting = "Fluxengine.command";
@@ -588,48 +588,56 @@ void MainWindow::ReadItemList()
             ui->plainTextEdit_2->setCurrentIndex(i);
         }
     }
-
 }
 
 void MainWindow::WriteItemList()
 {
+//    qInfo() << Q_FUNC_INFO;
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    QString setting = "Fluxengine.command";
+
     //write to settings
-    for (int i = 0;i<NUMBER_OF_COMMANDS;i++)
+    QStringList Commands[NUMBER_OF_COMMANDS];
+//    qInfo() << ui->plainTextEdit_2->count() << NUMBER_OF_COMMANDS;
+    if (ui->plainTextEdit_2->count() < NUMBER_OF_COMMANDS)
     {
-        QString setting = "Fluxengine.command";
-        QString s = QString::number(i);
-        setting = setting + s;
-        if (settings.value(setting).toString() == "")
-        {//i kleiner dan 10 and nog geen command.
-            settings.setValue(setting,m_fluxengine.getAddress());
-            break;
-        } else
+        //add item to the list
+        ui->plainTextEdit_2->addItem(m_fluxengine.getAddress());
+        ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->findText(m_fluxengine.getAddress()));
+    } else
+    {
+        //move everything i position up.
+        QString settingold = "Fluxengine.command";
+        //overwrite move everything up and loose first command.
+        //1 overschrijft 0, 2 overschrijft 1 3 overschrijft 2 etc 9 wordt toegevoegd
+        for (int i = 0;i<(NUMBER_OF_COMMANDS-1);i++)
         {
-            if (i == 9)
-            {
-                QString settingold = "Fluxengine.command";
-                //overwrite move everything up and loose first command.
-                //1 overschrijft 0, 2 overschrijft 1 3 overschrijft 2 etc 9 wordt toegevoegd
-                for (int i = 0;i<(NUMBER_OF_COMMANDS-1);i++)
-                {
-                    QString s = QString::number(i);
-                    QString t = QString::number(i+1);
-                    settings.setValue(settingold +s,settings.value(settingold +t));
-                }
-                settings.setValue(setting,m_fluxengine.getAddress());
-                ui->plainTextEdit_2->clear();
-                ReadItemList();
-                ui->plainTextEdit_2->setCurrentIndex(i);
-            }
+            QString s = QString::number(i);     //0
+            QString t = QString::number(i+1);   //1
+            settings.setValue(settingold + s,settings.value(settingold +t));
         }
+        settings.setValue(setting+(QString::number(NUMBER_OF_COMMANDS-1)),m_fluxengine.getAddress());
+        ui->plainTextEdit_2->clear();
+        ReadItemList();
+        ui->plainTextEdit_2->setCurrentIndex(NUMBER_OF_COMMANDS);
     }
 
+    for (int i = 0;i<ui->plainTextEdit_2->count();i++)
+    {
+        ui->plainTextEdit_2->setCurrentIndex(i);
+        Commands->append(ui->plainTextEdit_2->currentText());
+    }
+    for (int i = 0; i< Commands->size(); i++)
+    {
+        QString s = QString::number(i);
+//        qInfo() << setting << "command: " << Commands->at(i);
+        settings.setValue(setting + s, Commands->at(i));
+    }
 }
 void MainWindow::on_bntStartFluxengine_clicked()
 {
-//    if (!firsttimecheck(""))
-//        return;
+    if (!firsttimecheck(""))
+        return;
 
     //We dont want the test and rpm commands in the list because there are dedicated buttons for this.
     QString string1 = m_fluxengine.getAddress();
@@ -640,10 +648,9 @@ void MainWindow::on_bntStartFluxengine_clicked()
     string3.truncate(7);
     if (( string1 != "test") && (string2 != "rpm") && (string2 != "analyse"))
     {
+//        qInfo() << (ui->plainTextEdit_2->findText(m_fluxengine.getAddress()) == -1);
         if (ui->plainTextEdit_2->findText(m_fluxengine.getAddress()) == -1)
         {
-            ui->plainTextEdit_2->addItem(m_fluxengine.getAddress());
-            ui->plainTextEdit_2->setCurrentIndex(ui->plainTextEdit_2->findText(m_fluxengine.getAddress()));
             WriteItemList();
         }
         m_fluxengine.start();
@@ -654,6 +661,11 @@ void MainWindow::on_bntStartFluxengine_clicked()
         {
             m_fluxengine.setAddress(ui->plainTextEdit_2->currentText());
             m_fluxengine.start();
+        } else
+        {
+            //open an empty session
+            m_fluxengine.setAddress("");
+            m_fluxengine.start();
         }
     }
     callingfunction = "on_bntStartFluxengine_clicked()";
@@ -662,17 +674,37 @@ void MainWindow::on_bntStartFluxengine_clicked()
 
 void MainWindow::on_pushButton_clicked()
 {
-   // QString input;
+//    qInfo() << Q_FUNC_INFO;
     QByteArray Input;
     //input = ui->Fluxengineinput->text();
-    if ((ui->Fluxengineinput->text() != "") && (m_fluxengine.busy()))
+    if (!waitforfluzenginetofinish)
     {
-        Input = ui->Fluxengineinput->text().toUtf8();
+        if ((ui->Fluxengineinput->text() != "") && (m_fluxengine.busy()))
+        {
+            waitforfluzenginetofinish = true;
+            callingfunction = "on_pushButton_clicked()"; // works with the output signal. the process will give back what it hgas written.
+            Input = ui->Fluxengineinput->text().toUtf8();
+            m_fluxengine.write(Input);
+            ui->Fluxengineinput->clear();
+        } else
+        {
+            //do nothing
+        }
+    } else
+    {
+        if (m_fluxengine.getAddress() == "")
+        {
+
+        } else
+        {
+        Input.clear();
+        Input.append("exit");
+        if(QSysInfo::productType() == "windows") Input.append("\r");
+        Input.append("\n");
         m_fluxengine.write(Input);
-        ui->Fluxengineinput->clear();
+        }
     }
 }
-
 
 void MainWindow::on_Fluxengineinput_returnPressed()
 {
