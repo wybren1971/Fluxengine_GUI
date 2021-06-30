@@ -70,6 +70,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->btnReadDisk->setFocus();
     ui->plainTextEdit_2->completer();
     ui->plainTextEdit_2->setInsertPolicy(QComboBox::NoInsert);
+    ui->txtOutput->setStyleSheet("QPlainTextEdit { font: 8pt Monospace ; background-color: #000; color: white; }"
+                                 "QToolTip { color: #ffffff; background-color: #000000; border: 0px; }"
+                                 "QMenu { color: #ffffff; background-color: #000000; border: 0px; }");
+
     ReadItemList();
 }
 
