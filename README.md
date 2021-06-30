@@ -32,12 +32,13 @@ The wizard gives a recap of the resulting command for fluxengine:
 
 The preferences window for setting the drives connected to fluxengine:
 
-![Screenshot from 2021-05-31 21-48-13](https://user-images.githubusercontent.com/14984509/122675269-efb9bb80-d1d8-11eb-9c63-c7f39f58cf3e.png)
+![Screenshot from 2021-06-30 11-55-02](https://user-images.githubusercontent.com/14984509/123941055-15de1900-d99a-11eb-8d6a-daba5c715481.png)
 
-Set the location of the fluxengine application and set the preferred location for writing the images, fluxfiles  and csv files to:
+Set the location of the fluxengine application and initialize and set the preferred location for writing the images, fluxfiles  and csv files to:
 
-![Screenshot from 2021-06-20 15-01-54](https://user-images.githubusercontent.com/14984509/122675216-b2edc480-d1d8-11eb-9cd6-2ba146942224.png)
-![Screenshot from 2021-06-20 15-01-46](https://user-images.githubusercontent.com/14984509/122675220-b719e200-d1d8-11eb-8752-d2894573f197.png)
+![Screenshot from 2021-06-30 11-52-35](https://user-images.githubusercontent.com/14984509/123940812-d3b4d780-d999-11eb-84b3-87e68bcf5d4d.png)
+
+![Screenshot from 2021-06-30 11-52-39](https://user-images.githubusercontent.com/14984509/123940873-e4fde400-d999-11eb-8e60-34f34f8eb966.png)
 
 Analyse a csv visualy:
 
