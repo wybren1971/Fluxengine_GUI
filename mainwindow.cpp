@@ -426,7 +426,7 @@ bool MainWindow::firsttimecheck(QString message)
         if (message == "")
         {
             message = tr("Welcome to fluxengine_gui\n"
-                         "Set the location of fluxengine in preferences on the tab 'My Locations'\nand then go to tab 'Advanced' and initialize fluxengine.\nThese are the minimum steps needed to use the Fluxengine_GUI");
+                         "Set the location of fluxengine in preferences and initialize fluxengine on the tab 'My Locations'.\nThese are the minimum steps needed to use the Fluxengine_GUI");
         }
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, tr("Fluxengine Wizard Info"), message);
@@ -458,7 +458,7 @@ bool MainWindow::firsttimecheck(QString message)
             if (message == "")
             {
                 message = tr("Welcome to fluxengine_gui\n"
-                             "Please initialize fluxengine in preferences on the tab 'Advanced' and press initialize fluxengine.\nThis is needed to use the Wizard");
+                             "Please initialize fluxengine in preferences on the tab 'My Locations' and press initialize fluxengine.\nThis is needed to use the Wizard");
             }
             QMessageBox::StandardButton reply;
             reply = QMessageBox::question(this, tr("Fluxengine Wizard Info"), message);
@@ -614,7 +614,7 @@ void MainWindow::WriteItemList()
         {
             QString s = QString::number(i);     //0
             QString t = QString::number(i+1);   //1
-            settings.setValue(settingold +s,settings.value(settingold +t));
+            settings.setValue(settingold + s,settings.value(settingold +t));
         }
         settings.setValue(setting+(QString::number(NUMBER_OF_COMMANDS-1)),m_fluxengine.getAddress());
         ui->plainTextEdit_2->clear();
@@ -629,11 +629,9 @@ void MainWindow::WriteItemList()
     }
     for (int i = 0; i< Commands->size(); i++)
     {
-        QString setting = "Fluxengine.command";
         QString s = QString::number(i);
-        setting = setting + s;
 //        qInfo() << setting << "command: " << Commands->at(i);
-        settings.setValue(setting, Commands->at(i));
+        settings.setValue(setting + s, Commands->at(i));
     }
 }
 void MainWindow::on_bntStartFluxengine_clicked()

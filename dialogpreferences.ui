@@ -23,7 +23,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="System">
       <attribute name="title">
@@ -133,7 +133,7 @@
        <string>My locations</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="1" column="0">
+       <item row="2" column="0">
         <widget class="QGroupBox" name="groupBox_4">
          <property name="title">
           <string>Default location to write images to:</string>
@@ -159,31 +159,6 @@
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QGroupBox" name="groupBox_9">
-         <property name="title">
-          <string>Default location to write csv files to:</string>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_5">
-          <item>
-           <widget class="QComboBox" name="cmbcsvlocation"/>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btncsvlocation">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Browse...</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="2" column="0">
         <widget class="QGroupBox" name="groupBox_5">
          <property name="title">
           <string>Default location to read and write fluxfiles to:</string>
@@ -208,17 +183,17 @@
          </layout>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="QGroupBox" name="groupBox_6">
+       <item row="4" column="0">
+        <widget class="QGroupBox" name="groupBox_9">
          <property name="title">
-          <string>Default location of the fluxengine program:</string>
+          <string>Default location to write csv files to:</string>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
-           <widget class="QComboBox" name="cmbFluxengineLocation"/>
+           <widget class="QComboBox" name="cmbcsvlocation"/>
           </item>
           <item>
-           <widget class="QPushButton" name="btnfluxenginelocation">
+           <widget class="QPushButton" name="btncsvlocation">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -233,31 +208,24 @@
          </layout>
         </widget>
        </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="Advanced">
-      <attribute name="title">
-       <string>Advanced</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="2" column="0">
-        <widget class="QGroupBox" name="groupBox_8">
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="groupBox_6">
          <property name="title">
-          <string/>
+          <string>Default location of the fluxengine program:</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_5">
-          <item row="1" column="1">
-           <widget class="QProgressBar" name="progressBar">
-            <property name="value">
-             <number>24</number>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="1" column="3">
+           <widget class="QPushButton" name="btnInitialize">
+            <property name="text">
+             <string>Initialize</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QPushButton" name="btnInitialize">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="cmbFluxengineLocation"/>
+          </item>
+          <item row="0" column="3">
+           <widget class="QPushButton" name="btnfluxenginelocation">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -265,17 +233,31 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Initialize</string>
+             <string>Browse...</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="0" colspan="2">
+          <item row="1" column="1">
+           <widget class="QProgressBar" name="progressBar">
+            <property name="value">
+             <number>24</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
            <widget class="QPlainTextEdit" name="txtoutput"/>
           </item>
          </layout>
         </widget>
        </item>
-       <item row="0" column="0">
+      </layout>
+     </widget>
+     <widget class="QWidget" name="Advanced">
+      <attribute name="title">
+       <string>Advanced</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="1" column="0">
         <widget class="QGroupBox" name="groupBox_7">
          <property name="title">
           <string>Advanced settings for Fluxengine_GUI</string>
@@ -294,7 +276,7 @@
          </layout>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="2" column="0">
         <widget class="QGroupBox" name="groupBox_10">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
