@@ -513,6 +513,7 @@ void MainWindow::enableFluxengineCommands(bool blnStarted)
         ui->btntestVoltages->setEnabled(false);
         ui->btntestbandwidth->setEnabled(false);
         ui->bntStartFluxengine->setEnabled(false);
+        ui->btnInspect->setEnabled(false);
 
         waitforfluzenginetofinish=true;
     } else
@@ -525,6 +526,7 @@ void MainWindow::enableFluxengineCommands(bool blnStarted)
         ui->btntestVoltages->setEnabled(true);
         ui->btntestbandwidth->setEnabled(true);
         ui->bntStartFluxengine->setEnabled(true);
+        ui->btnInspect->setEnabled(true);
         if (waitforfluzenginetofinish)
         {
             if (callingfunction == "on_btnAnalyse_clicked()")
