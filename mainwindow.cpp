@@ -96,7 +96,7 @@ void MainWindow::newFile()
 void MainWindow::readdisk()
 {
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
-    if (!firsttimecheck(""))
+    if (!firsttimecheck("wizard"))
         return;
 //    qInfo() << "readinfo rest";
     int intDrive;
@@ -453,38 +453,41 @@ bool MainWindow::firsttimecheck(QString message)
         }
     } else
     {
-        QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
-
-        settings.beginGroup("readformats");
-        if (!settings.contains("0"))
+        if (!message.isEmpty())
         {
-            //fluxengine not initialized
-            if (message == "")
+            QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+
+            settings.beginGroup("readformats");
+            if (!settings.contains("0"))
             {
+                //fluxengine not initialized
                 message = tr("Welcome to fluxengine_gui\n"
                              "Please initialize fluxengine in preferences on the tab 'My Locations' and press initialize fluxengine.\nThis is needed to use the Wizard");
-            }
-            QMessageBox::StandardButton reply;
-            reply = QMessageBox::question(this, tr("Fluxengine Wizard Info"), message);
+                QMessageBox::StandardButton reply;
+                reply = QMessageBox::question(this, tr("Fluxengine Wizard Info"), message);
 
-            //if cancel then dont go to preferences
-            if (reply == QMessageBox::Yes)
-            {
-                preference();
+                //if cancel then dont go to preferences
+                if (reply == QMessageBox::Yes)
+                {
+                    preference();
 
-            } else
-            {
-                return false;
+                } else
+                {
+                    return false;
+                }
+                if (!settings.contains("readformats0"))
+                {
+                    return false;
+                } else
+                {
+                    return true;
+                }
             }
-            if (!settings.contains("readformats0"))
-            {
-                return false;
-            } else
-            {
-                return true;
-            }
+            settings.endGroup();
+        } else
+        {
+            return true;
         }
-        settings.endGroup();
     }
     return true;
 }
