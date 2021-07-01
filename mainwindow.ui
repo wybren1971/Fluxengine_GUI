@@ -406,9 +406,6 @@
    <zorder>plainTextEdit_2</zorder>
    <zorder>label</zorder>
    <zorder>btnAnalyse</zorder>
-   <zorder>verticalSpacer</zorder>
-   <zorder>verticalSpacer_2</zorder>
-   <zorder>verticalSpacer_3</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
