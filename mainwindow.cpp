@@ -67,6 +67,13 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ui->btnAnalyse->setVisible(settings.value("showanalyzebutton").toBool());
     }
+    if (settings.value("showinspectbutton").toString() == "")
+    {
+        ui->btnInspect->setVisible(false);
+    } else
+    {
+        ui->btnInspect->setVisible(settings.value("showinspectbutton").toBool());
+    }
     ui->btnReadDisk->setFocus();
     ui->plainTextEdit_2->completer();
     ui->plainTextEdit_2->setInsertPolicy(QComboBox::NoInsert);
@@ -141,6 +148,7 @@ void MainWindow::preference()
     form->exec();
     setDrive();
     ui->btnAnalyse->setVisible(settings.value("showanalyzebutton") == "true");
+    ui->btnInspect->setVisible(settings.value("showinspectbutton") == "true");
 
     if (settings.value("fluxengine").toString() != "")
         m_fluxengine.setWorkingDirectory(settings.value("fluxengine").toString());
@@ -780,3 +788,11 @@ void MainWindow::on_btnAnalyse_clicked()
     }
 }
 
+void MainWindow::on_btnInspect_clicked()
+{
+    if (!firsttimecheck(""))
+        return;
+    m_fluxengine.setAddress("inspect");
+    m_fluxengine.start();
+    callingfunction = "on_btnInspect_clicked()";
+}

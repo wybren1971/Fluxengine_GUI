@@ -37,6 +37,11 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
         ui->chkShowAnalyzeButton->setChecked(settings.value("showanalyzebutton").toBool());
     }
 
+    if (settings.value("showinspectbutton").toString() != "")
+    {
+        ui->chkShowAnalyzeButton->setChecked(settings.value("showinspectbutton").toBool());
+    }
+
     numberofcommands = settings.value("NUMBER_OF_COMMANDS").toString();
     if (settings.value("NUMBER_OF_COMMANDS").toString() == "")
     {//set default
@@ -606,6 +611,7 @@ void DialogPreferences::save()
     settings.setValue("fluxengine", ui->cmbFluxengineLocation->currentText());
     settings.setValue("csvlocation", ui->cmbcsvlocation->currentText());
     settings.setValue("showanalyzebutton", ui->chkShowAnalyzeButton->isChecked());
+    settings.setValue("showinspectbutton", ui->chkShowInspectButton->isChecked());
     if (ui->intNumberofcommands->text().toInt() < numberofcommands.toInt())
     {
         //Clear the remaining
