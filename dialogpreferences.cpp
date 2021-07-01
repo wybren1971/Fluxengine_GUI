@@ -39,7 +39,7 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
 
     if (settings.value("showinspectbutton").toString() != "")
     {
-        ui->chkShowAnalyzeButton->setChecked(settings.value("showinspectbutton").toBool());
+        ui->chkShowInspectButton->setChecked(settings.value("showinspectbutton").toBool());
     }
 
     numberofcommands = settings.value("NUMBER_OF_COMMANDS").toString();
