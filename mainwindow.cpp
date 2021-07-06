@@ -828,7 +828,13 @@ void MainWindow::on_btnInspect_clicked()
 {
     if (!firsttimecheck(""))
         return;
-    m_fluxengine.setAddress("inspect");
+    if (ui->btnDrive0->isChecked())
+    {
+        m_fluxengine.setAddress("inspect -s drive:0");
+    } else
+    {
+        m_fluxengine.setAddress("inspect -s drive:1");
+    }
     m_fluxengine.start();
     callingfunction = "on_btnInspect_clicked()";
 }
