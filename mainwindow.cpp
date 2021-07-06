@@ -67,9 +67,20 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ui->btnAnalyse->setVisible(settings.value("showanalyzebutton").toBool());
     }
+    if (settings.value("showinspectbutton").toString() == "")
+    {
+        ui->btnInspect->setVisible(false);
+    } else
+    {
+        ui->btnInspect->setVisible(settings.value("showinspectbutton").toBool());
+    }
     ui->btnReadDisk->setFocus();
     ui->plainTextEdit_2->completer();
     ui->plainTextEdit_2->setInsertPolicy(QComboBox::NoInsert);
+    ui->txtOutput->setStyleSheet("QPlainTextEdit { font: 8pt Monospace ; background-color: #000; color: white; }"
+                                 "QToolTip { color: #ffffff; background-color: #000000; border: 0px; }"
+                                 "QMenu { color: #ffffff; background-color: #000000; border: 0px; }");
+
     ReadItemList();
 }
 
@@ -92,7 +103,7 @@ void MainWindow::newFile()
 void MainWindow::readdisk()
 {
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
-    if (!firsttimecheck(""))
+    if (!firsttimecheck("wizard"))
         return;
 //    qInfo() << "readinfo rest";
     int intDrive;
@@ -137,6 +148,7 @@ void MainWindow::preference()
     form->exec();
     setDrive();
     ui->btnAnalyse->setVisible(settings.value("showanalyzebutton") == "true");
+    ui->btnInspect->setVisible(settings.value("showinspectbutton") == "true");
 
     if (settings.value("fluxengine").toString() != "")
         m_fluxengine.setWorkingDirectory(settings.value("fluxengine").toString());
@@ -426,7 +438,7 @@ bool MainWindow::firsttimecheck(QString message)
         if (message == "")
         {
             message = tr("Welcome to fluxengine_gui\n"
-                         "Set the location of fluxengine in preferences on the tab 'My Locations'\nand then go to tab 'Advanced' and initialize fluxengine.\nThese are the minimum steps needed to use the Fluxengine_GUI");
+                         "Set the location of fluxengine in preferences and initialize fluxengine on the tab 'My Locations'.\nThese are the minimum steps needed to use the Fluxengine_GUI");
         }
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, tr("Fluxengine Wizard Info"), message);
@@ -449,38 +461,41 @@ bool MainWindow::firsttimecheck(QString message)
         }
     } else
     {
-        QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
-
-        settings.beginGroup("readformats");
-        if (!settings.contains("0"))
+        if (!message.isEmpty())
         {
-            //fluxengine not initialized
-            if (message == "")
+            QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+
+            settings.beginGroup("readformats");
+            if (!settings.contains("0"))
             {
+                //fluxengine not initialized
                 message = tr("Welcome to fluxengine_gui\n"
-                             "Please initialize fluxengine in preferences on the tab 'Advanced' and press initialize fluxengine.\nThis is needed to use the Wizard");
-            }
-            QMessageBox::StandardButton reply;
-            reply = QMessageBox::question(this, tr("Fluxengine Wizard Info"), message);
+                             "Please initialize fluxengine in preferences on the tab 'My Locations' and press initialize fluxengine.\nThis is needed to use the Wizard");
+                QMessageBox::StandardButton reply;
+                reply = QMessageBox::question(this, tr("Fluxengine Wizard Info"), message);
 
-            //if cancel then dont go to preferences
-            if (reply == QMessageBox::Yes)
-            {
-                preference();
+                //if cancel then dont go to preferences
+                if (reply == QMessageBox::Yes)
+                {
+                    preference();
 
-            } else
-            {
-                return false;
+                } else
+                {
+                    return false;
+                }
+                if (!settings.contains("readformats0"))
+                {
+                    return false;
+                } else
+                {
+                    return true;
+                }
             }
-            if (!settings.contains("readformats0"))
-            {
-                return false;
-            } else
-            {
-                return true;
-            }
+            settings.endGroup();
+        } else
+        {
+            return true;
         }
-        settings.endGroup();
     }
     return true;
 }
@@ -498,6 +513,7 @@ void MainWindow::enableFluxengineCommands(bool blnStarted)
         ui->btntestVoltages->setEnabled(false);
         ui->btntestbandwidth->setEnabled(false);
         ui->bntStartFluxengine->setEnabled(false);
+        ui->btnInspect->setEnabled(false);
 
         waitforfluzenginetofinish=true;
     } else
@@ -510,6 +526,7 @@ void MainWindow::enableFluxengineCommands(bool blnStarted)
         ui->btntestVoltages->setEnabled(true);
         ui->btntestbandwidth->setEnabled(true);
         ui->bntStartFluxengine->setEnabled(true);
+        ui->btnInspect->setEnabled(true);
         if (waitforfluzenginetofinish)
         {
             if (callingfunction == "on_btnAnalyse_clicked()")
@@ -614,7 +631,7 @@ void MainWindow::WriteItemList()
         {
             QString s = QString::number(i);     //0
             QString t = QString::number(i+1);   //1
-            settings.setValue(settingold +s,settings.value(settingold +t));
+            settings.setValue(settingold + s,settings.value(settingold +t));
         }
         settings.setValue(setting+(QString::number(NUMBER_OF_COMMANDS-1)),m_fluxengine.getAddress());
         ui->plainTextEdit_2->clear();
@@ -629,11 +646,9 @@ void MainWindow::WriteItemList()
     }
     for (int i = 0; i< Commands->size(); i++)
     {
-        QString setting = "Fluxengine.command";
         QString s = QString::number(i);
-        setting = setting + s;
 //        qInfo() << setting << "command: " << Commands->at(i);
-        settings.setValue(setting, Commands->at(i));
+        settings.setValue(setting + s, Commands->at(i));
     }
 }
 void MainWindow::on_bntStartFluxengine_clicked()
@@ -776,3 +791,11 @@ void MainWindow::on_btnAnalyse_clicked()
     }
 }
 
+void MainWindow::on_btnInspect_clicked()
+{
+    if (!firsttimecheck(""))
+        return;
+    m_fluxengine.setAddress("inspect");
+    m_fluxengine.start();
+    callingfunction = "on_btnInspect_clicked()";
+}

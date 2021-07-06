@@ -84,6 +84,7 @@ protected:
         void ClearText();
         void on_btnAnalyse_clicked();
 
+        void on_btnInspect_clicked();
 private:
         void createActions();
         void createMenus();

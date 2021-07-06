@@ -61,25 +61,33 @@ void fluxengine::start()
 
 }
 
-void fluxengine::startdirect()
-{
-    m_listening = true;
-    QString program = getProcess();
-    QByteArray command;
-    command = (m_workingdirectory + " " + m_address).toUtf8();
-    if(QSysInfo::productType() == "windows") command.append("\r");
-    command.append("\n");
-    QStringList Arguments;
-    if(QSysInfo::productType() == "windows")
-    {
-        Arguments << "/c" << command;
+//void fluxengine::startdirect()
+//{   //ToDo spaces in strings to cmd
+//    m_listening = true;
+//    QString program = getProcess();
+//    QString command;
+//    command = m_workingdirectory;
+////    if(QSysInfo::productType() == "windows") command.prepend(""");
+//    if(QSysInfo::productType() != "windows") command.prepend("\"");
+////    if(QSysInfo::productType() == "windows") command.append(""");
+//    if(QSysInfo::productType() != "windows") command.append("\" ");
 
-    } else
-    {
-        Arguments << "-c" << command;
-    }
-    m_process.start(program, Arguments, QIODevice::ReadWrite);
-}
+//    command = (command + " " + m_address);
+
+//    if(QSysInfo::productType() == "windows") command.append("\r");
+//    command.append("\n");
+//    QStringList Arguments;
+//    if(QSysInfo::productType() == "windows")
+//    {
+//        Arguments << "/c" << command;
+//    } else
+//    {
+//        Arguments << "-c" << command;
+//    }
+//    qInfo() << Arguments;
+//    m_process.start(program, Arguments);
+
+//}
 
 void fluxengine::stop()
 {
@@ -210,7 +218,7 @@ void fluxengine::readyRead()
         if (data.right(4) == "exit")
             data = "";
     }
-    data = QDir::toNativeSeparators(data).toUtf8();
+    //data = QDir::toNativeSeparators(data).toUtf8();
     if (data.size() > 1)
     {
         emit output(data);
@@ -232,7 +240,7 @@ void fluxengine::startFluxengine()
         command = (QStringLiteral("\"") + m_workingdirectory + ("\" " + m_address)).toUtf8();
     } else
     {
-        command = (m_workingdirectory + " " + m_address).toUtf8();
+        command = ("\"" + m_workingdirectory + "\" " + m_address).toUtf8();
     }
 //    qInfo() << "command: " << command;
     if(QSysInfo::productType() == "windows") command.append("\r");

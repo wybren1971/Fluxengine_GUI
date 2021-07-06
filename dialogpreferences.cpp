@@ -37,6 +37,11 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
         ui->chkShowAnalyzeButton->setChecked(settings.value("showanalyzebutton").toBool());
     }
 
+    if (settings.value("showinspectbutton").toString() != "")
+    {
+        ui->chkShowInspectButton->setChecked(settings.value("showinspectbutton").toBool());
+    }
+
     numberofcommands = settings.value("NUMBER_OF_COMMANDS").toString();
     if (settings.value("NUMBER_OF_COMMANDS").toString() == "")
     {//set default
@@ -189,22 +194,25 @@ void DialogPreferences::enablecommands(bool running)
 
 void DialogPreferences::initializefluxengine()
 {
-    if (m_fluxengine.getWorkingDirectory() == "")
-    {
+//    if (m_fluxengine.getWorkingDirectory() == "")
+//    {
         if (ui->cmbFluxengineLocation->currentText()== "")
         {
             QString message;
-            message = tr("Welcome to fluxengine_gui "
+            message = tr("Welcome to Fluxengine_GUI "
                          "first set the location of the fluxengine");
 
-            QMessageBox::information(this, tr("Fluxengine Wizard Info"), message);
+            QMessageBox::information(this, tr("Fluxengine_GUI Info"), message);
             return;
         } else
         {
+            QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
             m_fluxengine.setWorkingDirectory(ui->cmbFluxengineLocation->currentText());
+            settings.setValue("fluxengine", ui->cmbFluxengineLocation->currentText());  //we initialize this fluxengine binary so remember it
         }
-    }
+//    }
     ui->btnInitialize->setEnabled(false);
+    ui->buttonBox->setEnabled(false);
     this->setCursor(Qt::WaitCursor);
     if (!waitforfluzenginetofinish)
     {
@@ -214,7 +222,7 @@ void DialogPreferences::initializefluxengine()
             {
                 m_fluxengine.setAddress("read");
 //                qInfo() << State;
-                m_fluxengine.startdirect();
+                m_fluxengine.start();
                 waitforfluzenginetofinish = true;
                 ui->progressBar->setValue(1);
                 break;
@@ -223,7 +231,8 @@ void DialogPreferences::initializefluxengine()
             {
                 m_fluxengine.setAddress("write");
 //                qInfo() << "address" << m_fluxengine.getAddress();
-                m_fluxengine.startdirect();
+//                m_fluxengine.startdirect();
+                m_fluxengine.start();
                 waitforfluzenginetofinish = true;
                 ui->progressBar->setValue(2);
                 break;
@@ -237,7 +246,8 @@ void DialogPreferences::initializefluxengine()
                 {
                     m_fluxengine.setAddress(m_address + " " + readformats.at(readcounter) + " -C");
 //                    qInfo() << State;
-                    m_fluxengine.startdirect();
+//                    m_fluxengine.startdirect();
+                    m_fluxengine.start();
                     waitforfluzenginetofinish = true;
                     if ((intTotal +3 + intTotalWrite) > ui->progressBar->maximum())
                         ui->progressBar->setMaximum(intTotal +3 + intTotalWrite);
@@ -253,7 +263,8 @@ void DialogPreferences::initializefluxengine()
                 {
                     m_fluxengine.setAddress(m_address + " " + writeformats.at(writecounter) + " -C");
 //                    qInfo() << State;
-                    m_fluxengine.startdirect();
+//                    m_fluxengine.startdirect();
+                    m_fluxengine.start();
                     waitforfluzenginetofinish = true;
                     ui->progressBar->setValue(readcounter + writecounter +3);
                 }
@@ -266,12 +277,14 @@ void DialogPreferences::initializefluxengine()
                 ui->progressBar->setValue(ui->progressBar->maximum());
                 this->setCursor(Qt::ArrowCursor);
                 ui->btnInitialize->setEnabled(true);
+                ui->buttonBox->setEnabled(true);
                 break;
             }
         default: //
             {
                 this->setCursor(Qt::ArrowCursor);
                 ui->btnInitialize->setEnabled(true);
+                ui->buttonBox->setEnabled(true);
                 break;
             }
         }
@@ -598,6 +611,7 @@ void DialogPreferences::save()
     settings.setValue("fluxengine", ui->cmbFluxengineLocation->currentText());
     settings.setValue("csvlocation", ui->cmbcsvlocation->currentText());
     settings.setValue("showanalyzebutton", ui->chkShowAnalyzeButton->isChecked());
+    settings.setValue("showinspectbutton", ui->chkShowInspectButton->isChecked());
     if (ui->intNumberofcommands->text().toInt() < numberofcommands.toInt())
     {
         //Clear the remaining
@@ -607,24 +621,24 @@ void DialogPreferences::save()
         // 3 = command 4
         int i = numberofcommands.toInt() - ui->intNumberofcommands->text().toInt(); //4-2 = 2 = i
         int numberofnewcommands = ui->intNumberofcommands->text().toInt();
-        qInfo() << "i: " << i;
-        qInfo() << "numberofnewcommands: " << numberofnewcommands;
+//        qInfo() << "i: " << i;
+//        qInfo() << "numberofnewcommands: " << numberofnewcommands;
 
         for (int t = 0; t < i; t++)
         { //delete first commands
             settings.setValue("Fluxengine.command" + QString::number(t), "");
-            qInfo() << "t pass 1: " << t;
+//            qInfo() << "t pass 1: " << t;
         }
         for (int t = 0; t < numberofnewcommands; t++)
         {   //copy old commands to new position
             settings.setValue("Fluxengine.command" + QString::number(t), settings.value("Fluxengine.command" + QString::number(t + i)));
-            qInfo() << "t pass 2: " << t;
+//            qInfo() << "t pass 2: " << t;
         }
-        qInfo() << "numberofcommands.toInt() pass 3: " << numberofcommands.toInt();
+//        qInfo() << "numberofcommands.toInt() pass 3: " << numberofcommands.toInt();
         for (int t = numberofnewcommands; t<numberofcommands.toInt() ;t++ )
         {
             settings.remove("Fluxengine.command" + QString::number(t));
-             qInfo() << "t pass 3: " << t;
+//             qInfo() << "t pass 3: " << t;
         }
     }
     settings.setValue("NUMBER_OF_COMMANDS", ui->intNumberofcommands->text());
