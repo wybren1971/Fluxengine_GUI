@@ -5,7 +5,6 @@
 #include <qsettings.h>
 #include <dialogpreferences.h>
 #include <QApplication>
-#include <showlayout.h>
 
 class FragTreeViewer : public QWidget {
    QGridLayout m_layout{this};
@@ -35,7 +34,7 @@ public:
    void scaleImage(double factor) {
       m_scaleFactor *= factor;
       m_scaleLabel.setText(QStringLiteral("%1%").arg(m_scaleFactor*100, 0, 'f', 1));
-      QSize size = m_imageLabel.pixmap()->size() * m_scaleFactor;
+      QSize size = m_imageLabel.pixmap(Qt::ReturnByValue).size() * m_scaleFactor;
       m_imageLabel.resize(size);
    }
 };
@@ -807,6 +806,7 @@ void MainWindow::on_btnAnalyse_clicked()
 
         if (dir.absolutePath() != "")
         {
+
             m_fluxengine.setAddress("analyse layout --csv \"" + dir.absolutePath() + "\"");
             m_fluxengine.start();
             waitforfluzenginetofinish = true;
@@ -815,13 +815,6 @@ void MainWindow::on_btnAnalyse_clicked()
     } else
     {
         //show the resulting png
-//        showlayout *form = new showlayout();
-//        form->setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
-//        form->setWindowTitle("Visual layout of the csv: \"" + dir.absolutePath() + "/disklayout.png\"");
-//        //we have to wait for fluxengine to finish...
-//        form->LoadFile("disklayout.png");
-//        form->show();
-        //QImage Image;
         QImage Image(dir.absolutePath() + "/disklayout.png");
         FragTreeViewer *form = new FragTreeViewer;
         form->setImage(Image);
