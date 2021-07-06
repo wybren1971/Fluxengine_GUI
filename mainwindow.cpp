@@ -17,8 +17,9 @@ public:
       m_scaleFactor = 1.0;
       m_imageLabel.setPixmap(QPixmap::fromImage(img));
       scaleImage(m_scaleFactor);
-      this->setMinimumWidth(800);
-      this->setMinimumHeight(600);
+      this->setMinimumWidth(600);
+      this->setMinimumHeight(480);
+      this->resize(850,660);
 
    }
    ImageViewer() {
