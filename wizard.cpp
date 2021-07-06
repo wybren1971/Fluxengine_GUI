@@ -470,7 +470,7 @@ void ReadPage::editCSVComboBox(QString dir)
         int last_dot = dir.lastIndexOf("/");
         QString dir1 = dir.left(last_dot);
         const QFileInfo outputDir(dir1);
-        qInfo() << outputDir.isDir() << dir1 << outputDir;
+//        qInfo() << outputDir.isDir() << dir1 << outputDir;
         if (!outputDir.isDir()) {
             CSVComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
             emit completeChanged();
