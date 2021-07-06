@@ -6,7 +6,7 @@
 #include <dialogpreferences.h>
 #include <QApplication>
 
-class FragTreeViewer : public QWidget {
+class ImageViewer : public QWidget {
    QGridLayout m_layout{this};
    QScrollArea m_area;
    QLabel m_imageLabel, m_scaleLabel;
@@ -21,7 +21,7 @@ public:
       this->setMinimumHeight(600);
 
    }
-   FragTreeViewer() {
+   ImageViewer() {
       m_layout.addWidget(&m_area, 0, 0, 1, 3);
       m_layout.addWidget(&m_zoomOut, 1, 0);
       m_layout.addWidget(&m_scaleLabel, 1,1, Qt::AlignCenter);
@@ -816,8 +816,9 @@ void MainWindow::on_btnAnalyse_clicked()
     {
         //show the resulting png
         QImage Image(dir.absolutePath() + "/disklayout.png");
-        FragTreeViewer *form = new FragTreeViewer;
+        ImageViewer *form = new ImageViewer;
         form->setImage(Image);
+        form->setWindowTitle("Analyze: " + dir.absolutePath() + "/disklayout.png");
         form->show();
     }
 }
