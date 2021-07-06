@@ -5,7 +5,40 @@
 #include <qsettings.h>
 #include <dialogpreferences.h>
 #include <QApplication>
-#include <showlayout.h>
+
+class ImageViewer : public QWidget {
+   QGridLayout m_layout{this};
+   QScrollArea m_area;
+   QLabel m_imageLabel, m_scaleLabel;
+   QPushButton m_zoomOut{"Zoom Out"}, m_zoomIn{"Zoom In"};
+   double m_scaleFactor = 1.0;
+public:
+   void setImage(const QImage & img) {
+      m_scaleFactor = 1.0;
+      m_imageLabel.setPixmap(QPixmap::fromImage(img));
+      scaleImage(m_scaleFactor);
+      this->setMinimumWidth(600);
+      this->setMinimumHeight(480);
+      this->resize(850,660);
+
+   }
+   ImageViewer() {
+      m_layout.addWidget(&m_area, 0, 0, 1, 3);
+      m_layout.addWidget(&m_zoomOut, 1, 0);
+      m_layout.addWidget(&m_scaleLabel, 1,1, Qt::AlignCenter);
+      m_layout.addWidget(&m_zoomIn, 1, 2);
+      m_area.setWidget(&m_imageLabel);
+      m_imageLabel.setScaledContents(true);
+      connect(&m_zoomIn, &QPushButton::clicked, [this]{ scaleImage(1.1); });
+      connect(&m_zoomOut, &QPushButton::clicked, [this]{ scaleImage(1.0/1.1); });
+   }
+   void scaleImage(double factor) {
+      m_scaleFactor *= factor;
+      m_scaleLabel.setText(QStringLiteral("%1%").arg(m_scaleFactor*100, 0, 'f', 1));
+      QSize size = m_imageLabel.pixmap(Qt::ReturnByValue).size() * m_scaleFactor;
+      m_imageLabel.resize(size);
+   }
+};
 
 bool blnFirsttime;
 
@@ -67,9 +100,20 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ui->btnAnalyse->setVisible(settings.value("showanalyzebutton").toBool());
     }
+    if (settings.value("showinspectbutton").toString() == "")
+    {
+        ui->btnInspect->setVisible(false);
+    } else
+    {
+        ui->btnInspect->setVisible(settings.value("showinspectbutton").toBool());
+    }
     ui->btnReadDisk->setFocus();
     ui->plainTextEdit_2->completer();
     ui->plainTextEdit_2->setInsertPolicy(QComboBox::NoInsert);
+    ui->txtOutput->setStyleSheet("QPlainTextEdit { font: 8pt Monospace ; background-color: #000; color: white; }"
+                                 "QToolTip { color: #ffffff; background-color: #000000; border: 0px; }"
+                                 "QMenu { color: #ffffff; background-color: #000000; border: 0px; }");
+
     ReadItemList();
 }
 
@@ -92,7 +136,7 @@ void MainWindow::newFile()
 void MainWindow::readdisk()
 {
     QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
-    if (!firsttimecheck(""))
+    if (!firsttimecheck("wizard"))
         return;
 //    qInfo() << "readinfo rest";
     int intDrive;
@@ -137,6 +181,7 @@ void MainWindow::preference()
     form->exec();
     setDrive();
     ui->btnAnalyse->setVisible(settings.value("showanalyzebutton") == "true");
+    ui->btnInspect->setVisible(settings.value("showinspectbutton") == "true");
 
     if (settings.value("fluxengine").toString() != "")
         m_fluxengine.setWorkingDirectory(settings.value("fluxengine").toString());
@@ -449,38 +494,41 @@ bool MainWindow::firsttimecheck(QString message)
         }
     } else
     {
-        QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
-
-        settings.beginGroup("readformats");
-        if (!settings.contains("0"))
+        if (!message.isEmpty())
         {
-            //fluxengine not initialized
-            if (message == "")
+            QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+
+            settings.beginGroup("readformats");
+            if (!settings.contains("0"))
             {
+                //fluxengine not initialized
                 message = tr("Welcome to fluxengine_gui\n"
                              "Please initialize fluxengine in preferences on the tab 'My Locations' and press initialize fluxengine.\nThis is needed to use the Wizard");
-            }
-            QMessageBox::StandardButton reply;
-            reply = QMessageBox::question(this, tr("Fluxengine Wizard Info"), message);
+                QMessageBox::StandardButton reply;
+                reply = QMessageBox::question(this, tr("Fluxengine Wizard Info"), message);
 
-            //if cancel then dont go to preferences
-            if (reply == QMessageBox::Yes)
-            {
-                preference();
+                //if cancel then dont go to preferences
+                if (reply == QMessageBox::Yes)
+                {
+                    preference();
 
-            } else
-            {
-                return false;
+                } else
+                {
+                    return false;
+                }
+                if (!settings.contains("readformats0"))
+                {
+                    return false;
+                } else
+                {
+                    return true;
+                }
             }
-            if (!settings.contains("readformats0"))
-            {
-                return false;
-            } else
-            {
-                return true;
-            }
+            settings.endGroup();
+        } else
+        {
+            return true;
         }
-        settings.endGroup();
     }
     return true;
 }
@@ -498,6 +546,7 @@ void MainWindow::enableFluxengineCommands(bool blnStarted)
         ui->btntestVoltages->setEnabled(false);
         ui->btntestbandwidth->setEnabled(false);
         ui->bntStartFluxengine->setEnabled(false);
+        ui->btnInspect->setEnabled(false);
 
         waitforfluzenginetofinish=true;
     } else
@@ -510,6 +559,7 @@ void MainWindow::enableFluxengineCommands(bool blnStarted)
         ui->btntestVoltages->setEnabled(true);
         ui->btntestbandwidth->setEnabled(true);
         ui->bntStartFluxengine->setEnabled(true);
+        ui->btnInspect->setEnabled(true);
         if (waitforfluzenginetofinish)
         {
             if (callingfunction == "on_btnAnalyse_clicked()")
@@ -757,6 +807,7 @@ void MainWindow::on_btnAnalyse_clicked()
 
         if (dir.absolutePath() != "")
         {
+
             m_fluxengine.setAddress("analyse layout --csv \"" + dir.absolutePath() + "\"");
             m_fluxengine.start();
             waitforfluzenginetofinish = true;
@@ -765,11 +816,19 @@ void MainWindow::on_btnAnalyse_clicked()
     } else
     {
         //show the resulting png
-        showlayout *form = new showlayout();
-        form->setWindowTitle("Visual layout of the csv: \"" + dir.absolutePath() + "/disklayout.png\"");
-        //we have to wait for fluxengine to finish...
-        form->LoadFile("disklayout.png");
-        form->exec();
+        QImage Image(dir.absolutePath() + "/disklayout.png");
+        ImageViewer *form = new ImageViewer;
+        form->setImage(Image);
+        form->setWindowTitle("Analyze: " + dir.absolutePath() + "/disklayout.png");
+        form->show();
     }
 }
 
+void MainWindow::on_btnInspect_clicked()
+{
+    if (!firsttimecheck(""))
+        return;
+    m_fluxengine.setAddress("inspect");
+    m_fluxengine.start();
+    callingfunction = "on_btnInspect_clicked()";
+}

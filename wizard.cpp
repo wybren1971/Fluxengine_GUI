@@ -470,7 +470,7 @@ void ReadPage::editCSVComboBox(QString dir)
         int last_dot = dir.lastIndexOf("/");
         QString dir1 = dir.left(last_dot);
         const QFileInfo outputDir(dir1);
-        qInfo() << outputDir.isDir() << dir1 << outputDir;
+//        qInfo() << outputDir.isDir() << dir1 << outputDir;
         if (!outputDir.isDir()) {
             CSVComboBox->setStyleSheet("QLineEdit { background: rgb(255,0,0); }");
             emit completeChanged();
@@ -1078,7 +1078,15 @@ AdvancedPage::AdvancedPage(QWidget *parent)
     registerField("AdvancedPage.debounce", debounceLabelEdit);
 
     QGridLayout *layout = new QGridLayout;
-    layout->setSizeConstraint(layout->SetFixedSize);
+    //layout->setSizeConstraint(layout->SetFixedSize);
+    layout->setColumnStretch(2,3);
+    layout->setRowMinimumHeight(0,50);
+    layout->setRowMinimumHeight(1,50);
+    layout->setRowMinimumHeight(2,50);
+    layout->setRowMinimumHeight(3,50);
+    layout->setRowMinimumHeight(4,50);
+
+    //layout->setRowMinimumHeight()
     layout->addWidget(retriesLabel, 0, 0);
     layout->addWidget(retriesEdit, 0, 1);
     layout->addWidget(retriesLabelexplain, 0, 2);
@@ -1112,6 +1120,7 @@ void AdvancedPage::initializePage()
         setSubTitle(tr("Be careful what you choose here. Leave empty to ignore"));
     }
 
+    updateGeometry();
 }
 
 int AdvancedPage::nextId() const
@@ -1268,6 +1277,12 @@ QString ConclusionPage::getData()
         strFormat.append(strDisk);
         strFormat.append(" -i \"");
         strFormat.append(_strInputfile + "\"");
+        QString drivetext = "drive" + QString::number(intSelectedDrive)+ "40track";
+
+//        if (settings.value(drivetext).toBool() && strDisk == "commodore1541")
+//        {
+//            strFormat.append(" --encoder.c64.forty_track_drive=true");
+//        }
 
         QString TrackStart = field("WritePage.TrackStart").toString();
         QString TrackStop = field("WritePage.TrackStop").toString();
@@ -1276,11 +1291,11 @@ QString ConclusionPage::getData()
         strFormat.append(" -c ");
         strFormat.append(TrackStart);
         strFormat.append("-");
-        QString drivetext = "drive" + QString::number(intSelectedDrive)+ "40track";
         if (((TrackStop.toInt()) > 39) && (settings.value(drivetext).toBool()))
         {
             //40 track drive with 80track operand use doublestep x2
             TrackStop = TrackStop + "x2";
+
         }
         strFormat.append(TrackStop);
 

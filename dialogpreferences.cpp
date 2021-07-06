@@ -37,6 +37,11 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
         ui->chkShowAnalyzeButton->setChecked(settings.value("showanalyzebutton").toBool());
     }
 
+    if (settings.value("showinspectbutton").toString() != "")
+    {
+        ui->chkShowInspectButton->setChecked(settings.value("showinspectbutton").toBool());
+    }
+
     numberofcommands = settings.value("NUMBER_OF_COMMANDS").toString();
     if (settings.value("NUMBER_OF_COMMANDS").toString() == "")
     {//set default
@@ -189,21 +194,23 @@ void DialogPreferences::enablecommands(bool running)
 
 void DialogPreferences::initializefluxengine()
 {
-    if (m_fluxengine.getWorkingDirectory() == "")
-    {
+//    if (m_fluxengine.getWorkingDirectory() == "")
+//    {
         if (ui->cmbFluxengineLocation->currentText()== "")
         {
             QString message;
-            message = tr("Welcome to fluxengine_gui "
+            message = tr("Welcome to Fluxengine_GUI "
                          "first set the location of the fluxengine");
 
-            QMessageBox::information(this, tr("Fluxengine Wizard Info"), message);
+            QMessageBox::information(this, tr("Fluxengine_GUI Info"), message);
             return;
         } else
         {
+            QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
             m_fluxengine.setWorkingDirectory(ui->cmbFluxengineLocation->currentText());
+            settings.setValue("fluxengine", ui->cmbFluxengineLocation->currentText());  //we initialize this fluxengine binary so remember it
         }
-    }
+//    }
     ui->btnInitialize->setEnabled(false);
     ui->buttonBox->setEnabled(false);
     this->setCursor(Qt::WaitCursor);
@@ -604,6 +611,7 @@ void DialogPreferences::save()
     settings.setValue("fluxengine", ui->cmbFluxengineLocation->currentText());
     settings.setValue("csvlocation", ui->cmbcsvlocation->currentText());
     settings.setValue("showanalyzebutton", ui->chkShowAnalyzeButton->isChecked());
+    settings.setValue("showinspectbutton", ui->chkShowInspectButton->isChecked());
     if (ui->intNumberofcommands->text().toInt() < numberofcommands.toInt())
     {
         //Clear the remaining
