@@ -15,7 +15,8 @@ I share it on github because i believe in opensource. You are welcome to contrib
 Some images to get an impression of the GUI...
 
 The mainwindow of Fluxengine_GUI:
-![Screenshot from 2021-06-20 15-01-15](https://user-images.githubusercontent.com/14984509/122675201-a36e7b80-d1d8-11eb-8499-137895b64cda.png)
+![Screenshot from 2021-07-06 20-30-35](https://user-images.githubusercontent.com/14984509/124649698-1e9e8580-de99-11eb-951c-2204a0d8be9c.png)
+
 
 The wizard for easy reading and writing disks with fluxengine:
 
@@ -23,8 +24,7 @@ The wizard for easy reading and writing disks with fluxengine:
 ![Screenshot from 2021-06-24 08-32-19](https://user-images.githubusercontent.com/14984509/123220110-ea58bb80-d4cd-11eb-888d-00556fb47ff0.png)
 
 With an advanced settings page for reading:
-
-![Screenshot from 2021-06-20 15-06-36](https://user-images.githubusercontent.com/14984509/122675334-360f1a80-d1d9-11eb-82d9-85f4d94ee4b7.png)
+![Screenshot from 2021-07-06 20-32-28](https://user-images.githubusercontent.com/14984509/124649942-6fae7980-de99-11eb-9c8d-1bd62fbbfcd1.png)
 
 The wizard gives a recap of the resulting command for fluxengine:
 
@@ -38,11 +38,13 @@ Set the location of the fluxengine application and initialize and set the prefer
 
 ![Screenshot from 2021-06-30 11-52-35](https://user-images.githubusercontent.com/14984509/123940812-d3b4d780-d999-11eb-84b3-87e68bcf5d4d.png)
 
-![Screenshot from 2021-06-30 11-52-39](https://user-images.githubusercontent.com/14984509/123940873-e4fde400-d999-11eb-8e60-34f34f8eb966.png)
+![Screenshot from 2021-07-06 20-32-39](https://user-images.githubusercontent.com/14984509/124649964-7937e180-de99-11eb-9bbf-7d6cd4abfde6.png)
 
-Analyse a csv visualy:
 
-![Screenshot from 2021-06-20 15-01-32](https://user-images.githubusercontent.com/14984509/122675235-d3b61a00-d1d8-11eb-9b5c-0890679d6926.png)
+Analyze a csv visualy:
+
+![Screenshot from 2021-07-06 20-30-27](https://user-images.githubusercontent.com/14984509/124649735-29591a80-de99-11eb-99c1-01e8f6823371.png)
+
 
 
 
