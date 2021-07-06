@@ -1080,11 +1080,11 @@ AdvancedPage::AdvancedPage(QWidget *parent)
     QGridLayout *layout = new QGridLayout;
     //layout->setSizeConstraint(layout->SetFixedSize);
     layout->setColumnStretch(2,3);
-    layout->setRowMinimumHeight(0,0);
-    layout->setRowMinimumHeight(1,0);
-    layout->setRowMinimumHeight(2,0);
-    layout->setRowMinimumHeight(3,0);
-    layout->setRowMinimumHeight(4,0);
+    layout->setRowMinimumHeight(0,50);
+    layout->setRowMinimumHeight(1,50);
+    layout->setRowMinimumHeight(2,50);
+    layout->setRowMinimumHeight(3,50);
+    layout->setRowMinimumHeight(4,50);
 
     //layout->setRowMinimumHeight()
     layout->addWidget(retriesLabel, 0, 0);
