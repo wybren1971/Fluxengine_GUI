@@ -107,6 +107,15 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ui->btnInspect->setVisible(settings.value("showinspectbutton").toBool());
     }
+    if (settings.value("DriveSelected").toInt() == 0)
+
+    {
+        ui->btnDrive0->setChecked(true);
+    } else
+    {
+        ui->btnDrive1->setChecked(true);
+    }
+
     ui->btnReadDisk->setFocus();
     ui->plainTextEdit_2->completer();
     ui->plainTextEdit_2->setInsertPolicy(QComboBox::NoInsert);
@@ -444,6 +453,13 @@ MainWindow::~MainWindow()
     settings.setValue("windowState", saveState());
     settings.setValue("WindowWidth", MainWindow::width());
     settings.setValue("WindowHeight", MainWindow::height());
+    if (ui->btnDrive0->isChecked())
+    {
+        settings.setValue("DriveSelected", "0");
+    } else
+    {
+        settings.setValue("DriveSelected", "1");
+    }
     delete ui;
     m_fluxengine.stop();
 }
