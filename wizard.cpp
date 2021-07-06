@@ -1078,7 +1078,15 @@ AdvancedPage::AdvancedPage(QWidget *parent)
     registerField("AdvancedPage.debounce", debounceLabelEdit);
 
     QGridLayout *layout = new QGridLayout;
-    layout->setSizeConstraint(layout->SetFixedSize);
+    //layout->setSizeConstraint(layout->SetFixedSize);
+    layout->setColumnStretch(2,3);
+    layout->setRowMinimumHeight(0,0);
+    layout->setRowMinimumHeight(1,0);
+    layout->setRowMinimumHeight(2,0);
+    layout->setRowMinimumHeight(3,0);
+    layout->setRowMinimumHeight(4,0);
+
+    //layout->setRowMinimumHeight()
     layout->addWidget(retriesLabel, 0, 0);
     layout->addWidget(retriesEdit, 0, 1);
     layout->addWidget(retriesLabelexplain, 0, 2);
@@ -1112,6 +1120,7 @@ void AdvancedPage::initializePage()
         setSubTitle(tr("Be careful what you choose here. Leave empty to ignore"));
     }
 
+    updateGeometry();
 }
 
 int AdvancedPage::nextId() const
