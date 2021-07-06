@@ -1268,6 +1268,12 @@ QString ConclusionPage::getData()
         strFormat.append(strDisk);
         strFormat.append(" -i \"");
         strFormat.append(_strInputfile + "\"");
+        QString drivetext = "drive" + QString::number(intSelectedDrive)+ "40track";
+
+//        if (settings.value(drivetext).toBool() && strDisk == "commodore1541")
+//        {
+//            strFormat.append(" --encoder.c64.forty_track_drive=true");
+//        }
 
         QString TrackStart = field("WritePage.TrackStart").toString();
         QString TrackStop = field("WritePage.TrackStop").toString();
@@ -1276,11 +1282,11 @@ QString ConclusionPage::getData()
         strFormat.append(" -c ");
         strFormat.append(TrackStart);
         strFormat.append("-");
-        QString drivetext = "drive" + QString::number(intSelectedDrive)+ "40track";
         if (((TrackStop.toInt()) > 39) && (settings.value(drivetext).toBool()))
         {
             //40 track drive with 80track operand use doublestep x2
             TrackStop = TrackStop + "x2";
+
         }
         strFormat.append(TrackStop);
 
