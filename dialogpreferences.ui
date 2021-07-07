@@ -23,7 +23,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="System">
       <attribute name="title">
@@ -55,28 +55,28 @@
              <item>
               <widget class="QRadioButton" name="radioButton_6">
                <property name="text">
-                <string>5.25 inch drive, 40 track</string>
+                <string>5.25&quot;, 40 track</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QRadioButton" name="radioButton_8">
                <property name="text">
-                <string>5.25 inch drive, 720K DD, 80 track</string>
+                <string>5.25&quot;, 720K DD, 80 track</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QRadioButton" name="radioButton_7">
                <property name="text">
-                <string>5.25 inch drive, 1.2M HD, 80 track</string>
+                <string>5.25&quot;, 1.2M HD, 80 track</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QRadioButton" name="radioButton_2">
                <property name="text">
-                <string>3.5 inch drive</string>
+                <string>3.5&quot; drive</string>
                </property>
               </widget>
              </item>
@@ -92,28 +92,28 @@
              <item>
               <widget class="QRadioButton" name="radioButton_3">
                <property name="text">
-                <string>5.25 inch drive, 40 track</string>
+                <string>5.25&quot;, 40 track</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QRadioButton" name="radioButton_5">
                <property name="text">
-                <string>5.25 inch drive, 720K DD, 80 track</string>
+                <string>5.25&quot;, 720K DD, 80 track</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QRadioButton" name="radioButton_4">
                <property name="text">
-                <string>5.25 inch drive, 1.2M HD, 80 track</string>
+                <string>5.25&quot;, 1.2M HD, 80 track</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QRadioButton" name="radioButton">
                <property name="text">
-                <string>3.5 inch drive</string>
+                <string>3.5&quot; drive</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
