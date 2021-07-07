@@ -29,8 +29,8 @@ public:
       m_layout.addWidget(&m_zoomIn, 1, 2);
       m_area.setWidget(&m_imageLabel);
       m_imageLabel.setScaledContents(true);
-      connect(&m_zoomIn, &QPushButton::clicked, [this]{ scaleImage(1.1); });
-      connect(&m_zoomOut, &QPushButton::clicked, [this]{ scaleImage(1.0/1.1); });
+      connect(&m_zoomIn, &QPushButton::clicked, this, [this]{ scaleImage(1.1); });
+      connect(&m_zoomOut, &QPushButton::clicked, this, [this]{ scaleImage(1.0/1.1); });
    }
    void scaleImage(double factor) {
       m_scaleFactor *= factor;
@@ -193,7 +193,10 @@ void MainWindow::preference()
     ui->btnInspect->setVisible(settings.value("showinspectbutton") == "true");
 
     if (settings.value("fluxengine").toString() != "")
+    {
         m_fluxengine.setWorkingDirectory(settings.value("fluxengine").toString());
+        blnFirsttime = false;
+    }
     NUMBER_OF_COMMANDS = settings.value("NUMBER_OF_COMMANDS").toInt();
     ReadItemList();
 }
