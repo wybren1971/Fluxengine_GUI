@@ -67,6 +67,80 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
             RadioButton1->setChecked(true);
         }
     }
+    QStringList readformat;
+    int i =0;
+    int j = 0;
+//    qInfo() << Q_FUNC_INFO;
+    settings.beginGroup("readformats");
+    while (settings.value(QString::number(i)) != "")
+    {
+        if (settings.value(QString::number(i)).toString() == "")
+        {
+            break;
+        } else
+        {
+            readformat.append(settings.value(QString::number(i)).toString());
+            if (settings.value(QString::number(i)).toString().contains("ibm"))
+                j = i;
+
+//            qInfo() << "Readformat " << settings.value(QString::number(i)).toString();
+//            qInfo() << "i: " << i;
+            i++;
+        }
+    }
+    settings.endGroup();
+    settings.beginGroup("readformatsdescription");
+    for (i = 0; i < readformat.size();i++)
+    {
+        ui->cmbDefaultreadformat->addItem(settings.value(QString::number(i)).toString());
+    }
+    settings.endGroup();
+    if (settings.value("defaultreadformat").toString() == "")
+        //not defined
+    {
+        ui->cmbDefaultreadformat->setCurrentIndex(j);
+    } else
+    {
+        ui->cmbDefaultreadformat->setCurrentIndex(settings.value("defaultreadformat").toInt());
+    }
+
+    QStringList writeformat;
+    i =0;
+    j = 0;
+//    qInfo() << Q_FUNC_INFO;
+    settings.beginGroup("writeformats");
+    while (settings.value(QString::number(i)) != "")
+    {
+        if (settings.value(QString::number(i)).toString() == "")
+        {
+            break;
+        } else
+        {
+            writeformat.append(settings.value(QString::number(i)).toString());
+            if (settings.value(QString::number(i)).toString().contains("ibm1440"))
+                j = i;
+
+//            qInfo() << "Readformat " << settings.value(QString::number(i)).toString();
+//            qInfo() << "i: " << i;
+            i++;
+        }
+    }
+    settings.endGroup();
+    settings.beginGroup("writeformatsdescription");
+    for (i = 0; i < writeformat.size();i++)
+    {
+        ui->cmbDefaultwriteformat->addItem(settings.value(QString::number(i)).toString());
+    }
+    settings.endGroup();
+    if (settings.value("defaultwriteformat").toString() == "")
+        //not defined
+    {
+        ui->cmbDefaultwriteformat->setCurrentIndex(j);
+    } else
+    {
+        ui->cmbDefaultwriteformat->setCurrentIndex(settings.value("defaultwriteformat").toInt());
+    }
+
 
     QValidator *validator = new QIntValidator(10, 99, this);
     ui->intNumberofcommands->setValidator(validator);
@@ -612,6 +686,8 @@ void DialogPreferences::save()
     settings.setValue("csvlocation", ui->cmbcsvlocation->currentText());
     settings.setValue("showanalyzebutton", ui->chkShowAnalyzeButton->isChecked());
     settings.setValue("showinspectbutton", ui->chkShowInspectButton->isChecked());
+    settings.setValue("defaultreadformat", ui->cmbDefaultreadformat->currentIndex());
+    settings.setValue("defaultwriteformat", ui->cmbDefaultwriteformat->currentIndex());
     if (ui->intNumberofcommands->text().toInt() < numberofcommands.toInt())
     {
         //Clear the remaining
