@@ -302,7 +302,14 @@ void ReadPage::initializePage()
     {
         readFormatbox->addItem(my_readformat[i][description]);
     }
-    readFormatbox->setCurrentIndex(ReadFormatDefault);                                                         //set IBM as standard
+
+    if (settings.value("defaultreadformat").toString() == "")
+    {
+        readFormatbox->setCurrentIndex(ReadFormatDefault);
+    } else
+    {
+        readFormatbox->setCurrentIndex(settings.value("defaultreadformat").toInt());                                                         //set selected read format as default
+    }
 
 }
 
@@ -848,7 +855,14 @@ void WritePage::initializePage()
         writeFormatbox->addItem(my_writeformat[i][description]);
     }
 
-    writeFormatbox->setCurrentIndex(WriteFormatDefault);   //set IBM as standard
+
+     if (settings.value("defaultwriteformat").toString() == "")
+     {
+         writeFormatbox->setCurrentIndex(WriteFormatDefault);
+     } else
+     {
+         writeFormatbox->setCurrentIndex(settings.value("defaultwriteformat").toInt());                                                         //set selected write format as default
+     }
 }
 
 int WritePage::nextId() const
