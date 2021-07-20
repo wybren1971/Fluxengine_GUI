@@ -466,10 +466,38 @@ QStringList DialogPreferences::initializeformats(QString data)
 
 QStringList DialogPreferences::getConfig(QString data)
 {
+
+//    encoder {
+//      c64 {
+//      }
+//    }
+//    decoder {
+//      c64 {
+//      }
+//    }
+//    cylinders {
+//      start: 0
+//      end: 79
+//    }
+//    heads {
+//      start: 0
+//      end: 0
+//    }
+//    comment: "Commodore 1541 170kB 5.25\" SS GCR"
+//    image_writer {
+//      filename: "commodore1541.img"
+//      d64 {
+//      }
+//    }
+//    image_reader {
+//      filename: "commodore1541.img"
+//      d64 {
+//      }
+//    }
     QStringList Configs;
     if (data.contains("encoder") || (data.contains("decoder")))
     {
-        int i = data.indexOf(":",0);
+        int i = data.indexOf(QRegExp("filename: "),0);
         int j;
         if(QSysInfo::productType() == "windows")
         {
@@ -478,7 +506,7 @@ QStringList DialogPreferences::getConfig(QString data)
         {
             j = data.indexOf("\n", i+1);
         }
-        Configs.append(data.mid(i+3, j-4 - i).trimmed());
+        Configs.append(data.mid(i+11, j-12 - i).trimmed());
         i = data.indexOf(QRegExp("start: "),0);
         if(QSysInfo::productType() == "windows")
         {
