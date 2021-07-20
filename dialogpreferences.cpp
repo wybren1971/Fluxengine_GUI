@@ -87,7 +87,7 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
     ui->progressBar->setMinimum(0);
     ui->progressBar->setMaximum(40); //near enough it gets updated when we now it precise
     ui->progressBar->setValue(0);
-    ui->txtoutput->setVisible(false); //for debug purposes on windows
+    ui->txtoutput->setVisible(true); //for debug purposes on windows
     readcounter = 0;
     writecounter = 0;
     State = 0;
@@ -184,8 +184,8 @@ void DialogPreferences::browse()
 
 void DialogPreferences::enablecommands(bool running)
 {
-//    qInfo() << Q_FUNC_INFO;
-//    qInfo() << running;
+    qInfo() << Q_FUNC_INFO;
+    qInfo() << running;
     if (running)
     {
         waitforfluzenginetofinish = true;
@@ -232,7 +232,7 @@ void DialogPreferences::initializefluxengine()
         QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
         int i =0;
         int j = 0;
-    //    qInfo() << Q_FUNC_INFO;
+        qInfo() << Q_FUNC_INFO;
         settings.beginGroup("readformats");
         while (settings.value(QString::number(i)) != "")
         {
@@ -242,9 +242,6 @@ void DialogPreferences::initializefluxengine()
             } else
             {
                 readformat.append(settings.value(QString::number(i)).toString());
-                if (settings.value(QString::number(i)).toString().contains("ibm"))
-                    j = i;
-
     //            qInfo() << "Readformat " << settings.value(QString::number(i)).toString();
     //            qInfo() << "i: " << i;
                 i++;
@@ -281,9 +278,6 @@ void DialogPreferences::initializefluxengine()
             } else
             {
                 writeformat.append(settings.value(QString::number(i)).toString());
-                if (settings.value(QString::number(i)).toString().contains("ibm"))
-                    j = i;
-
     //            qInfo() << "Readformat " << settings.value(QString::number(i)).toString();
     //            qInfo() << "i: " << i;
                 i++;
@@ -320,7 +314,7 @@ void DialogPreferences::initializefluxengine()
             case 0:
             {
                 m_fluxengine.setAddress("read");
-//                qInfo() << State;
+                qInfo() << State;
                 m_fluxengine.start();
                 waitforfluzenginetofinish = true;
                 ui->progressBar->setValue(1);
@@ -329,7 +323,7 @@ void DialogPreferences::initializefluxengine()
             case 1:
             {
                 m_fluxengine.setAddress("write");
-//                qInfo() << "address" << m_fluxengine.getAddress();
+                qInfo() << "address" << m_fluxengine.getAddress();
 //                m_fluxengine.startdirect();
                 m_fluxengine.start();
                 waitforfluzenginetofinish = true;
@@ -344,7 +338,7 @@ void DialogPreferences::initializefluxengine()
                 if (readcounter < intTotal)
                 {
                     m_fluxengine.setAddress(m_address + " " + readformats.at(readcounter) + " -C");
-//                    qInfo() << State;
+                    qInfo() << State;
 //                    m_fluxengine.startdirect();
                     m_fluxengine.start();
                     waitforfluzenginetofinish = true;
@@ -361,7 +355,7 @@ void DialogPreferences::initializefluxengine()
                 if (writecounter < intTotal)
                 {
                     m_fluxengine.setAddress(m_address + " " + writeformats.at(writecounter) + " -C");
-//                    qInfo() << State;
+                    qInfo() << State;
 //                    m_fluxengine.startdirect();
                     m_fluxengine.start();
                     waitforfluzenginetofinish = true;
@@ -372,20 +366,25 @@ void DialogPreferences::initializefluxengine()
             case 4:
             {
                 //ready
-//                qInfo() << "State" << State;
+                qInfo() << "State" << State;
                 ui->progressBar->setValue(ui->progressBar->maximum());
                 this->setCursor(Qt::ArrowCursor);
                 ui->btnInitialize->setEnabled(true);
                 ui->buttonBox->setEnabled(true);
+                //reset everything for next initialize
                 boolFirsttime = true;
+                State = 0;
+                readcounter = 0;
+                writecounter = 0;
                 break;
             }
         default: //
             {
-                this->setCursor(Qt::ArrowCursor);
-                ui->btnInitialize->setEnabled(true);
-                ui->buttonBox->setEnabled(true);
-                boolFirsttime = true;
+//                this->setCursor(Qt::ArrowCursor);
+//                ui->btnInitialize->setEnabled(true);
+//                ui->buttonBox->setEnabled(true);
+//                boolFirsttime = true;
+//                State = 0;
                 break;
             }
         }
@@ -619,7 +618,7 @@ void DialogPreferences::output(QString data)
                 writeformats = initializeformats(data);
                 foreach (QString x, writeformats)
                 {
-//                    qInfo() << "j: " << j << "i: " << i;
+                    qInfo() << "j: " << j << "i: " << i;
                     if (i % 2)
                     { //if odd then description
     //                    qInfo() << "Odd" << i;
@@ -642,6 +641,7 @@ void DialogPreferences::output(QString data)
                 if (State == 2)
                 {
                     readconfigs = getConfig(data);
+
                     if (readcounter < readformats.size())
                     {
                         //types are add even
@@ -803,7 +803,7 @@ void DialogPreferences::on_tabWidget_currentChanged(int index)
             } else
             {
                 readformat.append(settings.value(QString::number(i)).toString());
-                if (settings.value(QString::number(i)).toString().contains("ibm"))
+                if (settings.value(QString::number(i)).toString() == "ibm")
                     j = i;
 
     //            qInfo() << "Readformat " << settings.value(QString::number(i)).toString();
@@ -840,7 +840,7 @@ void DialogPreferences::on_tabWidget_currentChanged(int index)
             } else
             {
                 writeformat.append(settings.value(QString::number(i)).toString());
-                if (settings.value(QString::number(i)).toString().contains("ibm1440"))
+                if (settings.value(QString::number(i)).toString() == "ibm1440")
                     j = i;
 
     //            qInfo() << "Readformat " << settings.value(QString::number(i)).toString();
