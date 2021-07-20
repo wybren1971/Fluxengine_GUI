@@ -87,7 +87,7 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
     ui->progressBar->setMinimum(0);
     ui->progressBar->setMaximum(40); //near enough it gets updated when we now it precise
     ui->progressBar->setValue(0);
-    ui->txtoutput->setVisible(true); //for debug purposes on windows
+    ui->txtoutput->setVisible(false); //for debug purposes on windows
     readcounter = 0;
     writecounter = 0;
     State = 0;
@@ -184,8 +184,8 @@ void DialogPreferences::browse()
 
 void DialogPreferences::enablecommands(bool running)
 {
-    qInfo() << Q_FUNC_INFO;
-    qInfo() << running;
+//    qInfo() << Q_FUNC_INFO;
+//    qInfo() << running;
     if (running)
     {
         waitforfluzenginetofinish = true;
@@ -231,8 +231,8 @@ void DialogPreferences::initializefluxengine()
         QStringList readformat;
         QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
         int i =0;
-        int j = 0;
-        qInfo() << Q_FUNC_INFO;
+//        int j = 0;
+//        qInfo() << Q_FUNC_INFO;
         settings.beginGroup("readformats");
         while (settings.value(QString::number(i)) != "")
         {
@@ -314,7 +314,7 @@ void DialogPreferences::initializefluxengine()
             case 0:
             {
                 m_fluxengine.setAddress("read");
-                qInfo() << State;
+//                qInfo() << State;
                 m_fluxengine.start();
                 waitforfluzenginetofinish = true;
                 ui->progressBar->setValue(1);
@@ -323,7 +323,7 @@ void DialogPreferences::initializefluxengine()
             case 1:
             {
                 m_fluxengine.setAddress("write");
-                qInfo() << "address" << m_fluxengine.getAddress();
+//                qInfo() << "address" << m_fluxengine.getAddress();
 //                m_fluxengine.startdirect();
                 m_fluxengine.start();
                 waitforfluzenginetofinish = true;
@@ -338,7 +338,7 @@ void DialogPreferences::initializefluxengine()
                 if (readcounter < intTotal)
                 {
                     m_fluxengine.setAddress(m_address + " " + readformats.at(readcounter) + " -C");
-                    qInfo() << State;
+//                    qInfo() << State;
 //                    m_fluxengine.startdirect();
                     m_fluxengine.start();
                     waitforfluzenginetofinish = true;
@@ -355,7 +355,7 @@ void DialogPreferences::initializefluxengine()
                 if (writecounter < intTotal)
                 {
                     m_fluxengine.setAddress(m_address + " " + writeformats.at(writecounter) + " -C");
-                    qInfo() << State;
+ //                   qInfo() << State;
 //                    m_fluxengine.startdirect();
                     m_fluxengine.start();
                     waitforfluzenginetofinish = true;
@@ -366,7 +366,7 @@ void DialogPreferences::initializefluxengine()
             case 4:
             {
                 //ready
-                qInfo() << "State" << State;
+ //               qInfo() << "State" << State;
                 ui->progressBar->setValue(ui->progressBar->maximum());
                 this->setCursor(Qt::ArrowCursor);
                 ui->btnInitialize->setEnabled(true);
@@ -618,7 +618,7 @@ void DialogPreferences::output(QString data)
                 writeformats = initializeformats(data);
                 foreach (QString x, writeformats)
                 {
-                    qInfo() << "j: " << j << "i: " << i;
+//                    qInfo() << "j: " << j << "i: " << i;
                     if (i % 2)
                     { //if odd then description
     //                    qInfo() << "Odd" << i;
@@ -776,15 +776,15 @@ void DialogPreferences::save()
 }
 
 void DialogPreferences::on_tabWidget_currentChanged(int index)
-{   qInfo() << index;
+{//   qInfo() << index;
     if (index == 2)
     {
-        qInfo() << ui->cmbDefaultreadformat->count();
+ //       qInfo() << ui->cmbDefaultreadformat->count();
         for (int i = ui->cmbDefaultreadformat->count(); i >= 0;i--)
         {
             ui->cmbDefaultreadformat->removeItem(i);
         }
-        qInfo() << ui->cmbDefaultwriteformat->count();
+//        qInfo() << ui->cmbDefaultwriteformat->count();
         for (int i = ui->cmbDefaultwriteformat->count(); i >= 0 ;i--)
         {
             ui->cmbDefaultwriteformat->removeItem(i);
