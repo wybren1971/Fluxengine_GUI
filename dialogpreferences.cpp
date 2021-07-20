@@ -308,6 +308,9 @@ void DialogPreferences::initializefluxengine()
             settings.remove(""); //removes the group, and all it keys
             settings.endGroup();
         }
+        settings.setValue("defaultreadformat", "");
+        settings.setValue("defaultwriteformat", "");
+
         boolFirsttime = false;
     }
     if (!waitforfluzenginetofinish)
