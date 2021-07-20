@@ -28,6 +28,8 @@ private slots:
     void output(QString data);
     void enablecommands(bool running);
     void browsecsv();
+    void on_tabWidget_currentChanged(int index);
+
 private:
     Ui::DialogPreferences *ui;
     fluxengine m_fluxengine;
