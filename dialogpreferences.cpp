@@ -51,6 +51,7 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
         if (ui->checkBox->isChecked())
         {
             on_checkBox_stateChanged(2);
+            ui->cmbSerialports->addItem(settings.value("GreasewaezlePort").toString());
         } else
         {
             on_checkBox_stateChanged(0);
@@ -759,6 +760,7 @@ void DialogPreferences::save()
     settings.setValue("UseGreaseWaezle", ui->checkBox->isChecked());
     if (ui->checkBox->isChecked())
     {
+        qInfo() << "selected port: " << ui->cmbSerialports->currentText(); //problem if tAB IS NOT VISITED
         settings.setValue("GreasewaezlePort", ui->cmbSerialports->currentText());
     } else
     {
@@ -900,10 +902,10 @@ void DialogPreferences::on_tabWidget_currentChanged(int index)
         const auto infos = QSerialPortInfo::availablePorts();
         j = 0;
   //      qInfo() << "serialports count: " << ui->cmbSerialports->count();
-        for (i=ui->cmbSerialports->count(); i>=1;i--)
+        for (i=ui->cmbSerialports->count(); i>=0;i--)
         {
 //            qInfo() << "remove port: " << i;
-            ui->cmbSerialports->removeItem(i-1);
+            ui->cmbSerialports->removeItem(i);
         }
         i = 0;
         for (const QSerialPortInfo &info : infos) {
