@@ -347,6 +347,21 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="USB">
+      <attribute name="title">
+       <string>USB</string>
+      </attribute>
+      <widget class="QComboBox" name="cmbSerialports">
+       <property name="geometry">
+        <rect>
+         <x>95</x>
+         <y>120</y>
+         <width>281</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
     </widget>
    </item>
    <item>

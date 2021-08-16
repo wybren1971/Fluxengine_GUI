@@ -1,6 +1,8 @@
 #include "dialogpreferences.h"
 #include "ui_dialogpreferences.h"
 #include <QtWidgets>
+#include <QtSerialPort/QSerialPortInfo>
+#include <QtSerialPort/qserialportinfo.h>
 
 QString numberofcommands;
 bool boolFirsttime;
@@ -774,96 +776,3 @@ void DialogPreferences::save()
     }
     settings.setValue("NUMBER_OF_COMMANDS", ui->intNumberofcommands->text());
 }
-
-void DialogPreferences::on_tabWidget_currentChanged(int index)
-{//   qInfo() << index;
-    if (index == 2)
-    {
- //       qInfo() << ui->cmbDefaultreadformat->count();
-        for (int i = ui->cmbDefaultreadformat->count(); i >= 0;i--)
-        {
-            ui->cmbDefaultreadformat->removeItem(i);
-        }
-//        qInfo() << ui->cmbDefaultwriteformat->count();
-        for (int i = ui->cmbDefaultwriteformat->count(); i >= 0 ;i--)
-        {
-            ui->cmbDefaultwriteformat->removeItem(i);
-        }
-        QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
-        QStringList readformat;
-        int i =0;
-        int j = 0;
-    //    qInfo() << Q_FUNC_INFO;
-        settings.beginGroup("readformats");
-        while (settings.value(QString::number(i)) != "")
-        {
-            if (settings.value(QString::number(i)).toString() == "")
-            {
-                break;
-            } else
-            {
-                readformat.append(settings.value(QString::number(i)).toString());
-                if (settings.value(QString::number(i)).toString() == "ibm")
-                    j = i;
-
-    //            qInfo() << "Readformat " << settings.value(QString::number(i)).toString();
-    //            qInfo() << "i: " << i;
-                i++;
-            }
-        }
-        settings.endGroup();
-        settings.beginGroup("readformatsdescription");
-        for (i = 0; i < readformat.size();i++)
-        {
-            ui->cmbDefaultreadformat->addItem(settings.value(QString::number(i)).toString());
-        }
-        settings.endGroup();
-        if (settings.value("defaultreadformat").toString() == "")
-            //not defined
-        {
-            ui->cmbDefaultreadformat->setCurrentIndex(j);
-        } else
-        {
-            ui->cmbDefaultreadformat->setCurrentIndex(settings.value("defaultreadformat").toInt());
-        }
-
-        QStringList writeformat;
-        i =0;
-        j = 0;
-    //    qInfo() << Q_FUNC_INFO;
-        settings.beginGroup("writeformats");
-        while (settings.value(QString::number(i)) != "")
-        {
-            if (settings.value(QString::number(i)).toString() == "")
-            {
-                break;
-            } else
-            {
-                writeformat.append(settings.value(QString::number(i)).toString());
-                if (settings.value(QString::number(i)).toString() == "ibm1440")
-                    j = i;
-
-    //            qInfo() << "Readformat " << settings.value(QString::number(i)).toString();
-    //            qInfo() << "i: " << i;
-                i++;
-            }
-        }
-        settings.endGroup();
-        settings.beginGroup("writeformatsdescription");
-        for (i = 0; i < writeformat.size();i++)
-        {
-            ui->cmbDefaultwriteformat->addItem(settings.value(QString::number(i)).toString());
-        }
-        settings.endGroup();
-        if (settings.value("defaultwriteformat").toString() == "")
-            //not defined
-        {
-            ui->cmbDefaultwriteformat->setCurrentIndex(j);
-        } else
-        {
-            ui->cmbDefaultwriteformat->setCurrentIndex(settings.value("defaultwriteformat").toInt());
-        }
-    }
-
-}
-

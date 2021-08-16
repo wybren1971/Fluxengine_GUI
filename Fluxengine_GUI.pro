@@ -11,6 +11,7 @@ DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 APP_NAME = "%{FLuxengine_GUI}"
 COMPANY_NAME = "Wybren van Duinen"
 
+QT +=serialport
 # add defines
 DEFINES += AppName='"\\\\\\"$$APP_NAME\\\\\\""'
 DEFINES += CompanyName='"\\\\\\"COMPANY_NAME\\\\\\""'
