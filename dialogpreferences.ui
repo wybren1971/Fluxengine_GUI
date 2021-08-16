@@ -19,11 +19,21 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
-   <item>
+  <layout class="QGridLayout" name="gridLayout_8">
+   <item row="1" column="0">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="System">
       <attribute name="title">
@@ -351,27 +361,52 @@
       <attribute name="title">
        <string>USB</string>
       </attribute>
-      <widget class="QComboBox" name="cmbSerialports">
-       <property name="geometry">
-        <rect>
-         <x>95</x>
-         <y>120</y>
-         <width>281</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
+      <layout class="QGridLayout" name="gridLayout_10">
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="groupBox_8">
+         <property name="title">
+          <string>Select greaseweazle port:</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_9">
+          <item row="1" column="1">
+           <widget class="QComboBox" name="cmbSerialports"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>Serial Port for Greaseweazle:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="checkBox">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If the hardware used to write a floppy is a greaseweazle. checking this box allows to set the usb (serial) port used by greaseweazle.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Using a greaseweazle?</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="pushButton">
+            <property name="text">
+             <string>Refresh ports</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QPlainTextEdit" name="txtPortInfo">
+         <property name="plainText">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
-    </widget>
-   </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
     </widget>
    </item>
   </layout>

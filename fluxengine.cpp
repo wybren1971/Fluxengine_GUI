@@ -234,6 +234,7 @@ QString fluxengine::getProcess()
 void fluxengine::startFluxengine()
 {
     QByteArray command;
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
 
     if(QSysInfo::productType() == "windows")
     {
@@ -242,10 +243,20 @@ void fluxengine::startFluxengine()
     {
         command = ("\"" + m_workingdirectory + "\" " + m_address).toUtf8();
     }
+//    qInfo() << "expressie: " << (settings.value("UseGreaseWaezle").toBool() && m_address != "read" && m_address != "write" && !m_address.contains(" -C") && !m_address.contains(" -C"));
+    if (settings.value("UseGreaseWaezle").toBool() && m_address != "read" && m_address != "write" && !m_address.contains(" -C") && !m_address.contains(" -C"))
+    {
+//        qInfo() << "m_address: " + m_address;
+        //using a greaseweazle add parameter for fluxengine client
+        command.append(" --usb.greaseweazle=");
+        QString GreaseWeazlePort = settings.value("GreasewaezlePort").toString();
+        command.append(GreaseWeazlePort.toUtf8());
+    }
 //    qInfo() << "command: " << command;
     if(QSysInfo::productType() == "windows") command.append("\r");
     command.append("\n");
     m_process.write(command);
+//    qInfo() << "Command: " + command;
     if (m_address.contains(".imd", Qt::CaseInsensitive) || m_address.isEmpty())
         //give user option to write comment for an imd file
     {

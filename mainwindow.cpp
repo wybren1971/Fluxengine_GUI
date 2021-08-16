@@ -82,6 +82,8 @@ MainWindow::MainWindow(QWidget *parent)
     createActions();
     createMenus();
     setDrive();
+    setGreasewaezle();
+
     setWindowTitle(tr("Fluxengine-GUI"));
     if (settings.value("fluxengine").toString() == "")
         blnFirsttime = true;
@@ -93,6 +95,7 @@ MainWindow::MainWindow(QWidget *parent)
     if (height == 0)
         height = 600;
     this->resize(width, height);
+
     if (settings.value("showanalyzebutton").toString() == "")
     {
         ui->btnAnalyse->setVisible(false);
@@ -189,6 +192,7 @@ void MainWindow::preference()
     form->setWindowTitle("Preferences Fluxengine_GUI");
     form->exec();
     setDrive();
+    setGreasewaezle();
     ui->btnAnalyse->setVisible(settings.value("showanalyzebutton") == "true");
     ui->btnInspect->setVisible(settings.value("showinspectbutton") == "true");
 
@@ -296,6 +300,19 @@ void MainWindow::setDrive()
     }
 }
 
+void MainWindow::setGreasewaezle()
+{
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    if (settings.value("UseGreaseWaezle").toString() == "")
+    {
+        ui->btntestVoltages->setVisible(true);
+        ui->btntestbandwidth->setVisible(true);
+    } else
+    {
+        ui->btntestVoltages->setVisible(!settings.value("UseGreaseWaezle").toBool());
+        ui->btntestbandwidth->setVisible(!settings.value("UseGreaseWaezle").toBool());
+    }
+}
 void MainWindow::createActions()
 {
     openAct = new QAction(tr("&Fluxengine wizard..."), this);

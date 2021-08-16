@@ -117,5 +117,6 @@ private:
         QAction *aboutAct;
         QAction *aboutQtAct;
         void setDrive();
+        void setGreasewaezle();
 };
 #endif

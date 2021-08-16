@@ -30,6 +30,12 @@ private slots:
     void browsecsv();
     void on_tabWidget_currentChanged(int index);
 
+    void on_checkBox_stateChanged(int arg1);
+
+    void on_cmbSerialports_currentIndexChanged(int index);
+
+    void on_pushButton_clicked();
+
 private:
     Ui::DialogPreferences *ui;
     fluxengine m_fluxengine;

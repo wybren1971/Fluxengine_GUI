@@ -44,6 +44,19 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
     {
         ui->chkShowInspectButton->setChecked(settings.value("showinspectbutton").toBool());
     }
+    if (settings.value("UseGreaseWaezle").toString() != "")
+    {
+
+        ui->checkBox->setChecked(settings.value("UseGreaseWaezle").toBool());
+        if (ui->checkBox->isChecked())
+        {
+            on_checkBox_stateChanged(2);
+        } else
+        {
+            on_checkBox_stateChanged(0);
+        }
+    }
+
 
     numberofcommands = settings.value("NUMBER_OF_COMMANDS").toString();
     boolFirsttime = true;
@@ -743,8 +756,17 @@ void DialogPreferences::save()
     settings.setValue("csvlocation", ui->cmbcsvlocation->currentText());
     settings.setValue("showanalyzebutton", ui->chkShowAnalyzeButton->isChecked());
     settings.setValue("showinspectbutton", ui->chkShowInspectButton->isChecked());
+    settings.setValue("UseGreaseWaezle", ui->checkBox->isChecked());
+    if (ui->checkBox->isChecked())
+    {
+        settings.setValue("GreasewaezlePort", ui->cmbSerialports->currentText());
+    } else
+    {
+        settings.remove("GreasewaezlePort");
+    }
     settings.setValue("defaultreadformat", ui->cmbDefaultreadformat->currentIndex());
     settings.setValue("defaultwriteformat", ui->cmbDefaultwriteformat->currentIndex());
+
     if (ui->intNumberofcommands->text().toInt() < numberofcommands.toInt())
     {
         //Clear the remaining
@@ -776,3 +798,187 @@ void DialogPreferences::save()
     }
     settings.setValue("NUMBER_OF_COMMANDS", ui->intNumberofcommands->text());
 }
+
+void DialogPreferences::on_tabWidget_currentChanged(int index)
+{
+    QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+    int i;
+    int j;
+//    qInfo() << "index; " << index;
+    if (index == 2)
+    {
+//        qInfo() << ui->cmbDefaultreadformat->count();
+        for (int i = ui->cmbDefaultreadformat->count(); i >= 0;i--)
+        {
+            ui->cmbDefaultreadformat->removeItem(i);
+        }
+//        qInfo() << ui->cmbDefaultwriteformat->count();
+        for (int i = ui->cmbDefaultwriteformat->count(); i >= 0 ;i--)
+        {
+            ui->cmbDefaultwriteformat->removeItem(i);
+        }
+        QSettings settings("Fluxengine_GUI", "Fluxengine_GUI");
+        QStringList readformat;
+        int i =0;
+        int j = 0;
+    //    qInfo() << Q_FUNC_INFO;
+        settings.beginGroup("readformats");
+        while (settings.value(QString::number(i)) != "")
+        {
+            if (settings.value(QString::number(i)).toString() == "")
+            {
+                break;
+            } else
+            {
+                readformat.append(settings.value(QString::number(i)).toString());
+                if (settings.value(QString::number(i)).toString() == "ibm")
+                    j = i;
+
+    //            qInfo() << "Readformat " << settings.value(QString::number(i)).toString();
+    //            qInfo() << "i: " << i;
+                i++;
+            }
+        }
+        settings.endGroup();
+        settings.beginGroup("readformatsdescription");
+        for (i = 0; i < readformat.size();i++)
+        {
+            ui->cmbDefaultreadformat->addItem(settings.value(QString::number(i)).toString());
+        }
+        settings.endGroup();
+        if (settings.value("defaultreadformat").toString() == "")
+            //not defined
+        {
+            ui->cmbDefaultreadformat->setCurrentIndex(j);
+        } else
+        {
+            ui->cmbDefaultreadformat->setCurrentIndex(settings.value("defaultreadformat").toInt());
+        }
+
+        QStringList writeformat;
+        i =0;
+        j = 0;
+    //    qInfo() << Q_FUNC_INFO;
+        settings.beginGroup("writeformats");
+        while (settings.value(QString::number(i)) != "")
+        {
+            if (settings.value(QString::number(i)).toString() == "")
+            {
+                break;
+            } else
+            {
+                writeformat.append(settings.value(QString::number(i)).toString());
+                if (settings.value(QString::number(i)).toString() == "ibm1440")
+                    j = i;
+
+    //            qInfo() << "Readformat " << settings.value(QString::number(i)).toString();
+    //            qInfo() << "i: " << i;
+                i++;
+            }
+        }
+        settings.endGroup();
+        settings.beginGroup("writeformatsdescription");
+        for (i = 0; i < writeformat.size();i++)
+        {
+            ui->cmbDefaultwriteformat->addItem(settings.value(QString::number(i)).toString());
+        }
+        settings.endGroup();
+        if (settings.value("defaultwriteformat").toString() == "")
+            //not defined
+        {
+            ui->cmbDefaultwriteformat->setCurrentIndex(j);
+        } else
+        {
+            ui->cmbDefaultwriteformat->setCurrentIndex(settings.value("defaultwriteformat").toInt());
+        }
+    }
+
+    if (index == 3)
+    {
+        QString Greaseweazle;
+        Greaseweazle = settings.value("GreasewaezlePort").toString();
+        const auto infos = QSerialPortInfo::availablePorts();
+        j = 0;
+  //      qInfo() << "serialports count: " << ui->cmbSerialports->count();
+        for (i=ui->cmbSerialports->count(); i>=1;i--)
+        {
+//            qInfo() << "remove port: " << i;
+            ui->cmbSerialports->removeItem(i-1);
+        }
+        i = 0;
+        for (const QSerialPortInfo &info : infos) {
+            QString s = info.systemLocation();
+            ui->cmbSerialports->addItem(s);
+            ui->cmbSerialports->setCurrentIndex(j);
+//            qInfo() << "Greaseweazle: " << settings.value("GreasewaezlePort").toString();
+//            qInfo() << "s: " << s;
+            if (Greaseweazle == "")
+            {
+               //no setting made. check description for Greaseweazle
+               if (info.description() == "Greaseweazle" || info.manufacturer() == "Keir Fraser")
+               {
+//                   qInfo() << "description: " << info.description();
+                   i = j;
+               }
+            } else
+            {
+                if (s == Greaseweazle)
+                {
+                    i = j;
+                }
+            }
+            j++;
+        }
+//        qInfo() << "i= " << i;
+//        qInfo() << "j= " << j;
+        if (ui->cmbSerialports->count() == 0)
+        {
+            ui->cmbSerialports->addItem("No Serial ports found");
+        }
+        ui->cmbSerialports->setCurrentIndex(i);
+    }
+}
+
+
+void DialogPreferences::on_checkBox_stateChanged(int arg1)
+{
+//    qInfo() << arg1;
+    if (arg1 == Qt::Checked)
+    {
+        ui->cmbSerialports->setDisabled(false);
+        ui->txtPortInfo->setDisabled(false);
+        ui->pushButton->setDisabled(false);
+    } else
+    {
+        ui->cmbSerialports->setDisabled(true);
+        ui->txtPortInfo->setDisabled(true);
+        ui->pushButton->setDisabled(true);
+    }
+}
+
+
+void DialogPreferences::on_cmbSerialports_currentIndexChanged(int index)
+{
+    if (index >= 0)
+    {
+//        qInfo() << "index" << index;
+        const auto infos = QSerialPortInfo::availablePorts();
+
+        QString s = QObject::tr("Port: ") + infos.at(index).portName() + "\n"
+                + QObject::tr("Location: ") + infos.at(index).systemLocation() + "\n"
+                + QObject::tr("Description: ") + infos.at(index).description() + "\n"
+                + QObject::tr("Manufacturer: ") + infos.at(index).manufacturer() + "\n"
+                + QObject::tr("Serial number: ") + infos.at(index).serialNumber() + "\n"
+                + QObject::tr("Vendor Identifier: ") + (infos.at(index).hasVendorIdentifier() ? QString::number(infos.at(index).vendorIdentifier(), 16) : QString()) + "\n"
+                + QObject::tr("Product Identifier: ") + (infos.at(index).hasProductIdentifier() ? QString::number(infos.at(index).productIdentifier(), 16) : QString()) + "\n";
+        ui->txtPortInfo->clear();
+        ui->txtPortInfo->insertPlainText(s);
+    }
+}
+
+
+void DialogPreferences::on_pushButton_clicked()
+{
+    DialogPreferences::on_tabWidget_currentChanged(3);
+}
+
