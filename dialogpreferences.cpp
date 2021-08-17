@@ -58,7 +58,6 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
         }
     }
 
-
     numberofcommands = settings.value("NUMBER_OF_COMMANDS").toString();
     boolFirsttime = true;
     if (settings.value("NUMBER_OF_COMMANDS").toString() == "")
@@ -766,9 +765,11 @@ void DialogPreferences::save()
     {
         settings.remove("GreasewaezlePort");
     }
-    settings.setValue("defaultreadformat", ui->cmbDefaultreadformat->currentIndex());
-    settings.setValue("defaultwriteformat", ui->cmbDefaultwriteformat->currentIndex());
-
+    if (ui->cmbDefaultreadformat->count() > 1 && ui->cmbDefaultwriteformat->count() > 1 )
+    {   //populated with items en default is set. <=1 just initial filling. dont save.
+        settings.setValue("defaultreadformat", ui->cmbDefaultreadformat->currentIndex());
+        settings.setValue("defaultwriteformat", ui->cmbDefaultwriteformat->currentIndex());
+    }
     if (ui->intNumberofcommands->text().toInt() < numberofcommands.toInt())
     {
         //Clear the remaining
