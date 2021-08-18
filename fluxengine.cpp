@@ -244,7 +244,7 @@ void fluxengine::startFluxengine()
         command = ("\"" + m_workingdirectory + "\" " + m_address).toUtf8();
     }
 //    qInfo() << "expressie: " << (settings.value("UseGreaseWaezle").toBool() && m_address != "read" && m_address != "write" && !m_address.contains(" -C") && !m_address.contains(" -C"));
-    if (settings.value("UseGreaseWaezle").toBool() && m_address != "read" && m_address != "write" && !m_address.contains(" -C") && !m_address.contains(" -C"))
+    if (settings.value("UseGreaseWaezle").toBool() && m_address != "read" && m_address != "write" && !m_address.contains(" -C", Qt::CaseSensitive) && !m_address.contains(" -C", Qt::CaseSensitive))
     {
 //        qInfo() << "m_address: " + m_address;
         //using a greaseweazle add parameter for fluxengine client
