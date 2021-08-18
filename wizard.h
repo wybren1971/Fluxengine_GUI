@@ -159,13 +159,15 @@ private:
     QLabel *clock_intervalLabel;
     QLabel *syncLabel;
     QLabel *syncLabelexplain;
+    QLabel *bit_error_thresholdLabelexplain;
+    QLabel *bit_error_thresholdLabel;
 
     QLineEdit *revolutionsEdit;
     QCheckBox *syncEdit;
     QLineEdit *retriesEdit;
     QLineEdit *debounceLabelEdit;
     QLineEdit *clock_intervalLabelEdit;
-
+    QLineEdit *bit_error_thresholdLabelEdit;
 };
 
 //! [6]

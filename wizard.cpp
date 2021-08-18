@@ -32,6 +32,7 @@ QString sync_with_index = " --flux_source.drive.sync_with_index=";
 QString retries = " --decoder.retries=";
 QString clock_interval_bias = " --decoder.clock_interval_bias ";
 QString pulse_debounce_threshold = " --decoder.pulse_debounce_threshold ";
+QString bit_error_threshold = " --decoder.bit_error_threshold=";
 
 QVector<QVector<QString>> my_readformat;
 QVector<QVector<QString>> my_writeformat;
@@ -1035,30 +1036,35 @@ AdvancedPage::AdvancedPage(QWidget *parent)
     syncLabelexplain = new QLabel;
     debounceLabelexplain = new QLabel;
     clock_intervalLabelexplain = new QLabel;
+    bit_error_thresholdLabelexplain = new QLabel;
 
     revolutionsLabel = new QLabel;
     syncLabel = new QLabel;
     retriesLabel = new QLabel;
     debounceLabel = new QLabel;
     clock_intervalLabel = new QLabel;
+    bit_error_thresholdLabel = new QLabel;
 
     revolutionsEdit = new QLineEdit;
     syncEdit = new QCheckBox;
     retriesEdit = new QLineEdit;
     debounceLabelEdit = new QLineEdit;
     clock_intervalLabelEdit = new QLineEdit;
+    bit_error_thresholdLabelEdit = new QLineEdit;
 
     revolutionsLabelexplain->setWordWrap(true);
     retriesLabelexplain->setWordWrap(true);
     syncLabelexplain->setWordWrap(true);
     debounceLabelexplain->setWordWrap(true);
     clock_intervalLabelexplain->setWordWrap(true);
+    bit_error_thresholdLabelexplain->setWordWrap(true);
 
     revolutionsLabelexplain->setText("When reading, spin the disk X times. X can be a floating point number. The default is usually 1.2. Some formats default to 1. Increasing the number will sample more data, and can be useful on dubious disks to try and get a better read.");
     retriesLabelexplain->setText("If the disk is particularly dodgy, you can force FluxEngine not to retry failed reads with --retries=0. This reduces head movement. This is not recommended.");
     syncLabelexplain->setText("Wait for an index pulse before starting to read the disk. (Ignored for write operations.) By default FluxEngine doesn't, as it makes reads faster, but when diagnosing disk problems it's helpful to have all your data start at the same place each time.");
     debounceLabelexplain->setText("pulse_debounce_threshold controls whether FluxEngine ignores pairs of pulses in rapid succession. This is common on some disks (I've observed them on Brother word processor disks). The value typically varies from 0.0 to 0.5; the default is 0.2.");
     clock_intervalLabelexplain->setText("clock_interval_bias adds a constant bias to the intervals between pulses before doing decodes. This is very occasionally necessary to get clean reads --- for example, if the machine which wrote the disk always writes pulses late. If you try this, use very small numbers (e.g. 0.02). Negative values are allowed.");
+    bit_error_thresholdLabelexplain->setText("The value of the parameter is the fraction of a clock of error to accept. The value typically varies from 0.0 to 0.5; the default is 0.2. Larger values make FluxEngine more tolerant, so trying 0.4 is the first thing to do when faced with a dubious disk. However, in some situations, increasing the value can actually increase the error rate --- which is why 0.4 isn't the default --- so you'll need to experiment.");
 
     QFont font = revolutionsLabelexplain->font();
     font.setPointSize(8);
@@ -1067,12 +1073,14 @@ AdvancedPage::AdvancedPage(QWidget *parent)
     syncLabelexplain->setFont(font);
     debounceLabelexplain->setFont(font);
     clock_intervalLabelexplain->setFont(font);
+    bit_error_thresholdLabelexplain->setFont(font);
 
     revolutionsLabel->setText("Revolutions:");
     syncLabel->setText("Wait for index pulse:");
     retriesLabel->setText("Number of retries:");
     debounceLabel->setText("Debounce value:");
     clock_intervalLabel->setText("constant bias:");
+    bit_error_thresholdLabel->setText("Bit error threshold:");
 
 //    QValidator *validator = new QValidator(1, 99, this);
 
@@ -1090,12 +1098,16 @@ AdvancedPage::AdvancedPage(QWidget *parent)
     QRegExp rx2("-?0?\\.\\d{0,3}");
     QValidator *clock_intervalvalidator = new QRegExpValidator(rx2, this);
     clock_intervalLabelEdit->setValidator(clock_intervalvalidator);
+    QRegExp rx3("0\\.\\d{0,2}");
+    QValidator *bit_error_thresholdvalidator = new QRegExpValidator(rx3, this);
+    bit_error_thresholdLabelEdit->setValidator(bit_error_thresholdvalidator);
 
     registerField("AdvancedPage.revolutions", revolutionsEdit);
     registerField("AdvancedPage.retries", retriesEdit);
     registerField("AdvancedPage.sync", syncEdit);
     registerField("AdvancedPage.clock_interval", clock_intervalLabelEdit);
     registerField("AdvancedPage.debounce", debounceLabelEdit);
+    registerField("AdvancedPage.bit_error_threshold", bit_error_thresholdLabelEdit);
 
     QGridLayout *layout = new QGridLayout;
     //layout->setSizeConstraint(layout->SetFixedSize);
@@ -1116,12 +1128,15 @@ AdvancedPage::AdvancedPage(QWidget *parent)
     layout->addWidget(syncLabel, 2, 0);
     layout->addWidget(syncEdit, 2, 1);
     layout->addWidget(syncLabelexplain, 2, 2);
-    layout->addWidget(clock_intervalLabel, 3, 0);
-    layout->addWidget(clock_intervalLabelEdit, 3, 1);
-    layout->addWidget(clock_intervalLabelexplain, 3, 2);
-    layout->addWidget(debounceLabel, 4, 0);
-    layout->addWidget(debounceLabelEdit, 4, 1);
-    layout->addWidget(debounceLabelexplain, 4, 2);
+    layout->addWidget(bit_error_thresholdLabel, 3, 0);
+    layout->addWidget(bit_error_thresholdLabelEdit, 3, 1);
+    layout->addWidget(bit_error_thresholdLabelexplain, 3, 2);
+    layout->addWidget(clock_intervalLabel, 4, 0);
+    layout->addWidget(clock_intervalLabelEdit, 4, 1);
+    layout->addWidget(clock_intervalLabelexplain, 4, 2);
+    layout->addWidget(debounceLabel, 5, 0);
+    layout->addWidget(debounceLabelEdit, 5, 1);
+    layout->addWidget(debounceLabelexplain, 5, 2);
     setLayout(layout);
 
 
@@ -1265,7 +1280,9 @@ QString ConclusionPage::getData()
            QString sync = field("AdvancedPage.sync").toString();
            QString clock_interval = field("AdvancedPage.clock_interval").toString();
            QString debounce = field("AdvancedPage.debounce").toString();
-//           qInfo() << retries;
+           QString strbit_error_threshold = field("AdvancedPage.bit_error_threshold").toString();
+
+           //           qInfo() << retries;
            if (strRetries != "")
            {
                strFormat.append(retries + strRetries);
@@ -1278,6 +1295,10 @@ QString ConclusionPage::getData()
            {
                strFormat.append(clock_interval_bias + clock_interval);
            }
+           if (strbit_error_threshold != "")
+           {
+               strFormat.append(bit_error_threshold + strbit_error_threshold);
+           }
            if (debounce != "")
            {
                strFormat.append(pulse_debounce_threshold + debounce);
@@ -1286,6 +1307,7 @@ QString ConclusionPage::getData()
            {
                strFormat.append(sync_with_index + sync);
            }
+
        }
        command.append(strFormat);
     }
