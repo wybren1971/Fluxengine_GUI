@@ -27,6 +27,12 @@ const int description = 5;
 const int filter = 6;
 const int type = 7;
 
+QString revolutions = " --flux_source.drive.revolutions=";
+QString sync_with_index = " --flux_source.drive.sync_with_index=";
+QString retries = " --decoder.retries=";
+QString clock_interval_bias = " --decoder.clock_interval_bias ";
+QString pulse_debounce_threshold = " --decoder.pulse_debounce_threshold ";
+
 QVector<QVector<QString>> my_readformat;
 QVector<QVector<QString>> my_writeformat;
 
@@ -1254,31 +1260,31 @@ QString ConclusionPage::getData()
        }
        if (field("ReadPage.Advanced") == "true")
        {
-           QString retries = field("AdvancedPage.retries").toString();
-           QString revolutions = field("AdvancedPage.revolutions").toString();
+           QString strRetries = field("AdvancedPage.retries").toString();
+           QString strrevolutions = field("AdvancedPage.revolutions").toString();
            QString sync = field("AdvancedPage.sync").toString();
            QString clock_interval = field("AdvancedPage.clock_interval").toString();
            QString debounce = field("AdvancedPage.debounce").toString();
 //           qInfo() << retries;
-           if (retries != "")
+           if (strRetries != "")
            {
-               strFormat.append(" --decoder.retries=" + retries);
+               strFormat.append(retries + strRetries);
            }
-           if (revolutions != "")
+           if (strrevolutions != "")
            {
-               strFormat.append(" --input.flux.drive.revolutions=" + revolutions);
+               strFormat.append(revolutions + strrevolutions);
            }
            if (clock_interval != "")
            {
-               strFormat.append(" --decoder.clock_interval_bias " + clock_interval);
+               strFormat.append(clock_interval_bias + clock_interval);
            }
            if (debounce != "")
            {
-               strFormat.append(" --decoder.pulse_debounce_threshold " + debounce);
+               strFormat.append(pulse_debounce_threshold + debounce);
            }
            if (sync ==  "true")
            {
-               strFormat.append(" --input.flux.drive.sync_with_index="+sync);
+               strFormat.append(sync_with_index + sync);
            }
        }
        command.append(strFormat);
