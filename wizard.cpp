@@ -30,8 +30,8 @@ const int type = 7;
 QString revolutions = " --flux_source.drive.revolutions=";
 QString sync_with_index = " --flux_source.drive.sync_with_index=";
 QString retries = " --decoder.retries=";
-QString clock_interval_bias = " --decoder.clock_interval_bias ";
-QString pulse_debounce_threshold = " --decoder.pulse_debounce_threshold ";
+QString clock_interval_bias = " --decoder.clock_interval_bias=";
+QString pulse_debounce_threshold = " --decoder.pulse_debounce_threshold=";
 QString bit_error_threshold = " --decoder.bit_error_threshold=";
 
 QVector<QVector<QString>> my_readformat;
