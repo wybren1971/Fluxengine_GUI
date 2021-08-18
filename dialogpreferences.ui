@@ -369,7 +369,14 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_9">
           <item row="1" column="1">
-           <widget class="QComboBox" name="cmbSerialports"/>
+           <widget class="QComboBox" name="cmbSerialports">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the port your greaseweazle is connected to&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_6">
@@ -390,6 +397,12 @@
           </item>
           <item row="0" column="1">
            <widget class="QPushButton" name="pushButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rescan available serial ports on your system&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
              <string>Refresh ports</string>
             </property>
