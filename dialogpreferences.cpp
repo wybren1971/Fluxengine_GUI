@@ -87,7 +87,7 @@ DialogPreferences::DialogPreferences(QWidget *parent) :
     ui->progressBar->setMinimum(0);
     ui->progressBar->setMaximum(40); //near enough it gets updated when we now it precise
     ui->progressBar->setValue(0);
-    ui->txtoutput->setVisible(false); //for debug purposes on windows
+    ui->txtoutput->setVisible(true); //for debug purposes on windows
     readcounter = 0;
     writecounter = 0;
     State = 0;
@@ -449,6 +449,8 @@ QStringList DialogPreferences::initializeformats(QString data)
 //    9=brother120: Brother 120kB 3.5\" 39-track GCR disks
    if (data.contains("syntax: fluxengine read ") || (data.contains("syntax: fluxengine write ")))
    {
+       //stop before: Available profile options include:
+//       qInfo() << "Index " <<  data.indexOf("Available profile options include:");
        int i = 0;
         if (data.contains("fluxengine read "))
         {
@@ -457,9 +459,9 @@ QStringList DialogPreferences::initializeformats(QString data)
         {
             i = data.indexOf("fluxengine write ",0);
         }
-//        ui->txtoutput->appendPlainText("i: " + QString::number(i));
+        ui->txtoutput->appendPlainText("i: " + QString::number(i));
         int j = data.indexOf(":", i+1);
-//        ui->txtoutput->appendPlainText("j: " + QString::number(j));
+        ui->txtoutput->appendPlainText("j: " + QString::number(j));
         for (int x=0; x < data.size(); x++)
         {
             if(QSysInfo::productType() == "windows")
@@ -471,13 +473,15 @@ QStringList DialogPreferences::initializeformats(QString data)
                 i = data.indexOf("\n", j);
                 j = data.indexOf("\n", i+1);
             }
-//            ui->txtoutput->appendPlainText("enter at position: " + QString::number(i));
+            ui->txtoutput->appendPlainText("enter at position: " + QString::number(i));
 //            qInfo() << data.mid(i, j+1 - i).trimmed();
 //"acornadfs: Acorn ADFS L/D/E/F 640kB/800kB/1600kB 3.5\" or 5.25\" 80-track double-sided"
             QString typedescription = data.mid(i, j+1 - i).trimmed();
             int k = typedescription.indexOf(":",0);
 
             if (j == -1) break;
+            //Dont add profile options
+            if (j >= data.indexOf("Available profile options include:")) break;
             //append type
             int length = typedescription.size();
             Formats.append(typedescription.left(k).trimmed());
@@ -581,6 +585,10 @@ void DialogPreferences::output(QString data)
     if (data.size() > 1)
     {
         ui->txtoutput->appendPlainText(data.trimmed());
+    }
+    if (data.contains("denied"))
+    {
+        State = 4;
     }
     int i = 0;
     int j = 0;

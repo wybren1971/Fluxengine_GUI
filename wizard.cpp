@@ -331,6 +331,7 @@ int ReadPage::nextId() const
 
 void ReadPage::editLineBox(QString dir)
 {
+        qInfo() << dir;
         QList<QWidget*> mylineEdits = this->findChildren<QWidget*>();
         QListIterator<QWidget*> it(mylineEdits); // iterate through the list of widgets
         QWidget *lineEditField;
